@@ -37,6 +37,7 @@ export default function RootLayout({
     <html
       lang="pt-BR"
       className={`${manrope.variable} ${inter.variable} h-full`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-[#f7f9fb] text-[#191c1e]">
         {children}
