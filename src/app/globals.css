@@ -1,11 +1,14 @@
 @import "tailwindcss";
 
-@theme {
-  /* Tipografia */
-  --font-headline: "Manrope", sans-serif;
-  --font-body: "Inter", sans-serif;
+/* ============================================================================
+   DESIGN SYSTEM — The Architectural Legalist
+   ContratoFácil © 2026 FlowIQ
+   ============================================================================ */
 
-  /* Paleta Principal */
+@theme {
+  --font-headline: "Manrope", sans-serif;
+  --font-body:     "Inter", sans-serif;
+
   --color-primary:                   #002b73;
   --color-primary-container:         #0040a1;
   --color-on-primary:                #ffffff;
@@ -14,7 +17,6 @@
   --color-primary-fixed-dim:         #b2c5ff;
   --color-inverse-primary:           #b2c5ff;
 
-  /* Superfícies */
   --color-surface:                   #f7f9fb;
   --color-surface-bright:            #f7f9fb;
   --color-surface-dim:               #d8dadc;
@@ -24,34 +26,29 @@
   --color-surface-container-high:    #e6e8ea;
   --color-surface-container-highest: #e0e3e5;
 
-  /* Texto */
   --color-on-surface:                #191c1e;
   --color-on-surface-variant:        #434652;
   --color-on-background:             #191c1e;
 
-  /* Bordas */
   --color-outline:                   #747784;
   --color-outline-variant:           #c3c6d4;
 
-  /* Secundária */
   --color-secondary:                 #475d92;
   --color-secondary-container:       #adc3fe;
   --color-on-secondary-container:    #394f83;
 
-  /* Erro */
   --color-error:                     #ba1a1a;
   --color-error-container:           #ffdad6;
 
-  /* Inverso */
   --color-inverse-surface:           #2d3133;
   --color-inverse-on-surface:        #eff1f3;
-
-  /* Border radius padrão dos botões */
-  --radius-btn: 0.5rem;
 }
 
-/* Reset global */
-* {
+/* ============================================================================
+   RESET
+   ============================================================================ */
+
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -63,40 +60,85 @@ html {
 }
 
 body {
-  background-color: var(--color-surface);
-  color: var(--color-on-surface);
-  font-family: var(--font-body);
+  background-color: #f7f9fb;
+  color: #191c1e;
+  font-family: "Inter", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
-/* Gradiente Signature — CTAs e elementos primários */
+/* ============================================================================
+   UTILITY CLASSES — Brand colors (garante aplicação independente do Tailwind)
+   ============================================================================ */
+
+/* Backgrounds */
+.bg-primary                   { background-color: #002b73; }
+.bg-primary-container         { background-color: #0040a1; }
+.bg-primary-fixed             { background-color: #dae2ff; }
+.bg-primary-fixed-dim         { background-color: #b2c5ff; }
+.bg-surface                   { background-color: #f7f9fb; }
+.bg-surface-dim               { background-color: #d8dadc; }
+.bg-surface-container-lowest  { background-color: #ffffff; }
+.bg-surface-container-low     { background-color: #f2f4f6; }
+.bg-surface-container         { background-color: #eceef0; }
+.bg-surface-container-high    { background-color: #e6e8ea; }
+.bg-surface-container-highest { background-color: #e0e3e5; }
+.bg-secondary                 { background-color: #475d92; }
+.bg-secondary-container       { background-color: #adc3fe; }
+.bg-error                     { background-color: #ba1a1a; }
+.bg-error-container           { background-color: #ffdad6; }
+.bg-inverse-surface           { background-color: #2d3133; }
+
+/* Text colors */
+.text-primary                 { color: #002b73; }
+.text-on-primary              { color: #ffffff; }
+.text-on-primary-fixed        { color: #001848; }
+.text-primary-fixed           { color: #dae2ff; }
+.text-primary-fixed-dim       { color: #b2c5ff; }
+.text-on-surface              { color: #191c1e; }
+.text-on-surface-variant      { color: #434652; }
+.text-on-background           { color: #191c1e; }
+.text-outline                 { color: #747784; }
+.text-outline-variant         { color: #c3c6d4; }
+.text-secondary               { color: #475d92; }
+.text-secondary-container     { color: #adc3fe; }
+.text-on-secondary-container  { color: #394f83; }
+.text-error                   { color: #ba1a1a; }
+.text-inverse-surface         { color: #2d3133; }
+.text-inverse-on-surface      { color: #eff1f3; }
+
+/* Border colors */
+.border-primary               { border-color: #002b73; }
+.border-outline               { border-color: #747784; }
+.border-outline-variant       { border-color: #c3c6d4; }
+.border-error                 { border-color: #ba1a1a; }
+
+/* Ring colors */
+.ring-primary                 { --tw-ring-color: #002b73; }
+.ring-error                   { --tw-ring-color: #ba1a1a; }
+
+/* ============================================================================
+   COMPONENTES GLOBAIS
+   ============================================================================ */
+
+/* Gradiente Signature — CTAs e headers */
 .signature-gradient {
   background: linear-gradient(135deg, #0040a1 0%, #002b73 100%);
 }
 
-/* Glassmorphism — Header flutuante */
+/* Glassmorphism — Header */
 .glass-header {
-  background: rgba(247, 249, 251, 0.80);
+  background: rgba(247, 249, 251, 0.85);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
 }
 
-/* Ambient shadow — FABs e elementos flutuantes */
+/* Ambient shadow — FABs */
 .ambient-shadow {
   box-shadow: 0px 12px 32px rgba(25, 28, 30, 0.06);
 }
 
-/* Ghost border de acessibilidade */
-.ghost-border {
-  outline: 1px solid rgba(195, 198, 212, 0.15);
-}
-
-/* Tipografia utilitária */
-.font-headline {
-  font-family: var(--font-headline);
-}
-
-.font-body {
-  font-family: var(--font-body);
-}
+/* Scroll suave sem scrollbar visível */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
