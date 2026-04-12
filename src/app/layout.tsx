@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope, Inter } from "next/font/google";
 import "./globals.css";
+import LoginGuard from "@/components/auth/LoginGuard";
 
 const manrope = Manrope({
   variable: "--font-headline",
@@ -41,6 +42,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-[#f7f9fb] text-[#191c1e]">
         {children}
+        <LoginGuard />
       </body>
     </html>
   );
