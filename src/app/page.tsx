@@ -12,10 +12,10 @@ export default function Home() {
       <main className="flex-1 w-full max-w-7xl mx-auto px-6 pt-12 md:pt-24 pb-32">
 
         {/* ── Hero ── */}
-        <div className="flex flex-col md:flex-row gap-12 items-center">
+        <div className="flex flex-col lg:flex-row gap-12 items-center">
 
           {/* Coluna esquerda — texto */}
-          <div className="w-full md:w-3/5 space-y-8">
+          <div className="w-full lg:w-3/5 space-y-8">
 
             {/* Badge gratuito */}
             <div className="inline-flex items-center gap-2 bg-secondary-container px-4 py-2 rounded-full"
@@ -43,7 +43,7 @@ export default function Home() {
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row gap-4 pt-6">
               <Link href="/gerar"
                 className="signature-gradient text-on-primary px-8 py-4 rounded-lg font-bold uppercase tracking-wider text-sm hover:brightness-110 active:scale-[0.98] transition-all text-center"
                 style={{ fontFamily: "var(--font-body)", boxShadow: "0 12px 32px rgba(0,43,115,0.15)" }}>
@@ -58,7 +58,7 @@ export default function Home() {
           </div>
 
           {/* Coluna direita — bento decorativo */}
-          <div className="w-full md:w-2/5 overflow-hidden">
+          <div className="w-full lg:w-2/5 overflow-hidden shrink-0">
             <div className="grid grid-cols-2 gap-4">
 
               {/* Card rascunho — largura total */}
@@ -143,7 +143,7 @@ export default function Home() {
             Escolha como usar
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {[
               { nome: "Grátis",    preco: "R$ 0",    detalhe: "2 contratos/mês" },
               { nome: "Avulso",    preco: "R$ 4,90", detalhe: "por contrato", destaque: true, badge: "★ Popular" },

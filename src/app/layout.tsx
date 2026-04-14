@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, Inter } from "next/font/google";
-import "../globals.css";
+import "./globals.css";
 import LoginGuard from "@/components/auth/LoginGuard";
 
 const manrope = Manrope({
