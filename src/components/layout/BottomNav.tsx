@@ -17,7 +17,7 @@ export default function BottomNav() {
   return (
     <nav className="fixed bottom-0 left-0 w-full md:hidden z-50 flex justify-around items-center pt-2 pb-4 bg-surface-container-lowest/80 backdrop-blur-2xl shadow-[0px_-4px_24px_rgba(25,28,30,0.04)] border-t border-[rgba(195,198,212,0.15)]">
       {navItems.map(({ href, label, icon: Icon }) => {
-        const isActive = pathname === href || (href !== "/" && pathname.startsWith(href.split("?")[0]));
+        const isActive = pathname === href || (href !== "/" && pathname?.startsWith(href.split("?")[0]));
         return (
           <Link
             key={href}

@@ -1,7 +1,7 @@
 @import "tailwindcss";
-@source "./app";
-@source "./components";
-@source "./lib";
+@source "../src";
+@source "./";
+@source "./src";
 /* ============================================================================
    DESIGN SYSTEM — The Architectural Legalist
    ContratoFácil © 2026 FlowIQ
