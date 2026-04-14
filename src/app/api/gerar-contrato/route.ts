@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { gerarContrato } from "@/lib/grok";
+import { gerarContrato } from "@/lib/groq";
 import type { FormularioContrato, TipoContrato } from "@/types/contrato";
 
 const labelTipo: Record<TipoContrato, string> = {
