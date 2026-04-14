@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { FileText, Mail, Shield, Edit2, Download, ChevronRight, Loader2 } from "lucide-react";
 import ProgressRibbon from "@/components/ui/ProgressRibbon";
+import { createClient } from "@/lib/supabase/client";
+import type { User } from "@supabase/supabase-js";
 import type { FormularioContrato, TipoContrato } from "@/types/contrato";
 
 const tipos: { id: TipoContrato; label: string }[] = [
@@ -23,6 +25,23 @@ export default function VisualizadorContrato({ formulario }: VisualizadorContrat
   const [erro, setErro] = useState<string | null>(null);
   const [editando, setEditando] = useState(false);
   const [textoEditado, setTextoEditado] = useState("");
+  const [user, setUser] = useState<User | null>(null);
+  const [processandoDownload, setProcessandoDownload] = useState(false);
+  const supabase = createClient();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase]);
 
   const gerarTipo = useCallback(async (tipo: TipoContrato) => {
     if (conteudo[tipo]) return;
@@ -64,6 +83,52 @@ export default function VisualizadorContrato({ formulario }: VisualizadorContrat
     setConteudo((prev) => ({ ...prev, [tipoAtivo]: textoEditado }));
     setEditando(false);
   }
+
+  const baixarPdf = async () => {
+    if (!user) {
+      window.dispatchEvent(new CustomEvent("abrir-login", { detail: { acao: "baixar-pdf" } }));
+      return;
+    }
+
+    if (!conteudo[tipoAtivo]) return;
+
+    setProcessandoDownload(true);
+    setErro(null);
+
+    try {
+      // 1. Salvar contrato no BD RLS
+      const resSalvar = await fetch("/api/salvar-contrato", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          formulario,
+          tipo: tipoAtivo,
+          conteudo: conteudo[tipoAtivo]
+        })
+      });
+      const dataSalvar = await resSalvar.json();
+      if (!resSalvar.ok) throw new Error(dataSalvar.error || "Erro ao salvar contrato.");
+
+      const contratoId = dataSalvar.id;
+
+      // 2. Gerar arquivo PDF protegido
+      const resGerar = await fetch("/api/gerar-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contratoId })
+      });
+      const dataGerar = await resGerar.json();
+      if (!resGerar.ok) throw new Error(dataGerar.error || "Erro ao gerar PDF criptografado.");
+
+      // 3. Efetuar download privativo usando proxy assinado
+      window.location.href = `/api/baixar-pdf-salvo?id=${contratoId}`;
+      
+    } catch (e: any) {
+      setErro(e.message);
+    } finally {
+      setProcessandoDownload(false);
+    }
+  };
 
   const textoAtual = editando ? textoEditado : (conteudo[tipoAtivo] ?? "");
 
@@ -217,17 +282,29 @@ export default function VisualizadorContrato({ formulario }: VisualizadorContrat
 
             {/* CTA principal — dispara login */}
             <button
-              disabled={carregando || !conteudo[tipoAtivo]}
+              disabled={carregando || processandoDownload || !conteudo[tipoAtivo]}
               className="w-full signature-gradient text-on-primary rounded-2xl py-5 px-6 font-bold flex items-center justify-center gap-3 active:scale-[0.98] transition-all shadow-[0px_12px_32px_rgba(0,43,115,0.20)] mb-5 disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ fontFamily: "var(--font-body)" }}
-              onClick={() => {
-                // Login modal ativado aqui — implementado na próxima etapa
-                window.dispatchEvent(new CustomEvent("abrir-login", { detail: { acao: "baixar-pdf" } }));
-              }}
+              onClick={baixarPdf}
             >
-              <Download className="w-5 h-5" />
-              Baixar PDF
+              {processandoDownload ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
+              {processandoDownload ? "Processando..." : "Baixar PDF"}
             </button>
+
+            {/* Painel escondido p/ Testadores para evitar paywall */}
+            {user && (
+              <button
+                onClick={async () => {
+                  const res = await fetch("/api/dev/liberar-perfil");
+                  const data = await res.json();
+                  alert(data.message || "Testes liberados!");
+                }}
+                className="w-full text-center text-xs font-bold text-primary underline underline-offset-4 opacity-50 hover:opacity-100 transition-opacity mb-5"
+                style={{ fontFamily: "var(--font-body)" }}
+              >
+                🛠️ Modo Dev: Desbloquear Conta Grátis 🛠️
+              </button>
+            )}
 
             {/* Enviar por e-mail */}
             <button
