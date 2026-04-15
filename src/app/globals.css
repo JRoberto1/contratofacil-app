@@ -6,42 +6,71 @@
    ============================================================================ */
 
 @theme {
+  /* ── Tipografia ─────────────────────────────────────────────────────────── */
   --font-headline: "Manrope", sans-serif;
   --font-body:     "Inter", sans-serif;
+  --font-label:    "Inter", sans-serif;
 
+  /* ── Cores Primary ──────────────────────────────────────────────────────── */
   --color-primary:                   #002b73;
   --color-primary-container:         #0040a1;
   --color-on-primary:                #ffffff;
+  --color-on-primary-container:      #98b3ff;
   --color-on-primary-fixed:          #001848;
+  --color-on-primary-fixed-variant:  #0040a1;
   --color-primary-fixed:             #dae2ff;
   --color-primary-fixed-dim:         #b2c5ff;
   --color-inverse-primary:           #b2c5ff;
 
+  /* ── Cores Secondary ────────────────────────────────────────────────────── */
+  --color-secondary:                 #475d92;
+  --color-secondary-container:       #adc3fe;
+  --color-on-secondary:              #ffffff;
+  --color-on-secondary-container:    #394f83;
+  --color-secondary-fixed:           #d9e2ff;
+  --color-secondary-fixed-dim:       #b1c6ff;
+  --color-on-secondary-fixed:        #001946;
+  --color-on-secondary-fixed-variant:#2f4579;
+
+  /* ── Cores Tertiary ─────────────────────────────────────────────────────── */
+  --color-tertiary:                  #003642;
+  --color-tertiary-container:        #004e5f;
+  --color-on-tertiary:               #ffffff;
+  --color-on-tertiary-container:     #32c5e9;
+  --color-tertiary-fixed:            #b3ebff;
+  --color-tertiary-fixed-dim:        #4cd6fb;
+  --color-on-tertiary-fixed:         #001f27;
+  --color-on-tertiary-fixed-variant: #004e5f;
+
+  /* ── Surfaces ───────────────────────────────────────────────────────────── */
   --color-surface:                   #f7f9fb;
   --color-surface-bright:            #f7f9fb;
   --color-surface-dim:               #d8dadc;
+  --color-surface-variant:           #e0e3e5;
+  --color-surface-tint:              #2c59ba;
   --color-surface-container-lowest:  #ffffff;
   --color-surface-container-low:     #f2f4f6;
   --color-surface-container:         #eceef0;
   --color-surface-container-high:    #e6e8ea;
   --color-surface-container-highest: #e0e3e5;
+  --color-background:                #f7f9fb;
 
+  /* ── On-Surface ─────────────────────────────────────────────────────────── */
   --color-on-surface:                #191c1e;
   --color-on-surface-variant:        #434652;
   --color-on-background:             #191c1e;
+  --color-inverse-surface:           #2d3133;
+  --color-inverse-on-surface:        #eff1f3;
 
+  /* ── Outline ────────────────────────────────────────────────────────────── */
   --color-outline:                   #747784;
   --color-outline-variant:           #c3c6d4;
 
-  --color-secondary:                 #475d92;
-  --color-secondary-container:       #adc3fe;
-  --color-on-secondary-container:    #394f83;
-
+  /* ── Error ──────────────────────────────────────────────────────────────── */
   --color-error:                     #ba1a1a;
   --color-error-container:           #ffdad6;
-
-  --color-inverse-surface:           #2d3133;
-  --color-inverse-on-surface:        #eff1f3;
+  --color-on-error:                  #ffffff;
+  --color-on-error-container:        #93000a;
 }
 
 /* ============================================================================
@@ -72,59 +101,101 @@ body {
    UTILITY CLASSES — Brand colors (garante aplicação independente do Tailwind)
    ============================================================================ */
 
-/* Backgrounds */
-.bg-primary                   { background-color: #002b73; }
-.bg-primary-container         { background-color: #0040a1; }
-.bg-primary-fixed             { background-color: #dae2ff; }
-.bg-primary-fixed-dim         { background-color: #b2c5ff; }
-.bg-surface                   { background-color: #f7f9fb; }
-.bg-surface-dim               { background-color: #d8dadc; }
-.bg-surface-container-lowest  { background-color: #ffffff; }
-.bg-surface-container-low     { background-color: #f2f4f6; }
-.bg-surface-container         { background-color: #eceef0; }
-.bg-surface-container-high    { background-color: #e6e8ea; }
-.bg-surface-container-highest { background-color: #e0e3e5; }
-.bg-secondary                 { background-color: #475d92; }
-.bg-secondary-container       { background-color: #adc3fe; }
-.bg-error                     { background-color: #ba1a1a; }
-.bg-error-container           { background-color: #ffdad6; }
-.bg-inverse-surface           { background-color: #2d3133; }
+/* Backgrounds — Primary */
+.bg-primary                       { background-color: #002b73; }
+.bg-primary-container             { background-color: #0040a1; }
+.bg-primary-fixed                 { background-color: #dae2ff; }
+.bg-primary-fixed-dim             { background-color: #b2c5ff; }
 
-/* Text colors */
-.text-primary                 { color: #002b73; }
-.text-on-primary              { color: #ffffff; }
-.text-on-primary-fixed        { color: #001848; }
-.text-primary-fixed           { color: #dae2ff; }
-.text-primary-fixed-dim       { color: #b2c5ff; }
-.text-on-surface              { color: #191c1e; }
-.text-on-surface-variant      { color: #434652; }
-.text-on-background           { color: #191c1e; }
-.text-outline                 { color: #747784; }
-.text-outline-variant         { color: #c3c6d4; }
-.text-secondary               { color: #475d92; }
-.text-secondary-container     { color: #adc3fe; }
-.text-on-secondary-container  { color: #394f83; }
-.text-error                   { color: #ba1a1a; }
-.text-inverse-surface         { color: #2d3133; }
-.text-inverse-on-surface      { color: #eff1f3; }
+/* Backgrounds — Secondary */
+.bg-secondary                     { background-color: #475d92; }
+.bg-secondary-container           { background-color: #adc3fe; }
 
-/* Border colors */
-.border-primary               { border-color: #002b73; }
-.border-outline               { border-color: #747784; }
-.border-outline-variant       { border-color: #c3c6d4; }
-.border-error                 { border-color: #ba1a1a; }
+/* Backgrounds — Tertiary */
+.bg-tertiary                      { background-color: #003642; }
+.bg-tertiary-container            { background-color: #004e5f; }
+.bg-tertiary-fixed                { background-color: #b3ebff; }
+.bg-tertiary-fixed-dim            { background-color: #4cd6fb; }
 
-/* Ring colors */
-.ring-primary                 { --tw-ring-color: #002b73; }
-.ring-error                   { --tw-ring-color: #ba1a1a; }
+/* Backgrounds — Surface */
+.bg-surface                       { background-color: #f7f9fb; }
+.bg-surface-dim                   { background-color: #d8dadc; }
+.bg-surface-variant               { background-color: #e0e3e5; }
+.bg-surface-container-lowest      { background-color: #ffffff; }
+.bg-surface-container-low         { background-color: #f2f4f6; }
+.bg-surface-container             { background-color: #eceef0; }
+.bg-surface-container-high        { background-color: #e6e8ea; }
+.bg-surface-container-highest     { background-color: #e0e3e5; }
+
+/* Backgrounds — Error / Inverse */
+.bg-error                         { background-color: #ba1a1a; }
+.bg-error-container               { background-color: #ffdad6; }
+.bg-inverse-surface               { background-color: #2d3133; }
+
+/* Text — Primary */
+.text-primary                     { color: #002b73; }
+.text-on-primary                  { color: #ffffff; }
+.text-on-primary-fixed            { color: #001848; }
+.text-on-primary-container        { color: #98b3ff; }
+.text-primary-fixed               { color: #dae2ff; }
+.text-primary-fixed-dim           { color: #b2c5ff; }
+.text-inverse-primary             { color: #b2c5ff; }
+
+/* Text — Secondary */
+.text-secondary                   { color: #475d92; }
+.text-on-secondary                { color: #ffffff; }
+.text-secondary-container         { color: #adc3fe; }
+.text-on-secondary-container      { color: #394f83; }
+
+/* Text — Tertiary */
+.text-tertiary                    { color: #003642; }
+.text-on-tertiary                 { color: #ffffff; }
+.text-tertiary-container          { color: #004e5f; }
+.text-on-tertiary-container       { color: #32c5e9; }
+
+/* Text — Surface / Error */
+.text-on-surface                  { color: #191c1e; }
+.text-on-surface-variant          { color: #434652; }
+.text-on-background               { color: #191c1e; }
+.text-outline                     { color: #747784; }
+.text-outline-variant             { color: #c3c6d4; }
+.text-error                       { color: #ba1a1a; }
+.text-on-error-container          { color: #93000a; }
+.text-inverse-surface             { color: #2d3133; }
+.text-inverse-on-surface          { color: #eff1f3; }
+
+/* Border */
+.border-primary                   { border-color: #002b73; }
+.border-outline                   { border-color: #747784; }
+.border-outline-variant           { border-color: #c3c6d4; }
+.border-error                     { border-color: #ba1a1a; }
+
+/* Ring */
+.ring-primary                     { --tw-ring-color: #002b73; }
+.ring-error                       { --tw-ring-color: #ba1a1a; }
 
 /* ============================================================================
    COMPONENTES GLOBAIS
    ============================================================================ */
 
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
 /* Gradiente Signature — CTAs e headers */
-.signature-gradient {
+.signature-gradient, .bg-gradient-primary {
   background: linear-gradient(135deg, #0040a1 0%, #002b73 100%);
+}
+
+.premium-gradient {
+  background: linear-gradient(135deg, #0040a1 0%, #002b73 100%);
+}
+
+.architectural-layer {
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+.architectural-layer:active {
+  transform: scale(0.98);
 }
 
 /* Glassmorphism — Header */
