@@ -40,7 +40,10 @@ export default function RootLayout({
       className={`${manrope.variable} ${inter.variable} h-full`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-[#f7f9fb] text-[#191c1e]">
+      <head>
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+      </head>
+      <body className="min-h-full flex flex-col bg-surface text-on-surface font-body selection:bg-primary-container selection:text-white">
         {children}
         <LoginGuard />
       </body>

@@ -1,201 +1,91 @@
 import Link from "next/link";
-import { ShieldCheck, Zap, Shield, FileText } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col bg-surface">
+    <>
       <Header />
 
-      <main className="flex-1 w-full max-w-7xl mx-auto px-6 pt-12 md:pt-24 pb-32">
-
-        {/* ── Hero ── */}
-        <div className="flex flex-col lg:flex-row gap-12 items-center">
-
-          {/* Coluna esquerda — texto */}
-          <div className="w-full lg:w-3/5 space-y-8">
-
-            {/* Badge gratuito */}
-            <div className="inline-flex items-center gap-2 bg-secondary-container px-4 py-2 rounded-full"
-              style={{ backgroundColor: "rgba(173,195,254,0.30)" }}>
-              <ShieldCheck className="w-4 h-4 text-primary" strokeWidth={2.5} />
-              <span className="text-xs font-bold uppercase tracking-widest text-on-secondary-container"
-                style={{ fontFamily: "var(--font-body)" }}>
-                2 contratos por mês grátis, sem cartão
-              </span>
+      <main className="max-w-7xl mx-auto px-6 pt-12 md:pt-24 pb-32">
+        {/* Hero Section */}
+        <div className="flex flex-col md:flex-row gap-12 items-center">
+          <div className="w-full md:w-3/5 space-y-8">
+            <div className="inline-flex items-center gap-2 bg-secondary-container/30 px-4 py-2 rounded-full border border-outline-variant/15">
+              <span className="material-symbols-outlined text-primary text-sm" style={{fontVariationSettings: "'FILL' 1"}}>verified</span>
+              <span className="text-xs font-bold uppercase tracking-widest font-label text-on-secondary-container">2 contratos por mês grátis, sem cartão</span>
             </div>
-
-            {/* Headline principal */}
-            <h1 className="text-5xl md:text-7xl font-extrabold text-on-surface tracking-tight leading-[1.1]"
-              style={{ fontFamily: "var(--font-headline)" }}>
-              Pare de tomar calote —{" "}
-              <span className="text-primary">formalize seu serviço</span>{" "}
-              em 5 minutos.
+            <h1 className="text-5xl md:text-7xl font-headline font-extrabold text-on-surface tracking-tight leading-[1.1]">
+              Pare de tomar calote — <span className="text-primary">formalize seu serviço</span> em 5 minutos.
             </h1>
-
-            {/* Subtítulo */}
-            <p className="text-lg md:text-xl text-on-surface-variant max-w-2xl leading-relaxed"
-              style={{ fontFamily: "var(--font-body)" }}>
-              A ferramenta indispensável para freelancers e MEIs que buscam
-              segurança jurídica sem a complexidade da advocacia tradicional.
+            <p className="text-lg md:text-xl text-on-surface-variant max-w-2xl leading-relaxed">
+              A ferramenta indispensável para freelancers e MEIs que buscam segurança jurídica sem a complexidade da advocacia tradicional. Gere contratos personalizados instantaneamente.
             </p>
-
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-6">
-              <Link href="/gerar"
-                className="signature-gradient text-on-primary px-8 py-4 rounded-lg font-bold uppercase tracking-wider text-sm hover:brightness-110 active:scale-[0.98] transition-all text-center"
-                style={{ fontFamily: "var(--font-body)", boxShadow: "0 12px 32px rgba(0,43,115,0.15)" }}>
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <Link href="/gerar" className="bg-gradient-primary text-white px-8 py-4 rounded-lg font-label font-bold uppercase tracking-wider text-sm shadow-[0px_12px_32px_rgba(0,43,115,0.15)] hover:brightness-110 active:scale-[0.98] transition-all text-center">
                 Criar meu contrato grátis
               </Link>
-              <Link href="/planos"
-                className="bg-surface-container-high text-on-secondary-container px-8 py-4 rounded-lg font-bold uppercase tracking-wider text-sm hover:bg-surface-container-highest active:scale-[0.98] transition-all text-center"
-                style={{ fontFamily: "var(--font-body)" }}>
+              <Link href="/planos" className="bg-surface-container-high text-on-secondary-container px-8 py-4 rounded-lg font-label font-bold uppercase tracking-wider text-sm hover:bg-surface-container-highest active:scale-[0.98] transition-all text-center">
                 Ver planos
               </Link>
             </div>
           </div>
-
-          {/* Coluna direita — bento decorativo */}
-          <div className="w-full lg:w-2/5 overflow-hidden shrink-0">
-            <div className="grid grid-cols-2 gap-4">
-
-              {/* Card rascunho — largura total */}
-              <div className="col-span-2 bg-surface-container-lowest p-8 rounded-xl"
-                style={{ boxShadow: "0 24px 48px rgba(25,28,30,0.04)", border: "1px solid rgba(195,198,212,0.12)" }}>
+          <div className="w-full md:w-2/5 relative">
+            {/* Decorative Bento Elements */}
+            <div className="relative z-10 grid grid-cols-2 gap-4">
+              <div className="col-span-2 bg-surface-container-lowest p-8 rounded-xl shadow-[0px_24px_48px_rgba(25,28,30,0.04)] border border-outline-variant/10">
                 <div className="flex justify-between items-start mb-6">
                   <div className="h-12 w-12 bg-primary-fixed rounded-lg flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-primary" />
+                    <span className="material-symbols-outlined text-primary">edit_document</span>
                   </div>
-                  <span className="text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter bg-secondary-container text-on-secondary-container"
-                    style={{ fontFamily: "var(--font-body)" }}>
-                    Rascunho
-                  </span>
+                  <span className="bg-secondary-container text-on-secondary-container text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter">Rascunho</span>
                 </div>
                 <div className="space-y-3">
-                  <div className="h-3 w-3/4 bg-surface-container rounded-full" />
-                  <div className="h-3 w-full bg-surface-container rounded-full" />
-                  <div className="h-3 w-1/2 bg-surface-container rounded-full" />
+                  <div className="h-4 w-3/4 bg-surface-container rounded"></div>
+                  <div className="h-4 w-full bg-surface-container rounded"></div>
+                  <div className="h-4 w-1/2 bg-surface-container rounded"></div>
                 </div>
               </div>
-
-              {/* Card 5min */}
-              <div className="signature-gradient p-6 rounded-xl flex flex-col justify-between aspect-square"
-                style={{ color: "#fff" }}>
-                <Zap className="w-8 h-8" strokeWidth={1.5} color="#fff" />
+              <div className="bg-primary p-6 rounded-xl text-white flex flex-col justify-between aspect-square">
+                <span className="material-symbols-outlined text-4xl">speed</span>
                 <div>
-                  <p className="text-2xl font-bold text-on-primary"
-                    style={{ fontFamily: "var(--font-headline)" }}>5min</p>
-                  <p className="text-xs text-on-primary" style={{ opacity: 0.7 }}>Geração rápida</p>
+                  <p className="text-2xl font-bold font-headline">5min</p>
+                  <p className="text-xs opacity-70">Geração rápida</p>
                 </div>
               </div>
-
-              {/* Card 100% */}
-              <div className="bg-primary p-6 rounded-xl flex flex-col justify-between aspect-square">
-                <Shield className="w-8 h-8" strokeWidth={1.5} color="#fff" />
+              <div className="bg-tertiary-container p-6 rounded-xl text-white flex flex-col justify-between aspect-square">
+                <span className="material-symbols-outlined text-4xl">shield</span>
                 <div>
-                  <p className="text-2xl font-bold text-on-primary"
-                    style={{ fontFamily: "var(--font-headline)" }}>100%</p>
-                  <p className="text-xs text-on-primary" style={{ opacity: 0.7 }}>Segurança Jurídica</p>
+                  <p className="text-2xl font-bold font-headline">100%</p>
+                  <p className="text-xs opacity-70">Segurança Jurídica</p>
                 </div>
               </div>
             </div>
+            {/* Background visual element */}
+            <div className="absolute -top-20 -right-20 w-64 h-64 bg-primary-container/10 rounded-full blur-3xl -z-0"></div>
+            <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-secondary-container/20 rounded-full blur-3xl -z-0"></div>
           </div>
         </div>
-
-        {/* ── Benefícios ── */}
-        <section className="mt-24 md:mt-32">
+        
+        {/* Section: Benefits (Bento Style) */}
+        <section className="mt-32">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
             <div className="md:col-span-2 bg-surface-container-low rounded-2xl p-10 flex flex-col justify-center">
-              <h2 className="text-3xl font-bold text-on-surface mb-4"
-                style={{ fontFamily: "var(--font-headline)" }}>
-                Feito para quem não tem tempo a perder
-              </h2>
-              <p className="text-on-surface-variant max-w-md leading-relaxed"
-                style={{ fontFamily: "var(--font-body)" }}>
-                Eliminamos o "juridiquês" e focamos no que importa: garantir que
-                você receba pelo seu trabalho com documentos válidos em todo
-                território nacional.
-              </p>
+              <h2 className="text-3xl font-headline font-bold text-on-surface mb-4">Feito para quem não tem tempo a perder</h2>
+              <p className="text-on-surface-variant max-w-md">Eliminamos o "juridiquês" e focamos no que importa: garantir que você receba pelo seu trabalho com documentos válidos em todo território nacional.</p>
             </div>
-
-            <div className="bg-surface-container-lowest rounded-2xl p-10 flex flex-col items-center text-center"
-              style={{ border: "1px solid rgba(195,198,212,0.12)" }}>
-              <Zap className="w-10 h-10 text-primary mb-4" strokeWidth={1.5} />
-              <h3 className="text-xl font-bold text-on-surface"
-                style={{ fontFamily: "var(--font-headline)" }}>
-                Assinatura Digital
-              </h3>
-              <p className="text-sm text-on-surface-variant mt-2"
-                style={{ fontFamily: "var(--font-body)" }}>
-                Envie para o cliente assinar direto do celular, sem papelada.
-              </p>
+            <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-2xl p-10 flex flex-col items-center text-center">
+              <span className="material-symbols-outlined text-primary text-5xl mb-4">bolt</span>
+              <h3 className="text-xl font-headline font-bold">Assinatura Digital</h3>
+              <p className="text-sm text-on-surface-variant mt-2">Envie para o cliente assinar direto do celular, sem papelada.</p>
             </div>
           </div>
         </section>
-
-        {/* ── Planos resumidos ── */}
-        <section className="mt-16 md:mt-24">
-          <h2 className="text-2xl font-bold text-on-surface mb-8 text-center"
-            style={{ fontFamily: "var(--font-headline)" }}>
-            Escolha como usar
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-            {[
-              { nome: "Grátis",    preco: "R$ 0",    detalhe: "2 contratos/mês" },
-              { nome: "Avulso",    preco: "R$ 4,90", detalhe: "por contrato", destaque: true, badge: "★ Popular" },
-              { nome: "Mensal",    preco: "R$ 19",   detalhe: "por mês" },
-              { nome: "Semestral", preco: "R$ 89",   detalhe: "6 meses · -22%" },
-              { nome: "Anual",     preco: "R$ 159",  detalhe: "por ano" },
-            ].map((plano) => (
-              <div key={plano.nome} className="relative rounded-xl p-6 flex flex-col gap-2 transition-all">
-                {/* fundo manual para garantir render */}
-                <div className="absolute inset-0 rounded-xl"
-                  style={plano.destaque
-                    ? { background: "linear-gradient(135deg,#0040a1,#002b73)", boxShadow: "0 12px 32px rgba(0,43,115,0.20)" }
-                    : { backgroundColor: "#f2f4f6" }} />
-
-                {plano.badge && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider whitespace-nowrap bg-secondary-container text-on-secondary-container"
-                    style={{ fontFamily: "var(--font-body)" }}>
-                    {plano.badge}
-                  </span>
-                )}
-
-                <div className="relative">
-                  <p className="text-sm font-bold uppercase tracking-wider"
-                    style={{ fontFamily: "var(--font-body)", color: plano.destaque ? "rgba(255,255,255,0.75)" : "#434652" }}>
-                    {plano.nome}
-                  </p>
-                  <p className="text-2xl font-extrabold"
-                    style={{ fontFamily: "var(--font-headline)", color: plano.destaque ? "#fff" : "#002b73" }}>
-                    {plano.preco}
-                  </p>
-                  <p className="text-xs"
-                    style={{ fontFamily: "var(--font-body)", color: plano.destaque ? "rgba(255,255,255,0.70)" : "#434652" }}>
-                    {plano.detalhe}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex justify-center mt-6">
-            <Link href="/planos"
-              className="text-primary font-bold text-sm underline underline-offset-4 hover:opacity-70 transition-opacity"
-              style={{ fontFamily: "var(--font-body)" }}>
-              Ver detalhes de todos os planos
-            </Link>
-          </div>
-        </section>
-
       </main>
 
       <Footer />
       <BottomNav />
-    </div>
+    </>
   );
 }
