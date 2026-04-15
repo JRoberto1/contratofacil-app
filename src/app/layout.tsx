@@ -37,7 +37,7 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${manrope.variable} ${inter.variable} h-full`}
+      className={`${manrope.variable} ${inter.variable} h-full light`}
       suppressHydrationWarning
     >
       <head>
