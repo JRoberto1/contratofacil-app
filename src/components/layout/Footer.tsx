@@ -1,23 +1,18 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="bg-[#f7f9fb] mb-20 flex flex-col items-center justify-center py-8 px-4 opacity-60">
-      <div className="flex gap-4 mb-2">
-        <Link
-          href="/termos"
-          className="text-[10px] font-['Inter'] font-normal text-[#74777f] no-underline hover:text-[#002b73] transition-colors"
-        >
-          Termos
-        </Link>
-        <Link
-          href="/privacidade"
-          className="text-[10px] font-['Inter'] font-normal text-[#74777f] no-underline hover:text-[#002b73] transition-colors"
-        >
-          Privacidade
-        </Link>
+    <footer className="w-full bg-surface-container-low py-8 mt-auto border-t">
+      <div className="max-w-7xl mx-auto px-4 flex flex-col items-center gap-4">
+        <div className="font-sans text-[10px] text-outline uppercase tracking-[0.2em] font-medium">
+          Um produto FlowIQ
+        </div>
+        <div className="flex items-center gap-4 text-xs text-outline-variant font-medium">
+          <Link href="#" className="hover:text-primary transition-colors">Termos</Link>
+          <span>·</span>
+          <Link href="#" className="hover:text-primary transition-colors">Privacidade</Link>
+        </div>
       </div>
-      <p className="text-[10px] font-['Inter'] font-normal text-[#74777f]">Um produto FlowIQ</p>
     </footer>
   );
 }

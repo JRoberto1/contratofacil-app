@@ -1,60 +1,73 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 export default function Header() {
   const pathname = usePathname();
+  const [user, setUser] = useState<any>(null);
+  const supabase = createClient();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase.auth]);
+
+  const initials = user?.email?.substring(0, 2).toUpperCase() || 'US';
 
   return (
-    <header className="bg-[#f7f9fb]/80 backdrop-blur-xl top-0 sticky z-50 flex justify-between items-center px-6 py-4 w-full shadow-[0px_1px_0px_rgba(25,28,30,0.05)]">
-      <div className="flex items-center gap-2">
-        <span className="material-symbols-outlined text-[#002b73]">gavel</span>
-        <span className="text-xl font-extrabold text-[#002b73] font-['Manrope'] tracking-tight">ContratoFácil</span>
-      </div>
-
-      {/* Nav desktop */}
-      <div className="hidden md:flex gap-8 items-center">
-        <nav className="flex gap-6">
-          <Link
-            href="/"
-            className={`transition-all duration-200 ${
-              pathname === "/"
-                ? "text-[#002b73] font-bold"
-                : "text-[#44474e] hover:bg-[#e6e8ea] rounded-lg px-2 py-1"
-            }`}
-          >
-            Início
+    <header className="fixed top-0 w-full z-50 glass-header border-b">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2 group">
+          <span className="material-symbols-outlined text-[28px] bg-cta-gradient bg-clip-text text-transparent group-hover:scale-110 transition-transform">
+            gavel
+          </span>
+          <span className="font-heading font-extrabold text-xl tracking-tight bg-cta-gradient bg-clip-text text-transparent">
+            ContratoFácil
+          </span>
+        </Link>
+        <nav className="hidden md:flex items-center gap-6">
+          <Link href="/gerar" className="text-sm font-medium hover:text-primary transition-colors text-on-surface">
+            Gerar Contrato
           </Link>
-          <Link
-            href="/planos"
-            className={`transition-all duration-200 ${
-              pathname === "/planos"
-                ? "text-[#002b73] font-bold"
-                : "text-[#44474e] hover:bg-[#e6e8ea] rounded-lg px-2 py-1"
-            }`}
-          >
+          <Link href="/planos" className="text-sm font-medium hover:text-primary transition-colors text-on-surface">
             Planos
           </Link>
-          <Link
-            href="/dashboard"
-            className={`transition-all duration-200 ${
-              pathname?.startsWith("/dashboard")
-                ? "text-[#002b73] font-bold"
-                : "text-[#44474e] hover:bg-[#e6e8ea] rounded-lg px-2 py-1"
-            }`}
-          >
-            Rascunhos
-          </Link>
+          {user ? (
+            <div className="flex items-center gap-4 ml-4 pl-4 border-l">
+              <Link href="/meus-contratos" className="text-sm font-medium hover:text-primary transition-colors">
+                Meus contratos
+              </Link>
+              <button 
+                onClick={() => supabase.auth.signOut()}
+                className="text-sm font-medium text-outline hover:text-error transition-colors"
+              >
+                Sair
+              </button>
+              <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold shadow-sm">
+                {initials}
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-4 ml-4 pl-4 border-l">
+              <Link 
+                href="/login" 
+                className="text-sm font-semibold text-primary border border-primary px-5 py-2 rounded-full hover:bg-primary/5 transition-colors"
+              >
+                Entrar
+              </Link>
+            </div>
+          )}
         </nav>
-        <div className="w-8 h-8 rounded-full bg-[#e0e3e5] overflow-hidden flex items-center justify-center">
-          <span className="material-symbols-outlined text-[#747784] text-base">person</span>
-        </div>
-      </div>
-
-      {/* Mobile: só ícone de perfil */}
-      <div className="md:hidden w-8 h-8 rounded-full bg-[#e0e3e5] overflow-hidden flex items-center justify-center">
-        <span className="material-symbols-outlined text-[#747784] text-base">person</span>
       </div>
     </header>
   );

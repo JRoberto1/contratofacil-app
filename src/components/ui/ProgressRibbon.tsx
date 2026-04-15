@@ -11,7 +11,7 @@ export default function ProgressRibbon({ step }: ProgressRibbonProps) {
     <div className="w-full mb-8">
       <div className="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
         <div
-          className="h-full signature-gradient rounded-full transition-all duration-500"
+          className="h-full bg-cta-gradient rounded-full transition-all duration-500"
           style={{ width: `${percent}%` }}
         />
       </div>
@@ -19,10 +19,9 @@ export default function ProgressRibbon({ step }: ProgressRibbonProps) {
         {labels.map((label, i) => (
           <span
             key={label}
-            className={`text-[10px] font-medium uppercase tracking-wider transition-colors ${
+            className={`text-[10px] font-bold uppercase tracking-wider transition-colors font-sans ${
               i + 1 <= step ? "text-primary" : "text-on-surface-variant opacity-40"
             }`}
-            style={{ fontFamily: "var(--font-body)" }}
           >
             {label}
           </span>

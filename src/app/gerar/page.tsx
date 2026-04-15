@@ -1,22 +1,77 @@
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import BottomNav from "@/components/layout/BottomNav";
-import SeletorCategoria from "@/components/contrato/SeletorCategoria";
+"use client";
 
-export const metadata = {
-  title: "Criar Contrato — ContratoFácil",
-  description: "Selecione a categoria do seu serviço para gerar um contrato profissional.",
-};
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import SeletorCategoria from "@/components/contrato/SeletorCategoria";
+import Formulario from "@/components/contrato/Formulario";
+import VisualizadorContrato from "@/components/contrato/VisualizadorContrato";
+import ProgressRibbon from "@/components/ui/ProgressRibbon";
+import type { FormularioContrato, CategoriaContrato } from "@/types/contrato";
 
 export default function GerarPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const rawStep = searchParams?.get("step");
+  const urlStep = rawStep ? parseInt(rawStep) : 1;
+  const currentStep = [1, 2, 3].includes(urlStep) ? (urlStep as 1 | 2 | 3) : 1;
+
+  // Persists memory
+  const [categoria, setCategoria] = useState<CategoriaContrato | null>(null);
+  const [categoriaCustom, setCategoriaCustom] = useState<string>("");
+  const [formData, setFormData] = useState<Omit<FormularioContrato, "categoria" | "categoriaCustom"> | null>(null);
+
+  // Sync state backwards: If url is step 2 but no category selected, redirect to 1
+  useEffect(() => {
+    if (currentStep >= 2 && !categoria) {
+      router.replace("/gerar?step=1");
+    }
+  }, [currentStep, categoria, router]);
+
+  const handleSelectCategoria = (selecionada: string, custom?: string) => {
+    setCategoria(selecionada as CategoriaContrato);
+    if (custom) setCategoriaCustom(custom);
+    router.push("/gerar?step=2");
+  };
+
+  const handleFormularioSubmit = (dados: FormularioContrato) => {
+    setFormData({
+      prestador: dados.prestador,
+      cliente: dados.cliente,
+      servico: dados.servico,
+    });
+    router.push("/gerar?step=3");
+  };
+
   return (
-    <div className="min-h-screen flex flex-col bg-surface">
-      <Header />
-      <main className="flex-1 px-6 pt-8 pb-32 max-w-2xl mx-auto w-full">
-        <SeletorCategoria />
-      </main>
-      <Footer />
-      <BottomNav />
+    <div className="max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <ProgressRibbon step={currentStep} />
+      
+      <div className="mt-8">
+        {currentStep === 1 && (
+          <SeletorCategoria onSelect={handleSelectCategoria} />
+        )}
+
+        {currentStep === 2 && categoria && (
+          <Formulario
+            categoria={categoria}
+            categoriaCustom={categoriaCustom}
+            initialData={formData || undefined}
+            onBack={() => router.push("/gerar?step=1")}
+            onSubmit={handleFormularioSubmit}
+          />
+        )}
+
+        {currentStep === 3 && categoria && formData && (
+          <VisualizadorContrato
+            formulario={{
+              categoria,
+              categoriaCustom,
+              ...formData,
+            }}
+            onBack={() => router.push("/gerar?step=2")}
+          />
+        )}
+      </div>
     </div>
   );
 }

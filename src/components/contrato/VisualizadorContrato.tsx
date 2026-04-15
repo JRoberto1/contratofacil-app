@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { FileText, Mail, Shield, Edit2, Download, ChevronRight, Loader2 } from "lucide-react";
-import ProgressRibbon from "@/components/ui/ProgressRibbon";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import type { FormularioContrato, TipoContrato } from "@/types/contrato";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
 
 const tipos: { id: TipoContrato; label: string }[] = [
   { id: "completo-formal", label: "Completo Formal" },
@@ -16,9 +17,10 @@ const tipos: { id: TipoContrato; label: string }[] = [
 
 interface VisualizadorContratoProps {
   formulario: FormularioContrato;
+  onBack?: () => void;
 }
 
-export default function VisualizadorContrato({ formulario }: VisualizadorContratoProps) {
+export default function VisualizadorContrato({ formulario, onBack }: VisualizadorContratoProps) {
   const [tipoAtivo, setTipoAtivo] = useState<TipoContrato>("completo-formal");
   const [conteudo, setConteudo] = useState<Record<TipoContrato, string>>({} as Record<TipoContrato, string>);
   const [carregando, setCarregando] = useState(false);
@@ -86,6 +88,7 @@ export default function VisualizadorContrato({ formulario }: VisualizadorContrat
 
   const baixarPdf = async () => {
     if (!user) {
+      // triggers login guard in this new approach
       window.dispatchEvent(new CustomEvent("abrir-login", { detail: { acao: "baixar-pdf" } }));
       return;
     }
@@ -96,7 +99,6 @@ export default function VisualizadorContrato({ formulario }: VisualizadorContrat
     setErro(null);
 
     try {
-      // 1. Salvar contrato no BD RLS
       const resSalvar = await fetch("/api/salvar-contrato", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -111,7 +113,6 @@ export default function VisualizadorContrato({ formulario }: VisualizadorContrat
 
       const contratoId = dataSalvar.id;
 
-      // 2. Gerar arquivo PDF protegido
       const resGerar = await fetch("/api/gerar-pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -120,7 +121,6 @@ export default function VisualizadorContrato({ formulario }: VisualizadorContrat
       const dataGerar = await resGerar.json();
       if (!resGerar.ok) throw new Error(dataGerar.error || "Erro ao gerar PDF criptografado.");
 
-      // 3. Efetuar download privativo usando proxy assinado
       window.location.href = `/api/baixar-pdf-salvo?id=${contratoId}`;
       
     } catch (e: any) {
@@ -134,34 +134,29 @@ export default function VisualizadorContrato({ formulario }: VisualizadorContrat
 
   return (
     <div className="w-full">
-      <ProgressRibbon step={3} />
+      {/* ProgressBar managed inside parent, so we removed it from here */}
 
       {/* Cabeçalho de sucesso */}
-      <section className="mb-8 text-center md:text-left">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-xs font-bold uppercase tracking-widest mb-4"
-          style={{ fontFamily: "var(--font-body)" }}>
-          <Shield className="w-3 h-3" strokeWidth={2.5} />
+      <section className="mb-8 text-center md:text-left animate-in slide-in-from-bottom-4 duration-500">
+        <Badge variant="primary" className="mb-4">
+          <Shield className="w-3 h-3 mr-1" strokeWidth={2.5} />
           Documento Gerado
-        </div>
-        <h2
-          className="text-3xl md:text-5xl font-extrabold text-on-surface tracking-tight mb-3 leading-tight"
-          style={{ fontFamily: "var(--font-headline)" }}
-        >
+        </Badge>
+        <h1 className="text-3xl md:text-5xl font-extrabold font-heading text-on-surface tracking-tight mb-3 leading-tight">
           Seu contrato está pronto!
-        </h2>
-        <p className="text-on-surface-variant text-lg max-w-2xl" style={{ fontFamily: "var(--font-body)" }}>
+        </h1>
+        <p className="text-on-surface-variant text-lg max-w-2xl">
           Revisamos os detalhes e seu documento está em conformidade. Escolha o estilo e baixe agora.
         </p>
       </section>
 
       {/* Toggle 4 tipos */}
-      <div className="mb-8">
-        <label className="block text-sm font-bold text-on-surface-variant mb-3 ml-1" style={{ fontFamily: "var(--font-body)" }}>
+      <div className="mb-8 animate-in slide-in-from-bottom-8 duration-500">
+        <label className="block text-sm font-bold text-on-surface-variant mb-3 ml-1">
           Estilo do Documento:
         </label>
-        {/* Mobile: scroll horizontal | Desktop: grid */}
         <div className="relative">
-          <div className="flex md:grid md:grid-cols-4 overflow-x-auto gap-1.5 bg-surface-container-high p-1.5 rounded-2xl no-scrollbar">
+          <div className="flex xl:grid lg:grid-cols-4 overflow-x-auto gap-1.5 bg-surface-container-high p-1.5 rounded-2xl no-scrollbar">
             {tipos.map(({ id, label }) => (
               <button
                 key={id}
@@ -171,60 +166,42 @@ export default function VisualizadorContrato({ formulario }: VisualizadorContrat
                     ? "bg-surface-container-lowest text-primary shadow-sm"
                     : "text-on-surface-variant hover:bg-surface-container-highest"
                 }`}
-                style={{ fontFamily: "var(--font-body)" }}
               >
                 {label}
               </button>
             ))}
           </div>
-          {/* Indicador de scroll no mobile */}
-          <div className="md:hidden absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-surface-container-high to-transparent rounded-r-2xl pointer-events-none flex items-center justify-end pr-1">
+          <div className="xl:hidden absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-surface-container-high to-transparent rounded-r-2xl pointer-events-none flex items-center justify-end pr-1">
             <ChevronRight className="w-4 h-4 text-on-surface-variant opacity-50" />
           </div>
         </div>
       </div>
 
       {/* Layout principal */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-in zoom-in-95 duration-500 delay-150">
         {/* Preview do contrato */}
-        <div className="lg:col-span-8 bg-surface-container-low rounded-[2rem] p-4 md:p-8 border border-[rgba(195,198,212,0.20)]">
+        <div className="lg:col-span-8 bg-surface-container-low rounded-[2rem] p-4 md:p-8 border border-surface-container-highest">
           <div className="flex justify-between items-center mb-6 px-2">
-            <h3
-              className="font-bold text-lg text-on-surface"
-              style={{ fontFamily: "var(--font-headline)" }}
-            >
-              Pré-visualização
-            </h3>
+            <h3 className="font-bold text-lg font-heading text-on-surface">Pré-visualização</h3>
             {!carregando && conteudo[tipoAtivo] && !editando && (
-              <button
-                onClick={iniciarEdicao}
-                className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary hover:bg-primary/20 rounded-full font-bold text-sm transition-all"
-                style={{ fontFamily: "var(--font-body)" }}
-              >
-                <Edit2 className="w-4 h-4" />
+              <Button onClick={iniciarEdicao} variant="outline" className="h-10 rounded-full px-4 text-xs font-bold border-transparent bg-primary/10 hover:bg-primary/20 hover:border-transparent">
+                <Edit2 className="w-3.5 h-3.5" />
                 Editar Contrato
-              </button>
+              </Button>
             )}
             {editando && (
-              <button
-                onClick={salvarEdicao}
-                className="flex items-center gap-2 px-4 py-2 signature-gradient text-on-primary rounded-full font-bold text-sm transition-all"
-                style={{ fontFamily: "var(--font-body)" }}
-              >
+              <Button onClick={salvarEdicao} variant="primary" className="h-10 rounded-full px-4 text-xs font-bold">
                 Salvar
-              </button>
+              </Button>
             )}
           </div>
 
           {/* Papel do contrato */}
-          <div className="bg-surface-container-lowest shadow-xl rounded-2xl mx-auto max-w-[640px] min-h-[500px] p-8 md:p-14 border border-[rgba(195,198,212,0.15)]">
+          <div className="bg-surface-container-lowest shadow-[0_24px_48px_rgba(25,28,30,0.04)] rounded-2xl mx-auto max-w-[640px] min-h-[500px] p-8 md:p-14 border border-surface-container-highest">
             {carregando && (
               <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
                 <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                <p className="text-on-surface-variant text-sm" style={{ fontFamily: "var(--font-body)" }}>
-                  Gerando seu contrato...
-                </p>
-                {/* Skeleton */}
+                <p className="text-on-surface-variant text-sm font-medium">Gerando seu contrato...</p>
                 <div className="w-full space-y-3 mt-4">
                   {[...Array(8)].map((_, i) => (
                     <div key={i} className={`h-3 bg-surface-container rounded-full animate-pulse ${i % 3 === 0 ? "w-1/2" : i % 3 === 1 ? "w-full" : "w-4/5"}`} />
@@ -238,12 +215,8 @@ export default function VisualizadorContrato({ formulario }: VisualizadorContrat
                 <div className="w-12 h-12 bg-error-container rounded-full flex items-center justify-center">
                   <FileText className="w-6 h-6 text-error" />
                 </div>
-                <p className="text-error font-semibold" style={{ fontFamily: "var(--font-body)" }}>{erro}</p>
-                <button
-                  onClick={() => { setErro(null); gerarTipo(tipoAtivo); }}
-                  className="text-primary font-bold text-sm underline underline-offset-4"
-                  style={{ fontFamily: "var(--font-body)" }}
-                >
+                <p className="text-error font-semibold">{erro}</p>
+                <button onClick={() => { setErro(null); gerarTipo(tipoAtivo); }} className="text-primary font-bold text-sm underline underline-offset-4">
                   Tentar novamente
                 </button>
               </div>
@@ -254,14 +227,10 @@ export default function VisualizadorContrato({ formulario }: VisualizadorContrat
                 <textarea
                   value={textoEditado}
                   onChange={(e) => setTextoEditado(e.target.value)}
-                  className="w-full h-[600px] bg-transparent text-on-surface text-sm leading-relaxed outline-none resize-none"
-                  style={{ fontFamily: "var(--font-body)" }}
+                  className="w-full h-[600px] bg-transparent text-on-surface text-sm leading-relaxed outline-none resize-none font-sans"
                 />
               ) : (
-                <div
-                  className="text-on-surface text-sm leading-relaxed whitespace-pre-wrap"
-                  style={{ fontFamily: "var(--font-body)" }}
-                >
+                <div className="text-on-surface text-sm leading-relaxed whitespace-pre-wrap font-sans">
                   {textoAtual}
                 </div>
               )
@@ -271,72 +240,64 @@ export default function VisualizadorContrato({ formulario }: VisualizadorContrat
 
         {/* Sidebar de ações */}
         <div className="lg:col-span-4 space-y-5">
-          {/* Card Próximo Passo */}
-          <div className="bg-surface-container-lowest rounded-[2rem] p-8 ambient-shadow border border-[rgba(195,198,212,0.10)]">
-            <h4
-              className="font-bold text-xl text-on-surface mb-6"
-              style={{ fontFamily: "var(--font-headline)" }}
-            >
-              Próximo Passo
-            </h4>
+          <div className="bg-surface-container-lowest rounded-[2rem] p-8 border border-surface-container-highest shadow-[0_8px_30px_rgb(0,0,0,0.04)] architectural-layer">
+            <h4 className="font-bold font-heading text-xl text-on-surface mb-6">Próximo Passo</h4>
 
-            {/* CTA principal — dispara login */}
-            <button
+            <Button
+              variant="primary"
               disabled={carregando || processandoDownload || !conteudo[tipoAtivo]}
-              className="w-full signature-gradient text-on-primary rounded-2xl py-5 px-6 font-bold flex items-center justify-center gap-3 active:scale-[0.98] transition-all shadow-[0px_12px_32px_rgba(0,43,115,0.20)] mb-5 disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ fontFamily: "var(--font-body)" }}
               onClick={baixarPdf}
+              fullWidth
+              className="h-14 font-bold text-base mb-4 bg-cta-gradient shadow-[0_12px_32px_rgba(0,43,115,0.20)]"
             >
               {processandoDownload ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
               {processandoDownload ? "Processando..." : "Baixar PDF"}
-            </button>
+            </Button>
 
-            {/* Painel escondido p/ Testadores para evitar paywall */}
-            {user && (
+            <Button
+              disabled={carregando || !conteudo[tipoAtivo]}
+              variant="tertiary"
+              fullWidth
+              className="h-14 bg-surface-container hover:bg-surface-container-highest mb-4"
+            >
+               <FileText className="w-5 h-5" strokeWidth={1.8} />
+               Baixar Word (Docx)
+            </Button>
+            
+            <Button
+              disabled={carregando || !conteudo[tipoAtivo]}
+              variant="tertiary"
+              fullWidth
+              className="h-14 bg-surface-container hover:bg-surface-container-highest flex items-center justify-between pl-6 pr-5"
+            >
+              <span className="flex items-center gap-3">
+                <Mail className="w-5 h-5 text-primary" strokeWidth={1.8} />
+                Enviar por E-mail
+              </span>
+            </Button>
+            
+             {user && (
               <button
                 onClick={async () => {
                   const res = await fetch("/api/dev/liberar-perfil");
                   const data = await res.json();
                   alert(data.message || "Testes liberados!");
                 }}
-                className="w-full text-center text-xs font-bold text-primary underline underline-offset-4 opacity-50 hover:opacity-100 transition-opacity mb-5"
-                style={{ fontFamily: "var(--font-body)" }}
+                className="w-full text-center text-[10px] font-bold text-primary underline underline-offset-4 opacity-50 mt-5 uppercase tracking-widest"
               >
-                🛠️ Modo Dev: Desbloquear Conta Grátis 🛠️
+                Modo Dev: Desbloquear Conta
               </button>
             )}
-
-            {/* Enviar por e-mail */}
-            <button
-              disabled={carregando || !conteudo[tipoAtivo]}
-              className="w-full flex items-center justify-between p-4 bg-surface-container rounded-xl hover:bg-surface-container-highest transition-colors group disabled:opacity-40"
-              style={{ fontFamily: "var(--font-body)" }}
-            >
-              <div className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-primary" strokeWidth={1.8} />
-                <span className="font-semibold text-on-surface text-sm">Enviar por E-mail</span>
-              </div>
-              <Download className="w-4 h-4 text-outline" />
-            </button>
           </div>
 
-          {/* Card segurança */}
-          <div className="p-6 bg-inverse-surface rounded-[2rem] text-inverse-on-surface">
+          <div className="p-6 bg-slate-900 rounded-[2rem] text-white">
             <div className="flex items-start gap-4">
               <div className="bg-white/10 p-2.5 rounded-xl flex-shrink-0">
                 <Shield className="w-5 h-5 text-primary-fixed-dim" strokeWidth={1.5} />
               </div>
               <div>
-                <h5
-                  className="font-bold text-sm mb-1"
-                  style={{ fontFamily: "var(--font-headline)" }}
-                >
-                  Criptografia Segura
-                </h5>
-                <p
-                  className="text-[11px] text-inverse-on-surface/60 leading-relaxed"
-                  style={{ fontFamily: "var(--font-body)" }}
-                >
+                <h5 className="font-bold font-heading text-sm mb-1">Criptografia Segura</h5>
+                <p className="text-[11px] text-white/60 leading-relaxed font-sans">
                   Documento em conformidade com LGPD. Acesso restrito e dados protegidos.
                 </p>
               </div>
