@@ -97,8 +97,8 @@ export default function Formulario({ categoria, categoriaCustom, onBack, onSubmi
               Prestador (Autônomo)
             </h2>
           </div>
-          <Campo label="Nome Completo" placeholder="Seu nome completo" value={form.prestador.nomeCompleto} onChange={(v) => set("prestador", "nomeCompleto", v)} erro={erros["prestador.nomeCompleto"]} />
-          <Campo label="CPF ou CNPJ" placeholder="000.000.000-00" value={form.prestador.cpfCnpj} onChange={(v) => set("prestador", "cpfCnpj", v)} erro={erros["prestador.cpfCnpj"]} />
+          <Campo label="Nome Completo" placeholder="Seu nome completo" value={form.prestador.nomeCompleto} onChange={(v: string) => set("prestador", "nomeCompleto", v)} erro={erros["prestador.nomeCompleto"]} />
+          <Campo label="CPF ou CNPJ" placeholder="000.000.000-00" value={form.prestador.cpfCnpj} onChange={(v: string) => set("prestador", "cpfCnpj", v)} erro={erros["prestador.cpfCnpj"]} />
         </section>
 
         {/* Seção 2: Cliente */}
@@ -109,8 +109,8 @@ export default function Formulario({ categoria, categoriaCustom, onBack, onSubmi
               Cliente (Contratante)
             </h2>
           </div>
-          <Campo label="Nome do Cliente" placeholder="Nome ou Razão Social" value={form.cliente.nomeRazaoSocial} onChange={(v) => set("cliente", "nomeRazaoSocial", v)} erro={erros["cliente.nomeRazaoSocial"]} />
-          <Campo label="CPF ou CNPJ" placeholder="000.000.000-00" value={form.cliente.cpfCnpj} onChange={(v) => set("cliente", "cpfCnpj", v)} erro={erros["cliente.cpfCnpj"]} />
+          <Campo label="Nome do Cliente" placeholder="Nome ou Razão Social" value={form.cliente.nomeRazaoSocial} onChange={(v: string) => set("cliente", "nomeRazaoSocial", v)} erro={erros["cliente.nomeRazaoSocial"]} />
+          <Campo label="CPF ou CNPJ" placeholder="000.000.000-00" value={form.cliente.cpfCnpj} onChange={(v: string) => set("cliente", "cpfCnpj", v)} erro={erros["cliente.cpfCnpj"]} />
         </section>
 
         {/* Seção 3: Serviço */}
@@ -135,10 +135,10 @@ export default function Formulario({ categoria, categoriaCustom, onBack, onSubmi
             {erros["servico.descricao"] && <p className="text-error text-[10px] mt-1 ml-1 font-bold uppercase tracking-wider">{erros["servico.descricao"]}</p>}
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <Campo label="Valor (R$)" placeholder="1.500,00" value={form.servico.valor ? form.servico.valor.toFixed(2).replace(".", ",") : ""} onChange={(v) => set("servico", "valor", v)} erro={erros["servico.valor"]} />
-            <Campo label="Prazo" placeholder="15 dias" value={form.servico.prazoEntrega} onChange={(v) => set("servico", "prazoEntrega", v)} erro={erros["servico.prazoEntrega"]} />
+            <Campo label="Valor (R$)" placeholder="1.500,00" value={form.servico.valor ? form.servico.valor.toFixed(2).replace(".", ",") : ""} onChange={(v: string) => set("servico", "valor", v)} erro={erros["servico.valor"]} />
+            <Campo label="Prazo" placeholder="15 dias" value={form.servico.prazoEntrega} onChange={(v: string) => set("servico", "prazoEntrega", v)} erro={erros["servico.prazoEntrega"]} />
           </div>
-          <Campo label="Forma de Pagamento Acordada" placeholder="Ex: PIX (50% entrada, 50% entrega)" value={form.servico.formaPagamento} onChange={(v) => set("servico", "formaPagamento", v)} erro={erros["servico.formaPagamento"]} />
+          <Campo label="Forma de Pagamento Acordada" placeholder="Ex: PIX (50% entrada, 50% entrega)" value={form.servico.formaPagamento} onChange={(v: string) => set("servico", "formaPagamento", v)} erro={erros["servico.formaPagamento"]} />
         </section>
 
         {/* Ações */}
