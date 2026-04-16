@@ -61,7 +61,6 @@ export default function RootLayout({
               }}
             />
           </>
-        )}
       </head>
       <body className="min-h-full flex flex-col bg-surface text-on-surface font-sans selection:bg-primary-container selection:text-white pb-16 md:pb-0 pt-16">
         <Header />

@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import SeletorCategoria from "@/components/contrato/SeletorCategoria";
 import Formulario from "@/components/contrato/Formulario";
 import VisualizadorContrato from "@/components/contrato/VisualizadorContrato";
-import ProgressRibbon from "@/components/ui/ProgressRibbon";
 import type { FormularioContrato, CategoriaContrato } from "@/types/contrato";
 
 function GerarContent() {
@@ -44,8 +43,6 @@ function GerarContent() {
 
   return (
     <>
-      <ProgressRibbon step={currentStep} />
-      
       <div className="mt-8">
         {currentStep === 1 && (
           <SeletorCategoria onSelect={handleSelectCategoria} />

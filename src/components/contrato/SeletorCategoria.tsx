@@ -2,115 +2,128 @@
 
 import { useState } from "react";
 
-const categorias = [
-  { id: "designer-grafico", label: "Designer", sublabel: "UX/UI, Graphic Design, Branding e ilustrações digitais.", icon: "palette" },
-  { id: "desenvolvedor-web", label: "Desenvolvedor", sublabel: "Software, Apps, Web e manutenção de sistemas complexos.", icon: "code" },
-  { id: "fotografo", label: "Fotógrafo", sublabel: "Ensaios, Eventos, Edição e licenciamento de imagem.", icon: "photo_camera" },
-  { id: "consultor", label: "Consultor", sublabel: "Gestão, Marketing, Financeiro e estratégia de negócios.", icon: "insights" },
-  { id: "eletricista", label: "Eletricista", sublabel: "Manutenção, Instalação predial e reparos especializados.", icon: "bolt" },
-  { id: "outros", label: "Outros", sublabel: "Não encontrou sua área? Personalize seu contrato do zero.", icon: "more_horiz" },
+interface SeletorCategoriaProps {
+  onSelect: (categoria: string, customText?: string) => void;
+}
+
+const categoriasExemplo = [
+  { id: "DESIGNER", icon: "palette", title: "Designer / Freelancer Digital", desc: "Logos, UI/UX, Social Media" },
+  { id: "DESENVOLVEDOR", icon: "code", title: "Desenvolvedor de Software", desc: "Sites, Apps, Sistemas" },
+  { id: "FOTOGRAFO", icon: "photo_camera", title: "Fotógrafo / Videomaker", desc: "Eventos, Ensaios, Edição" },
+  { id: "CONSULTOR", icon: "school", title: "Consultor / Professor", desc: "Aulas, Mentorias, Estratégia" },
+  { id: "SERVICOS_GERAIS", icon: "construction", title: "Eletricista / Encanador", desc: "Reparos e Manutenção" },
+  { id: "OUTROS", icon: "more_horiz", title: "Outros", desc: "Personalizado" },
 ];
 
-export default function SeletorCategoria({ onSelect }: { onSelect: (id: string, custom?: string) => void }) {
+export default function SeletorCategoria({ onSelect }: SeletorCategoriaProps) {
   const [busca, setBusca] = useState("");
-  const [selecionandoOutros, setSelecionandoOutros] = useState(false);
-  const [categoriaCustom, setCategoriaCustom] = useState("");
+  const [showCustom, setShowCustom] = useState(false);
+  const [customRole, setCustomRole] = useState("");
 
-  const categoriasFiltradas = categorias.filter(
-    (c) => c.label.toLowerCase().includes(busca.toLowerCase()) || c.sublabel.toLowerCase().includes(busca.toLowerCase())
-  );
-
-  function selecionar(id: string) {
-    if (id === "outros") {
-      setSelecionandoOutros(true);
+  const handleSelect = (id: string) => {
+    if (id === "OUTROS") {
+      setShowCustom(true);
     } else {
       onSelect(id);
     }
-  }
+  };
 
-  function confirmarOutros() {
-    if (!categoriaCustom.trim()) return;
-    onSelect("outros", categoriaCustom.trim());
-  }
+  const handleCustomSubmit = () => {
+    if (customRole.trim()) {
+      onSelect("OUTROS", customRole.trim());
+    }
+  };
+
+  const filtered = categoriasExemplo.filter(c => 
+    c.title.toLowerCase().includes(busca.toLowerCase()) || 
+    c.desc.toLowerCase().includes(busca.toLowerCase())
+  );
 
   return (
-    <div className="w-full animate-in fade-in duration-500 pb-12">
-      <header className="mb-12">
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-on-background mb-4 font-headline">Qual serviço você vai formalizar?</h1>
-        <p className="text-on-surface-variant font-body text-lg max-w-2xl">Selecione a categoria que melhor descreve o seu trabalho para que possamos adaptar as cláusulas ideais para você.</p>
-      </header>
-
-      <section className="mb-16">
-        <div className="relative max-w-xl group">
-          <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-outline">search</span>
-          <input 
-            type="text"
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-            className="w-full pl-14 pr-6 py-4 bg-surface-container-highest rounded-xl border-none focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all duration-300 outline-none text-on-surface placeholder:text-outline font-body" 
-            placeholder="Busque por profissão ou serviço..." 
-          />
+    <div className="w-full max-w-2xl mx-auto flex flex-col items-center">
+      
+      {/* Ribbon */}
+      <div className="w-full mb-12">
+        <div className="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+          <div className="h-full bg-primary rounded-full w-1/4"></div>
         </div>
-      </section>
+      </div>
 
-      {!selecionandoOutros ? (
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-          {categoriasFiltradas.map(({ id, label, sublabel, icon }) => (
-            <div 
-              key={id}
-              onClick={() => selecionar(id)}
-              className="bg-surface-container-lowest p-8 rounded-2xl group hover:bg-white hover:shadow-[0_20px_40px_rgba(0,43,115,0.04)] transition-all duration-300 cursor-pointer"
-            >
-              <div className="w-14 h-14 rounded-2xl bg-surface-container-low flex items-center justify-center mb-6 group-hover:bg-primary-container/10 transition-colors">
-                <span className="material-symbols-outlined text-primary text-3xl">{icon}</span>
-              </div>
-              <h3 className="text-xl font-bold mb-2 font-headline">{label}</h3>
-              <p className="text-sm text-on-surface-variant leading-relaxed font-body">{sublabel}</p>
+      <div className="text-center w-full mb-10">
+        <h1 className="text-3xl font-extrabold font-headline text-on-surface mb-3">Qual serviço você vai formalizar?</h1>
+        <p className="text-on-surface-variant font-body">Selecione a categoria para que possamos gerar as cláusulas ideais para o seu contrato.</p>
+      </div>
+
+      {/* Search */}
+      <div className="w-full relative mb-8">
+        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant z-10 w-6 h-6 flex items-center justify-center">search</span>
+        <input 
+          type="text" 
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          placeholder="Buscar categoria de serviço..." 
+          className="w-full bg-surface-container-highest rounded-xl py-4 pl-12 pr-4 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+        />
+      </div>
+
+      {/* Grid */}
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 mb-16">
+        {filtered.map(cat => (
+          <button 
+            key={cat.id}
+            onClick={() => handleSelect(cat.id)}
+            className={`flex items-center text-left bg-surface-container-lowest rounded-2xl p-5 shadow-sm hover:bg-primary-fixed/30 active:scale-95 transition-all outline-none focus-visible:ring-2 focus-visible:ring-primary ${showCustom && cat.id === 'OUTROS' ? 'border-2 border-primary' : 'border-2 border-transparent'}`}
+          >
+            <div className="w-12 h-12 flex-shrink-0 bg-secondary-container text-on-secondary-container rounded-xl flex items-center justify-center mr-4">
+              <span className="material-symbols-outlined text-2xl">{cat.icon}</span>
             </div>
-          ))}
-        </section>
-      ) : (
-        <section className="mb-16 animate-in slide-in-from-top-2">
-          <div className="bg-surface-container-lowest p-8 rounded-2xl max-w-xl">
-            <label className="text-[10px] font-bold uppercase tracking-wider text-primary font-label mb-2 block ml-2">Qual é o seu serviço?</label>
-            <input
-              type="text"
-              value={categoriaCustom}
-              onChange={(e) => setCategoriaCustom(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && confirmarOutros()}
-              placeholder="Ex: Nutricionista, Adestrador..."
-              className="w-full bg-surface-container-high border-0 rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all outline-none font-body mb-4"
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold font-headline text-on-surface leading-tight mb-1 truncate">{cat.title}</h3>
+              <p className="text-xs text-on-surface-variant font-body truncate">{cat.desc}</p>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* SlideDown Outros */}
+      {showCustom && (
+        <div className="w-full bg-surface-container-low p-6 rounded-2xl mb-12 animate-in slide-in-from-top-4 fade-in duration-300">
+          <label className="block text-sm font-bold font-headline text-on-surface mb-2">Qual é o seu tipo de serviço?</label>
+          <div className="flex gap-3">
+            <input 
+              type="text" 
               autoFocus
+              value={customRole}
+              onChange={(e) => setCustomRole(e.target.value)}
+              placeholder="Ex: Adestrador de cães, Nutricionista..." 
+              className="flex-1 bg-surface-container-highest rounded-xl py-3 px-4 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body"
+              onKeyDown={(e) => e.key === 'Enter' && handleCustomSubmit()}
             />
-            <div className="flex gap-4">
-              <button 
-                onClick={() => setSelecionandoOutros(false)}
-                className="px-6 py-4 rounded-full text-on-surface-variant hover:bg-surface-container transition-colors font-bold font-body"
-              >
-                Voltar
-              </button>
-              <button 
-                onClick={confirmarOutros}
-                disabled={!categoriaCustom.trim()}
-                className="signature-gradient text-white px-8 py-4 rounded-full font-bold shadow-xl flex-1 disabled:opacity-50 font-body"
-              >
-                Continuar
-              </button>
-            </div>
+            <button 
+              onClick={handleCustomSubmit}
+              disabled={!customRole.trim()}
+              className="signature-gradient text-white px-6 font-bold font-headline rounded-xl shadow-md disabled:opacity-50 hover:shadow-lg transition-all"
+            >
+              Continuar
+            </button>
           </div>
-        </section>
+        </div>
       )}
 
-      {/* Highlight Card */}
-      <section className="relative overflow-hidden rounded-3xl p-1 md:p-px bg-gradient-to-r from-outline-variant/30 to-transparent mt-12">
-        <div className="bg-surface-container-lowest rounded-[1.85rem] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 z-10 relative">
-          <div className="flex-1">
-            <h2 className="text-3xl font-extrabold mb-4 text-on-background font-headline">Crie seu contrato em menos de 2 minutos</h2>
-            <p className="text-on-surface-variant max-w-md font-body">Nossa inteligência artificial organiza todos os termos jurídicos enquanto você foca no seu trabalho.</p>
-          </div>
-          <div className="absolute -right-16 -top-16 w-64 h-64 bg-primary opacity-5 rounded-full blur-3xl pointer-events-none"></div>
+      {/* Destaque */}
+      {(!busca && !showCustom) && (
+        <div className="w-full bg-surface-container-low rounded-[2rem] p-8 text-center flex flex-col items-center">
+          <h3 className="text-xl font-bold font-headline text-primary mb-2">Crie seu contrato em menos de 2 minutos</h3>
+          <p className="text-on-surface-variant font-body mb-6 text-sm">Responda um formulário simples e nós cuidamos do texto jurídico.</p>
+          <button onClick={() => setBusca("t")} className="signature-gradient text-white px-8 py-3 rounded-full font-bold shadow-md hover:shadow-lg transition-all active:scale-95">Começar Agora</button>
         </div>
-      </section>
+      )}
+
+      {/* Footer */}
+      <div className="mt-8 text-center text-on-surface-variant opacity-60 text-xs font-body mb-8">
+        Um produto FlowIQ © {new Date().getFullYear()}
+      </div>
+
     </div>
   );
 }

@@ -24,6 +24,8 @@ export default function Header() {
 
   const initials = user?.email?.substring(0, 2).toUpperCase() || 'US';
 
+  if (pathname === '/login') return null;
+
   return (
     <nav className="fixed top-0 w-full z-50 glass-nav shadow-[0_20px_40px_rgba(0,43,115,0.06)]">
       <div className="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto w-full">
