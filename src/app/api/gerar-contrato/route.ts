@@ -28,11 +28,12 @@ const labelCategoria: Record<string, string> = {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { formulario, tipo, modoAssinatura } = body as {
-      formulario: FormularioContrato & { modoAssinatura: string };
+    const { formulario, tipo } = body as {
+      formulario: FormularioContrato;
       tipo: TipoContrato;
-      modoAssinatura: "fisica_com_testemunhas" | "fisica_sem_testemunhas" | "eletronica";
     };
+
+    const modoAssinatura = formulario?.modoAssinatura;
 
     if (!formulario || !tipo || !modoAssinatura) {
       return NextResponse.json(
