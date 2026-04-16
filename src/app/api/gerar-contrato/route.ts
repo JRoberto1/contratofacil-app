@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { gerarContrato } from "@/lib/groq";
+
+// Configura o limite de timeout na Vercel para 60 segundos (limite do Hobby plan)
+export const maxDuration = 60;
 import type { FormularioContrato, TipoContrato } from "@/types/contrato";
 
 const labelTipo: Record<TipoContrato, string> = {
