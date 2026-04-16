@@ -69,7 +69,7 @@ CONTRATANTE (Cliente):
 
 SERVIÇO:
 - Descrição: ${formulario.servico.descricao}
-- Valor: R$ ${formulario.servico.valor.toFixed(2).replace(".", ",")}
+- Valor: R$ ${formulario.servico.valor}
 - Prazo: ${formulario.servico.prazoEntrega}
 - Forma de pagamento: ${formulario.servico.formaPagamento}
 ${formulario.servico.clausulasEspeciais ? `- Cláusulas Especiais/Observações: ${formulario.servico.clausulasEspeciais}\n\nATENÇÃO: Inclua as Cláusulas Especiais/Observações descritas acima na íntegra no contrato aplicável a essa prestação.` : ""}`;
@@ -77,10 +77,10 @@ ${formulario.servico.clausulasEspeciais ? `- Cláusulas Especiais/Observações:
     const conteudo = await gerarContrato(systemPrompt, userPrompt);
 
     return NextResponse.json({ conteudo });
-  } catch (error) {
+  } catch (error: any) {
     console.error("[gerar-contrato]", error);
     return NextResponse.json(
-      { error: "Não foi possível gerar o contrato. Tente novamente." },
+      { error: `Erro na API: ${error.message}` },
       { status: 500 }
     );
   }
