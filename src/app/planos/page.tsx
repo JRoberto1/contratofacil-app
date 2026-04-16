@@ -67,7 +67,7 @@ export default function PlanosPage() {
           </div>
 
           {/* Card 3: Mensal (DESTAQUE) */}
-          <div className="premium-gradient p-8 rounded-lg flex flex-col justify-between text-white architectural-layer relative transform md:scale-105 z-10 shadow-xl">
+          <div className="signature-gradient p-8 rounded-lg flex flex-col justify-between text-white architectural-layer relative transform md:scale-105 z-10 shadow-xl">
             <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-secondary-container text-primary font-label text-[10px] font-bold uppercase tracking-widest px-4 py-1 rounded-full whitespace-nowrap">MAIS POPULAR ⭐</div>
             <div>
               <h3 className="font-headline text-xl font-bold mb-2">Mensal</h3>
