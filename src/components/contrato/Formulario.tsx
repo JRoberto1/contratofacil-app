@@ -19,9 +19,9 @@ export default function Formulario({
   onSubmit,
 }: FormularioProps) {
   const [formData, setFormData] = useState({
-    prestador: { nomeCompleto: "", cpfCnpj: "", cidadeEstado: "", email: "" },
-    cliente: { nomeRazaoSocial: "", cpfCnpj: "", cidadeEstado: "", email: "" },
-    servico: { descricao: "", valor: "", prazoEntrega: "", formaPagamento: "", localPrestacao: "", formaEntrega: "", clausulasEspeciais: "" },
+    prestador: { nomeCompleto: "", cpfCnpj: "", cidade: "", estado: "", email: "" },
+    cliente: { nomeRazaoSocial: "", cpfCnpj: "", cidade: "", estado: "", email: "" },
+    servico: { descricao: "", valor: "", prazoEntrega: "", formaPagamento: "", multaContratante: "20", multaContratado: "20", localPrestacao: "", formaEntrega: "", clausulasEspeciais: "" },
   });
 
   const [tipoAtivo, setTipoAtivo] = useState<import("@/types/contrato").TipoContrato>("completo-formal");
@@ -141,16 +141,29 @@ export default function Formulario({
                   className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
                 />
               </div>
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Cidade e Estado</label>
-                <input 
-                  required 
-                  type="text" 
-                  placeholder="Ex: Vitória, ES"
-                  value={formData.prestador.cidadeEstado}
-                  onChange={e => handleChange("prestador", "cidadeEstado", e.target.value)}
-                  className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Cidade</label>
+                  <input 
+                    required 
+                    type="text" 
+                    placeholder="Ex: Vitória"
+                    value={formData.prestador.cidade}
+                    onChange={e => handleChange("prestador", "cidade", e.target.value)}
+                    className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Estado</label>
+                  <input 
+                    required 
+                    type="text" 
+                    placeholder="Ex: ES"
+                    value={formData.prestador.estado}
+                    onChange={e => handleChange("prestador", "estado", e.target.value)}
+                    className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                  />
+                </div>
               </div>
             </div>
             <div>
@@ -196,16 +209,29 @@ export default function Formulario({
                   className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
                 />
               </div>
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Cidade e Estado</label>
-                <input 
-                  required 
-                  type="text" 
-                  placeholder="Ex: São Paulo, SP"
-                  value={formData.cliente.cidadeEstado}
-                  onChange={e => handleChange("cliente", "cidadeEstado", e.target.value)}
-                  className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Cidade</label>
+                  <input 
+                    required 
+                    type="text" 
+                    placeholder="Ex: São Paulo"
+                    value={formData.cliente.cidade}
+                    onChange={e => handleChange("cliente", "cidade", e.target.value)}
+                    className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Estado</label>
+                  <input 
+                    required 
+                    type="text" 
+                    placeholder="Ex: SP"
+                    value={formData.cliente.estado}
+                    onChange={e => handleChange("cliente", "estado", e.target.value)}
+                    className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                  />
+                </div>
               </div>
             </div>
             <div>
@@ -275,6 +301,36 @@ export default function Formulario({
                 className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
               />
             </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Multa (Contratante rescindir)</label>
+                <div className="relative">
+                  <input 
+                    type="text" 
+                    placeholder="Ex: 20"
+                    value={formData.servico.multaContratante}
+                    onChange={e => handleChange("servico", "multaContratante", e.target.value)}
+                    className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 pr-10 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                  />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant font-bold text-sm">%</span>
+                </div>
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Multa (Contratado rescindir)</label>
+                <div className="relative">
+                  <input 
+                    type="text" 
+                    placeholder="Ex: 20"
+                    value={formData.servico.multaContratado}
+                    onChange={e => handleChange("servico", "multaContratado", e.target.value)}
+                    className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 pr-10 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                  />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant font-bold text-sm">%</span>
+                </div>
+              </div>
+            </div>
+            <p className="text-[10px] text-outline-variant italic mt-[-8px] ml-1">Atenção: Percentuais acima de 30% podem ser considerados abusivos judicialmente.</p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
