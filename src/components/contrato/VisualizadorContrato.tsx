@@ -1,18 +1,15 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { FileText, Mail, Shield, Edit2, Download, ChevronRight, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import type { FormularioContrato, TipoContrato } from "@/types/contrato";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
 
 const tipos: { id: TipoContrato; label: string }[] = [
   { id: "completo-formal", label: "Completo Formal" },
-  { id: "resumido-formal", label: "Resumido Formal" },
-  { id: "completo-dia-a-dia", label: "Completo Dia a Dia" },
-  { id: "resumido-dia-a-dia", label: "Resumido Dia a Dia" },
+  { id: "resumido-formal", label: "Simplificado" },
+  { id: "completo-dia-a-dia", label: "Executivo" },
+  { id: "resumido-dia-a-dia", label: "Minimalista" },
 ];
 
 interface VisualizadorContratoProps {
@@ -133,177 +130,151 @@ export default function VisualizadorContrato({ formulario, onBack }: Visualizado
   const textoAtual = editando ? textoEditado : (conteudo[tipoAtivo] ?? "");
 
   return (
-    <div className="w-full">
-      {/* ProgressBar managed inside parent, so we removed it from here */}
+    <div className="w-full pb-12 animate-in fade-in duration-500">
+      <header className="mb-12">
+        <div className="inline-flex items-center gap-2 bg-secondary-container/20 text-primary px-4 py-1.5 rounded-full mb-6">
+          <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+          <span className="text-[12px] font-bold uppercase tracking-wider font-label">Documento Gerado</span>
+        </div>
+        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-primary mb-4 font-headline">Seu contrato está pronto!</h1>
+        <p className="text-on-surface-variant max-w-2xl text-lg font-body">Revisamos os detalhes e estruturamos as cláusulas conforme suas necessidades. Agora você pode personalizar o estilo ou prosseguir para o download.</p>
+      </header>
 
-      {/* Cabeçalho de sucesso */}
-      <section className="mb-8 text-center md:text-left animate-in slide-in-from-bottom-4 duration-500">
-        <Badge variant="primary" className="mb-4">
-          <Shield className="w-3 h-3 mr-1" strokeWidth={2.5} />
-          Documento Gerado
-        </Badge>
-        <h1 className="text-3xl md:text-5xl font-extrabold font-heading text-on-surface tracking-tight mb-3 leading-tight">
-          Seu contrato está pronto!
-        </h1>
-        <p className="text-on-surface-variant text-lg max-w-2xl">
-          Revisamos os detalhes e seu documento está em conformidade. Escolha o estilo e baixe agora.
-        </p>
+      <section className="mb-12">
+        <div className="bg-surface-container-high p-1.5 rounded-full inline-flex flex-wrap gap-1 md:gap-2">
+          {tipos.map(({ id, label }) => (
+            <button
+              key={id}
+              onClick={() => trocarTipo(id)}
+              className={`px-6 py-2.5 rounded-full text-sm transition-all font-body ${
+                tipoAtivo === id
+                  ? "bg-surface-container-lowest text-primary font-bold shadow-sm"
+                  : "text-slate-600 font-medium hover:bg-surface-container"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </section>
 
-      {/* Toggle 4 tipos */}
-      <div className="mb-8 animate-in slide-in-from-bottom-8 duration-500">
-        <label className="block text-sm font-bold text-on-surface-variant mb-3 ml-1">
-          Estilo do Documento:
-        </label>
-        <div className="relative">
-          <div className="flex xl:grid lg:grid-cols-4 overflow-x-auto gap-1.5 bg-surface-container-high p-1.5 rounded-2xl no-scrollbar">
-            {tipos.map(({ id, label }) => (
-              <button
-                key={id}
-                onClick={() => trocarTipo(id)}
-                className={`whitespace-nowrap flex-shrink-0 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
-                  tipoAtivo === id
-                    ? "bg-surface-container-lowest text-primary shadow-sm"
-                    : "text-on-surface-variant hover:bg-surface-container-highest"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-          <div className="xl:hidden absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-surface-container-high to-transparent rounded-r-2xl pointer-events-none flex items-center justify-end pr-1">
-            <ChevronRight className="w-4 h-4 text-on-surface-variant opacity-50" />
-          </div>
-        </div>
-      </div>
-
-      {/* Layout principal */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-in zoom-in-95 duration-500 delay-150">
-        {/* Preview do contrato */}
-        <div className="lg:col-span-8 bg-surface-container-low rounded-[2rem] p-4 md:p-8 border border-surface-container-highest">
-          <div className="flex justify-between items-center mb-6 px-2">
-            <h3 className="font-bold text-lg font-heading text-on-surface">Pré-visualização</h3>
-            {!carregando && conteudo[tipoAtivo] && !editando && (
-              <Button onClick={iniciarEdicao} variant="outline" className="h-10 rounded-full px-4 text-xs font-bold border-transparent bg-primary/10 hover:bg-primary/20 hover:border-transparent">
-                <Edit2 className="w-3.5 h-3.5" />
-                Editar Contrato
-              </Button>
-            )}
-            {editando && (
-              <Button onClick={salvarEdicao} variant="primary" className="h-10 rounded-full px-4 text-xs font-bold">
-                Salvar
-              </Button>
-            )}
-          </div>
-
-          {/* Papel do contrato */}
-          <div className="bg-surface-container-lowest shadow-[0_24px_48px_rgba(25,28,30,0.04)] rounded-2xl mx-auto max-w-[640px] min-h-[500px] p-8 md:p-14 border border-surface-container-highest">
-            {carregando && (
-              <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-                <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                <p className="text-on-surface-variant text-sm font-medium">Gerando seu contrato...</p>
-                <div className="w-full space-y-3 mt-4">
-                  {[...Array(8)].map((_, i) => (
-                    <div key={i} className={`h-3 bg-surface-container rounded-full animate-pulse ${i % 3 === 0 ? "w-1/2" : i % 3 === 1 ? "w-full" : "w-4/5"}`} />
-                  ))}
-                </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="lg:col-span-8 space-y-8">
+          <div className="bg-surface-container-lowest rounded-2xl p-10 md:p-16 shadow-[0_20px_40px_rgba(0,43,115,0.03)] relative flex flex-col min-h-[600px]">
+            <div className="absolute top-8 right-8 flex items-center gap-2 border border-outline-variant/30 rounded-lg p-3 bg-white/50 backdrop-blur-sm z-20">
+              <div className="w-10 h-10 rounded-full bg-secondary-container/30 flex items-center justify-center text-primary">
+                <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>new_releases</span>
               </div>
-            )}
-
-            {erro && !carregando && (
-              <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 text-center">
-                <div className="w-12 h-12 bg-error-container rounded-full flex items-center justify-center">
-                  <FileText className="w-6 h-6 text-error" />
-                </div>
-                <p className="text-error font-semibold">{erro}</p>
-                <button onClick={() => { setErro(null); gerarTipo(tipoAtivo); }} className="text-primary font-bold text-sm underline underline-offset-4">
-                  Tentar novamente
-                </button>
-              </div>
-            )}
-
-            {!carregando && !erro && textoAtual && (
-              editando ? (
-                <textarea
-                  value={textoEditado}
-                  onChange={(e) => setTextoEditado(e.target.value)}
-                  className="w-full h-[600px] bg-transparent text-on-surface text-sm leading-relaxed outline-none resize-none font-sans"
-                />
-              ) : (
-                <div className="text-on-surface text-sm leading-relaxed whitespace-pre-wrap font-sans">
-                  {textoAtual}
-                </div>
-              )
-            )}
-          </div>
-        </div>
-
-        {/* Sidebar de ações */}
-        <div className="lg:col-span-4 space-y-5">
-          <div className="bg-surface-container-lowest rounded-[2rem] p-8 border border-surface-container-highest shadow-[0_8px_30px_rgb(0,0,0,0.04)] architectural-layer">
-            <h4 className="font-bold font-heading text-xl text-on-surface mb-6">Próximo Passo</h4>
-
-            <Button
-              variant="primary"
-              disabled={carregando || processandoDownload || !conteudo[tipoAtivo]}
-              onClick={baixarPdf}
-              fullWidth
-              className="h-14 font-bold text-base mb-4 bg-cta-gradient shadow-[0_12px_32px_rgba(0,43,115,0.20)]"
-            >
-              {processandoDownload ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
-              {processandoDownload ? "Processando..." : "Baixar PDF"}
-            </Button>
-
-            <Button
-              disabled={carregando || !conteudo[tipoAtivo]}
-              variant="tertiary"
-              fullWidth
-              className="h-14 bg-surface-container hover:bg-surface-container-highest mb-4"
-            >
-               <FileText className="w-5 h-5" strokeWidth={1.8} />
-               Baixar Word (Docx)
-            </Button>
-            
-            <Button
-              disabled={carregando || !conteudo[tipoAtivo]}
-              variant="tertiary"
-              fullWidth
-              className="h-14 bg-surface-container hover:bg-surface-container-highest flex items-center justify-between pl-6 pr-5"
-            >
-              <span className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-primary" strokeWidth={1.8} />
-                Enviar por E-mail
-              </span>
-            </Button>
-            
-             {user && (
-              <button
-                onClick={async () => {
-                  const res = await fetch("/api/dev/liberar-perfil");
-                  const data = await res.json();
-                  alert(data.message || "Testes liberados!");
-                }}
-                className="w-full text-center text-[10px] font-bold text-primary underline underline-offset-4 opacity-50 mt-5 uppercase tracking-widest"
-              >
-                Modo Dev: Desbloquear Conta
-              </button>
-            )}
-          </div>
-
-          <div className="p-6 bg-slate-900 rounded-[2rem] text-white">
-            <div className="flex items-start gap-4">
-              <div className="bg-white/10 p-2.5 rounded-xl flex-shrink-0">
-                <Shield className="w-5 h-5 text-primary-fixed-dim" strokeWidth={1.5} />
-              </div>
-              <div>
-                <h5 className="font-bold font-heading text-sm mb-1">Criptografia Segura</h5>
-                <p className="text-[11px] text-white/60 leading-relaxed font-sans">
-                  Documento em conformidade com LGPD. Acesso restrito e dados protegidos.
-                </p>
+              <div className="hidden sm:block">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-outline leading-none mb-1 font-label">Status</p>
+                <p className="text-[12px] font-bold text-primary leading-none font-body">Autenticação Digital</p>
               </div>
             </div>
+
+            <div className="max-w-xl mx-auto w-full relative z-10 flex-grow">
+               {carregando && (
+                  <div className="flex flex-col items-center justify-center h-full gap-4 pt-20">
+                    <span className="material-symbols-outlined text-primary text-4xl animate-spin">refresh</span>
+                    <p className="text-on-surface-variant text-sm font-medium">Processando seu contrato...</p>
+                    <div className="w-full space-y-3 mt-4">
+                      {[...Array(6)].map((_, i) => (
+                        <div key={i} className={`h-3 bg-surface-container rounded-sm animate-pulse ${i % 3 === 0 ? "w-1/2" : i % 3 === 1 ? "w-full" : "w-5/6"}`} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+               {erro && !carregando && (
+                  <div className="flex flex-col items-center justify-center h-full gap-4 pt-20 text-center">
+                    <div className="w-12 h-12 bg-error-container rounded-full flex items-center justify-center">
+                      <span className="material-symbols-outlined text-error">error</span>
+                    </div>
+                    <p className="text-error font-semibold font-body">{erro}</p>
+                    <button onClick={() => { setErro(null); gerarTipo(tipoAtivo); }} className="text-primary font-bold text-sm underline font-label">Tentar novamente</button>
+                  </div>
+                )}
+
+               {!carregando && !erro && textoAtual && (
+                  editando ? (
+                    <textarea
+                      value={textoEditado}
+                      onChange={(e) => setTextoEditado(e.target.value)}
+                      className="w-full h-full min-h-[500px] bg-transparent text-on-surface text-sm leading-relaxed outline-none resize-none font-body py-4"
+                    />
+                  ) : (
+                    <div className="text-on-surface text-sm leading-relaxed whitespace-pre-wrap font-body py-4">{textoAtual}</div>
+                  )
+                )}
+            </div>
+          </div>
+          
+          <div className="flex justify-center gap-4">
+             {!carregando && textoAtual && !editando && (
+                <button onClick={iniciarEdicao} className="flex items-center gap-2 text-primary font-bold hover:bg-surface-container px-8 py-3 rounded-full transition-all font-body">
+                  <span className="material-symbols-outlined">edit_note</span>
+                  Editar Contrato
+                </button>
+             )}
+             {editando && (
+                <button onClick={salvarEdicao} className="flex items-center gap-2 signature-gradient text-white font-bold px-8 py-3 rounded-full transition-all font-body shadow-md">
+                  <span className="material-symbols-outlined">save</span>
+                  Salvar
+                </button>
+             )}
           </div>
         </div>
+
+        <aside className="lg:col-span-4 space-y-6">
+          <div className="bg-surface-container-lowest p-8 rounded-2xl shadow-[0_20px_40px_rgba(0,43,115,0.03)]">
+            <h3 className="text-xl font-bold text-primary mb-6 font-headline">Próximo Passo</h3>
+            <div className="space-y-4">
+              <button 
+                onClick={baixarPdf}
+                disabled={carregando || processandoDownload || !textoAtual}
+                className="w-full signature-gradient text-white py-4 rounded-full font-bold flex items-center justify-center gap-3 shadow-[0_10px_20px_rgba(0,64,161,0.2)] hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 font-body"
+              >
+                <span className={`material-symbols-outlined ${processandoDownload ? 'animate-spin' : ''}`}>
+                  {processandoDownload ? 'refresh' : 'picture_as_pdf'}
+                </span>
+                {processandoDownload ? 'Processando...' : 'Baixar em PDF'}
+              </button>
+              <button 
+                disabled={carregando || !textoAtual}
+                className="w-full bg-surface-container text-primary py-4 rounded-full font-bold flex items-center justify-center gap-3 hover:bg-surface-container-high transition-colors font-body disabled:opacity-50"
+              >
+                <span className="material-symbols-outlined">mail</span>
+                Enviar por E-mail
+              </button>
+
+              {user && (
+                <button
+                  onClick={async () => {
+                    const res = await fetch("/api/dev/liberar-perfil");
+                    const data = await res.json();
+                    alert(data.message || "Testes liberados!");
+                  }}
+                  className="w-full text-center text-[10px] font-bold text-primary underline underline-offset-4 opacity-50 pt-2 uppercase tracking-widest font-label"
+                >
+                  [Dev] Modificar Nível
+                </button>
+              )}
+            </div>
+            <div className="mt-8 pt-8 border-t border-surface-container">
+              <p className="text-xs text-outline text-center font-medium font-body">Arquivos disponíveis por 30 dias na sua conta gratuita.</p>
+            </div>
+          </div>
+
+          <div className="bg-[#191c1e] p-8 rounded-2xl text-white relative overflow-hidden">
+            <div className="relative z-10">
+              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
+                <span className="material-symbols-outlined text-white" style={{ fontVariationSettings: "'FILL' 1" }}>security</span>
+              </div>
+              <h4 className="text-lg font-bold mb-2 font-headline">Segurança de Dados</h4>
+              <p className="text-slate-400 text-sm leading-relaxed font-body">Seu documento é processado com criptografia de ponta a ponta. Não armazenamos seus dados sensíveis após a geração.</p>
+            </div>
+            <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
+          </div>
+        </aside>
       </div>
     </div>
   );

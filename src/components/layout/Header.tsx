@@ -25,50 +25,46 @@ export default function Header() {
   const initials = user?.email?.substring(0, 2).toUpperCase() || 'US';
 
   return (
-    <header className="fixed top-0 w-full z-50 glass-header border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <nav className="fixed top-0 w-full z-50 glass-nav shadow-[0_20px_40px_rgba(0,43,115,0.06)]">
+      <div className="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto w-full">
         <Link href="/" className="flex items-center gap-2 group">
-          <span className="material-symbols-outlined text-[28px] bg-cta-gradient bg-clip-text text-transparent group-hover:scale-110 transition-transform">
-            gavel
-          </span>
-          <span className="font-heading font-extrabold text-xl tracking-tight bg-cta-gradient bg-clip-text text-transparent">
-            ContratoFácil
-          </span>
+          <span className="material-symbols-outlined text-primary group-hover:scale-110 transition-transform" data-icon="gavel">gavel</span>
+          <span className="text-xl font-extrabold bg-gradient-to-r from-[#0040a1] to-[#0056d2] bg-clip-text text-transparent font-headline tracking-tight">ContratoFácil</span>
         </Link>
-        <nav className="hidden md:flex items-center gap-6">
-          <Link href="/gerar" className="text-sm font-medium hover:text-primary transition-colors text-on-surface">
+        <div className="hidden md:flex items-center gap-8">
+          <Link href="/gerar" className={`text-sm font-medium transition-colors duration-300 font-body ${pathname === '/gerar' ? 'text-primary font-bold border-b-2 border-primary pb-1' : 'text-slate-600 hover:text-[#0056d2]'}`}>
             Gerar Contrato
           </Link>
-          <Link href="/planos" className="text-sm font-medium hover:text-primary transition-colors text-on-surface">
+          <Link href="/planos" className={`text-sm font-medium transition-colors duration-300 font-body ${pathname === '/planos' ? 'text-primary font-bold border-b-2 border-primary pb-1' : 'text-slate-600 hover:text-[#0056d2]'}`}>
             Planos
           </Link>
+        </div>
+        <div className="flex items-center gap-4">
           {user ? (
-            <div className="flex items-center gap-4 ml-4 pl-4 border-l">
-              <Link href="/meus-contratos" className="text-sm font-medium hover:text-primary transition-colors">
+            <div className="flex items-center gap-4 md:ml-4 md:pl-4 md:border-l border-outline-variant/30">
+              <Link href="/meus-contratos" className="hidden md:block text-sm font-medium text-slate-600 hover:text-primary transition-colors">
                 Meus contratos
               </Link>
               <button 
                 onClick={() => supabase.auth.signOut()}
-                className="text-sm font-medium text-outline hover:text-error transition-colors"
+                className="hidden md:block text-sm font-medium text-outline hover:text-error transition-colors"
               >
                 Sair
               </button>
-              <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold shadow-sm">
+              <div className="w-10 h-10 rounded-full signature-gradient flex items-center justify-center text-white text-sm font-bold shadow-sm">
                 {initials}
               </div>
             </div>
           ) : (
-            <div className="flex items-center gap-4 ml-4 pl-4 border-l">
-              <Link 
-                href="/login" 
-                className="text-sm font-semibold text-primary border border-primary px-5 py-2 rounded-full hover:bg-primary/5 transition-colors"
-              >
-                Entrar
-              </Link>
-            </div>
+            <Link 
+              href="/login" 
+              className="px-6 py-2 rounded-full border border-outline-variant text-[#0040a1] font-bold hover:bg-surface-container-low transition-all scale-95 active:scale-90 font-label"
+            >
+              Entrar
+            </Link>
           )}
-        </nav>
+        </div>
       </div>
-    </header>
+    </nav>
   );
 }

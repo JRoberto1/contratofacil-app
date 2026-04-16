@@ -1,75 +1,109 @@
 @import "tailwindcss";
-@source "../";
-
-/* ============================================================================
-   DESIGN SYSTEM — The Architectural Legalist
-   ContratoFácil © 2026 FlowIQ
-   ============================================================================ */
 
 @theme {
-  --font-sans: "Inter", sans-serif;
-  --font-heading: "Manrope", sans-serif;
+  /* Fontes de The Fluid Architect */
+  --font-headline: "Manrope", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-label: "Inter", sans-serif;
 
-  --color-primary: #002b73;
-  --color-primary-container: #0040a1;
-  --color-surface: #f7f9fb;
-  --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #f2f4f6;
-  --color-surface-container: #eceef0;
-  --color-surface-container-high: #e6e8ea;
-  --color-surface-container-highest: #e0e3e5;
-  --color-on-surface: #191c1e;
-  --color-on-surface-variant: #434652;
-  --color-outline: #747784;
+  /* Material 3 Colors as per prototype */
+  --color-on-tertiary-fixed: #390c00;
+  --color-on-primary-fixed-variant: #0040a1;
+  --color-error-container: #ffdad6;
   --color-outline-variant: #c3c6d4;
-  --color-secondary-container: #adc3fe;
-  --color-on-secondary-container: #394f83;
+  --color-surface-container: #eceef0;
+  --color-on-secondary-fixed-variant: #23438b;
+  --color-on-primary-container: #98b3ff;
+  --color-surface-container-low: #f2f4f6;
+  --color-on-background: #191c1e;
+  --color-tertiary: #5d1900;
+  --color-primary-container: #0040a1;
+  --color-secondary-fixed-dim: #b2c5ff;
+  --color-outline: #747784;
   --color-error: #ba1a1a;
+  --color-inverse-on-surface: #eff1f3;
+  --color-surface-bright: #f8f9fb;
+  --color-primary: #002b73;
+  --color-surface-tint: #2c59ba;
+  --color-tertiary-fixed: #ffdbd0;
+  --color-surface-variant: #e0e3e5;
+  --color-on-tertiary: #ffffff;
+  --color-on-secondary-fixed: #001848;
+  --color-secondary-fixed: #dae2ff;
+  --color-on-secondary: #ffffff;
+  --color-on-surface-variant: #434652;
+  --color-tertiary-container: #822803;
+  --color-on-tertiary-container: #ff9c7a;
+  --color-tertiary-fixed-dim: #ffb59d;
+  --color-on-tertiary-fixed-variant: #822803;
+  --color-inverse-surface: #2d3133;
+  --color-on-secondary-container: #1f4087;
+  --color-on-surface: #191c1e;
+  --color-on-error: #ffffff;
+  --color-surface: #f8f9fb;
+  --color-surface-container-highest: #e0e3e5;
+  --color-surface-container-lowest: #ffffff;
+  --color-primary-fixed-dim: #b2c5ff;
+  --color-surface-container-high: #e6e8ea;
+  --color-on-primary-fixed: #001848;
+  --color-primary-fixed: #dae2ff;
+  --color-surface-dim: #d8dadc;
+  --color-secondary-container: #92aefd;
+  --color-secondary: #3e5ba4;
+  --color-on-primary: #ffffff;
+  --color-inverse-primary: #b2c5ff;
+  --color-on-error-container: #93000a;
+  --color-background: #f8f9fb;
+
+  /* Border Radii */
+  --radius-xs: 0.125rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-full: 9999px;
+  
+  --radius-*: initial;
+  --radius: 1rem;
 }
 
 @layer base {
-  *, ::before, ::after {
-    border-color: var(--color-surface-container-highest);
-  }
-
-  body {
-    background-color: var(--color-surface);
-    color: var(--color-on-surface);
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-heading);
+  :root {
+    --background: #f8f9fb;
+    --foreground: #191c1e;
   }
 }
 
-/* ============================================================================
-   UTILITY CLASSES GLOBAIS
-   ============================================================================ */
-
 @layer utilities {
-  .bg-cta-gradient {
-    background: linear-gradient(135deg, #0040a1 0%, #002b73 100%);
+  .glass-nav {
+    background: rgba(248, 249, 251, 0.8);
+    backdrop-filter: blur(12px);
+  }
+  .signature-gradient {
+    background: linear-gradient(135deg, #0040a1 0%, #0056d2 100%);
+  }
+  .tonal-transition {
+    transition: background-color 0.3s ease;
   }
   
-  .glass-header {
-    background: rgba(247, 249, 251, 0.8);
-    backdrop-filter: blur(24px); /* equivalente ao backdrop-blur-xl */
-    -webkit-backdrop-filter: blur(24px);
+  /* Safe env usage */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
   }
+}
 
-  .material-symbols-outlined {
+body {
+  font-family: var(--font-body);
+  color: var(--color-on-surface);
+  background-color: var(--color-surface);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-headline);
+}
+
+.material-symbols-outlined {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-  }
-
-  /* Evita scrollbar no mobile para sliders/toggles horizontais */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
 }

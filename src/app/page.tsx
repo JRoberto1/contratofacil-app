@@ -1,214 +1,250 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
+import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 md:pt-24 pb-32">
-      
-      {/* ── Hero ── */}
-      <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-center">
-        
-        {/* Espaço do Copy */}
-        <div className="w-full lg:w-3/5 space-y-8">
-          <div className="inline-flex items-center gap-2 bg-secondary-container/30 px-4 py-2 rounded-full border border-outline-variant/30">
-            <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
-              verified
-            </span>
-            <span className="text-xs font-bold uppercase tracking-widest text-on-secondary-container">
-              2 contratos por mês grátis, sem cartão
-            </span>
-          </div>
-
-          <h1 className="text-5xl lg:text-[64px] font-heading font-extrabold text-on-surface tracking-tight leading-[1.1]">
-            Pare de tomar calote — <br className="hidden lg:block" />
-            <span className="text-primary">formalize seu serviço</span> em 5 minutos.
-          </h1>
-
-          <p className="text-lg md:text-xl text-on-surface-variant max-w-2xl leading-relaxed">
-            A ferramenta indispensável para freelancers e MEIs que buscam segurança jurídica sem a complexidade da advocacia tradicional. Gere contratos personalizados instantaneamente.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 pt-4">
-            <Link href="/gerar" className="w-full sm:w-auto">
-              <Button variant="primary" className="h-14 px-8 text-base">
-                Criar meu contrato grátis
-              </Button>
-            </Link>
-            <Link href="/planos" className="w-full sm:w-auto">
-              <Button variant="tertiary" className="h-14 px-8 text-base">
-                Ver planos
-              </Button>
-            </Link>
-          </div>
+    <main>
+      {/* Hero Section */}
+      <header className="pt-32 pb-20 px-6 max-w-7xl mx-auto flex flex-col items-center text-center">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary-fixed text-on-secondary-fixed text-xs font-bold uppercase tracking-wider mb-8">
+          <span className="material-symbols-outlined text-sm" data-icon="verified" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+          2 contratos por mês grátis
         </div>
+        <h1 className="text-5xl md:text-7xl font-extrabold font-headline tracking-tight text-primary leading-tight max-w-4xl mb-6">
+          Contrato profissional em 5 minutos.
+        </h1>
+        <p className="text-on-surface-variant text-lg max-w-2xl mb-10 font-body">
+          Chega de burocracia ou documentos genéricos. Gere contratos juridicamente seguros e personalizados para sua profissão em instantes.
+        </p>
+        <Link 
+          href="/gerar" 
+          className="signature-gradient text-white px-8 py-4 rounded-full font-bold text-lg shadow-xl hover:shadow-2xl transition-all hover:scale-105 active:scale-95 mb-20 inline-block"
+        >
+          Gerar meu contrato grátis
+        </Link>
 
-        {/* Espaço Bento Decorativo */}
-        <div className="w-full lg:w-2/5 relative">
-          <div className="relative z-10 grid grid-cols-2 gap-4">
-            
-            {/* Card Documento Rascunho */}
-            <div className="col-span-2 bg-surface-container-lowest p-8 rounded-2xl border border-surface-container-highest shadow-[0_8px_30px_rgb(0,0,0,0.04)] architectural-layer">
-              <div className="flex justify-between items-start mb-6">
-                <div className="h-12 w-12 bg-primary-fixed rounded-xl flex items-center justify-center">
-                  <span className="material-symbols-outlined text-primary text-2xl">edit_document</span>
-                </div>
-                <Badge variant="primary" className="bg-secondary-container text-on-secondary-container font-bold px-3 py-1 uppercase tracking-tighter text-[10px]">
-                  Rascunho
-                </Badge>
-              </div>
+        {/* Bento Grid Mockup */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 w-full max-w-6xl">
+          <div className="md:col-span-8 bg-surface-container-lowest rounded-2xl p-8 shadow-[0_20px_40px_rgba(0,43,115,0.06)] flex flex-col items-start text-left relative overflow-hidden h-[400px]">
+            <div className="w-full h-full bg-surface-container-low rounded-lg p-6 opacity-60">
+              <div className="h-4 w-3/4 bg-outline-variant/30 rounded mb-4"></div>
+              <div className="h-4 w-1/2 bg-outline-variant/30 rounded mb-8"></div>
               <div className="space-y-3">
-                <div className="h-4 w-3/4 bg-surface-container rounded-md" />
-                <div className="h-4 w-full bg-surface-container rounded-md" />
-                <div className="h-4 w-1/2 bg-surface-container rounded-md" />
+                <div className="h-2 w-full bg-outline-variant/20 rounded"></div>
+                <div className="h-2 w-full bg-outline-variant/20 rounded"></div>
+                <div className="h-2 w-5/6 bg-outline-variant/20 rounded"></div>
               </div>
             </div>
-
-            {/* Card 5min */}
-            <div className="bg-primary p-6 rounded-2xl text-on-primary flex flex-col justify-between aspect-square shadow-[0_8px_30px_rgb(0,0,0,0.04)] architectural-layer">
-              <span className="material-symbols-outlined text-4xl opacity-90">speed</span>
-              <div>
-                <p className="text-3xl font-extrabold font-heading">5min</p>
-                <p className="text-sm opacity-80 font-medium tracking-tight mt-1">Geração rápida</p>
+            <div className="absolute bottom-12 left-12 right-12 p-6 bg-surface-container-lowest/90 backdrop-blur-md rounded-xl border border-white/50 shadow-lg">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full signature-gradient flex items-center justify-center text-white">
+                  <span className="material-symbols-outlined">description</span>
+                </div>
+                <div>
+                  <p className="font-bold text-primary font-body">Contrato de Prestação de Serviços</p>
+                  <p className="text-xs text-on-surface-variant font-body">Pronto para assinatura digital</p>
+                </div>
               </div>
             </div>
-
-            {/* Card 100% */}
-            <div className="bg-tertiary-container p-6 rounded-2xl text-on-tertiary flex flex-col justify-between aspect-square shadow-[0_8px_30px_rgb(0,0,0,0.04)] architectural-layer">
-              <span className="material-symbols-outlined text-4xl opacity-90">shield</span>
-              <div>
-                <p className="text-3xl font-extrabold font-heading">100%</p>
-                <p className="text-sm opacity-80 font-medium tracking-tight mt-1">Segurança Jurídica</p>
-              </div>
-            </div>
-            
           </div>
-          
-          {/* Ambient effects */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-primary/5 rounded-full blur-[100px] -z-10" />
+          <div className="md:col-span-4 grid grid-rows-2 gap-6">
+            <div className="bg-primary text-white rounded-2xl p-8 flex flex-col justify-center items-center">
+              <span className="text-4xl font-extrabold font-headline mb-1">5min</span>
+              <span className="text-sm font-label uppercase tracking-widest opacity-80">Tempo Médio</span>
+            </div>
+            <div className="bg-secondary-container text-on-secondary-container rounded-2xl p-8 flex flex-col justify-center items-center">
+              <span className="material-symbols-outlined text-4xl mb-2" style={{ fontVariationSettings: "'FILL' 1" }}>security</span>
+              <span className="text-lg font-bold font-body">100% Segurança</span>
+            </div>
+          </div>
         </div>
-      </div>
+      </header>
 
-      {/* ── Benefícios ── */}
-      <section className="mt-32">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 bg-surface-container-low rounded-3xl p-10 md:p-12 flex flex-col justify-center border border-surface-container-highest/50">
-            <h2 className="text-3xl lg:text-4xl font-heading font-extrabold text-on-surface mb-4">
-              Feito para quem não tem tempo a perder
-            </h2>
-            <p className="text-on-surface-variant text-lg max-w-xl">
-              Eliminamos o &ldquo;juridiquês&rdquo; e focamos no que importa:
-              garantir que você receba pelo seu trabalho com documentos válidos
-              em todo território nacional.
-            </p>
+      {/* Social Proof */}
+      <section className="py-12 bg-surface-container-low">
+        <div className="max-w-7xl mx-auto px-6 flex flex-wrap justify-center md:justify-around gap-8">
+          <div className="flex flex-col items-center">
+            <span className="text-xs font-bold uppercase tracking-widest text-primary mb-1">Público</span>
+            <span className="text-xl font-extrabold font-headline text-on-surface">16M de MEIs</span>
           </div>
-          <div className="bg-surface-container-lowest border border-surface-container-highest rounded-3xl p-10 flex flex-col justify-center text-center shadow-[0_4px_20px_rgb(0,0,0,0.02)]">
-            <div className="h-16 w-16 mx-auto bg-tertiary-fixed rounded-2xl flex items-center justify-center mb-6">
-              <span className="material-symbols-outlined text-on-tertiary-fixed text-3xl">bolt</span>
-            </div>
-            <h3 className="text-xl font-heading font-extrabold text-on-surface">Assinatura Digital</h3>
-            <p className="text-on-surface-variant mt-2 text-sm leading-relaxed">
-              Envie para o cliente assinar direto do celular, sem papelada.
-            </p>
+          <div className="flex flex-col items-center">
+            <span className="text-xs font-bold uppercase tracking-widest text-primary mb-1">Velocidade</span>
+            <span className="text-xl font-extrabold font-headline text-on-surface">Gerado em 5min</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <span className="text-xs font-bold uppercase tracking-widest text-primary mb-1">Exportação</span>
+            <span className="text-xl font-extrabold font-headline text-on-surface">4 Formatos Disponíveis</span>
           </div>
         </div>
       </section>
 
-      {/* ── Planos ── */}
-      <section className="mt-32">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-[40px] font-heading font-extrabold text-on-surface">
-            Escolha a segurança ideal para seus negócios
-          </h2>
-          <p className="text-on-surface-variant text-lg mt-4 max-w-2xl mx-auto">
-            Planos flexíveis pensados para freelancers e pequenos empreendedores.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-          
-          {/* Card Grátis */}
-          <PlanCard 
-            title="Grátis" 
-            price="R$0" 
-            description="2 contratos grátis por mês para conhecer"
-          />
-
-          {/* Card Avulso */}
-          <PlanCard 
-            title="Avulso" 
-            price="R$4,90" 
-            description="Pague apenas quando precisar usar"
-          />
-
-          {/* Card Mensal (Destaque) */}
-          <div className="bg-primary text-on-primary rounded-3xl p-8 flex flex-col relative shadow-[0_20px_40px_rgba(0,43,115,0.15)] ring-2 ring-primary xl:scale-105 z-10 transition-transform">
-            <div className="absolute -top-4 inset-x-0 flex justify-center">
-              <Badge className="bg-secondary-container text-on-secondary-container uppercase tracking-wider text-[10px] px-4 py-1">
-                Mais popular
-              </Badge>
-            </div>
-            <div className="mb-8">
-              <h3 className="text-xl font-heading font-extrabold text-primary-fixed">Mensal</h3>
-              <div className="flex items-baseline mt-4 mb-2">
-                <span className="text-4xl font-extrabold font-heading">R$19</span>
-                <span className="text-primary-fixed-dim text-sm ml-1">/mês</span>
+      {/* Why Section */}
+      <section className="py-24 bg-[#fff5f3]">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-extrabold font-headline text-primary mb-4">Por que você precisa disso?</h2>
+            <p className="text-on-surface-variant max-w-xl mx-auto font-body">Proteja seu trabalho e garanta seus recebimentos sem as complicações do passado.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-surface-container-lowest p-10 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-14 h-14 rounded-full bg-[#ffdbd0] flex items-center justify-center text-[#822803] mb-6">
+                <span className="material-symbols-outlined text-3xl">payments</span>
               </div>
-              <p className="text-primary-fixed-dim text-sm leading-relaxed">Contratos ilimitados. Cancele quando quiser.</p>
+              <h3 className="text-xl font-bold mb-4 text-primary">Advogado caro</h3>
+              <p className="text-on-surface-variant text-sm leading-relaxed font-body">Pagar milhares de reais por um contrato simples não cabe no bolso de quem está começando.</p>
             </div>
-            <div className="mt-auto pt-8">
-               <Button variant="secondary" fullWidth className="h-12 bg-white text-primary hover:bg-surface active:scale-[0.98]">
-                 Começar agora
-               </Button>
+            <div className="bg-surface-container-lowest p-10 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-14 h-14 rounded-full bg-[#ffdbd0] flex items-center justify-center text-[#822803] mb-6">
+                <span className="material-symbols-outlined text-3xl">file_copy</span>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-primary">Templates genéricos</h3>
+              <p className="text-on-surface-variant text-sm leading-relaxed font-body">Baixar modelos do Google é perigoso. Eles não cobrem as especificidades da sua profissão.</p>
+            </div>
+            <div className="bg-surface-container-lowest p-10 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-14 h-14 rounded-full bg-[#ffdbd0] flex items-center justify-center text-[#822803] mb-6">
+                <span className="material-symbols-outlined text-3xl">edit_note</span>
+              </div>
+              <h3 className="text-xl font-bold mb-4 text-primary">Processo manual</h3>
+              <p className="text-on-surface-variant text-sm leading-relaxed font-body">Ficar editando nomes e valores no Word gasta tempo e causa erros de digitação fatais.</p>
             </div>
           </div>
-
-          {/* Card Semestral */}
-          <PlanCard 
-            title="Semestral" 
-            price="R$89" 
-            description="Economize para focar nos projetos"
-            badge="-22%"
-          />
-
-          {/* Card Anual */}
-          <PlanCard 
-            title="Anual" 
-            price="R$159" 
-            description="Um ano de tranquilidade"
-            badge="Melhor preço"
-          />
-
         </div>
       </section>
 
-    </div>
-  );
-}
+      {/* How it Works */}
+      <section className="py-24 bg-surface-container-lowest">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl font-extrabold font-headline text-primary mb-4">Como funciona</h2>
+            <div className="h-1.5 w-20 bg-primary mx-auto rounded-full"></div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+            <div className="flex flex-col items-center text-center z-10">
+              <div className="w-20 h-20 rounded-2xl bg-surface-container flex items-center justify-center text-primary text-2xl font-black mb-8 shadow-inner">01</div>
+              <h3 className="text-xl font-bold mb-3">Escolha sua profissão</h3>
+              <p className="text-on-surface-variant text-sm font-body">Selecione o modelo base otimizado para o que você faz.</p>
+            </div>
+            <div className="flex flex-col items-center text-center z-10">
+              <div className="w-20 h-20 rounded-2xl bg-surface-container flex items-center justify-center text-primary text-2xl font-black mb-8 shadow-inner">02</div>
+              <h3 className="text-xl font-bold mb-3">Preencha o formulário</h3>
+              <p className="text-on-surface-variant text-sm font-body">Responda perguntas simples e nós cuidamos do texto jurídico.</p>
+            </div>
+            <div className="flex flex-col items-center text-center z-10">
+              <div className="w-20 h-20 rounded-2xl bg-surface-container flex items-center justify-center text-primary text-2xl font-black mb-8 shadow-inner">03</div>
+              <h3 className="text-xl font-bold mb-3">Baixe em PDF</h3>
+              <p className="text-on-surface-variant text-sm font-body">Seu contrato está pronto para ser enviado e assinado.</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-{/* Helper component for simple plans */}
-function PlanCard({ title, price, description, badge }: { title: string, price: string, description: string, badge?: string }) {
-  return (
-    <div className="bg-surface-container-lowest border border-surface-container-highest rounded-3xl p-8 flex flex-col relative architectural-layer shadow-[0_4px_20px_rgb(0,0,0,0.02)]">
-      {badge && (
-        <div className="absolute -top-3 inset-x-0 flex justify-center">
-          <Badge variant="info" className="uppercase tracking-wider text-[10px] px-3">
-            {badge}
-          </Badge>
+      {/* Profissões Section */}
+      <section className="py-24 bg-surface-container-low">
+        <div className="max-w-7xl mx-auto px-6">
+          <h2 className="text-3xl font-extrabold font-headline text-primary mb-12 text-center">Feito para a sua profissão</h2>
+          <div className="flex flex-wrap justify-center gap-4">
+            {["Designer Freelance", "Social Media", "Desenvolvedor", "Personal Trainer", "Fotógrafo", "Consultor", "Arquiteto", "Tradutor"].map(prof => (
+              <span key={prof} className="px-6 py-3 rounded-full bg-surface-container-lowest border border-outline-variant/20 text-on-surface font-medium hover:bg-primary hover:text-white transition-all cursor-default font-body">
+                {prof}
+              </span>
+            ))}
+          </div>
         </div>
-      )}
-      <div className="mb-8">
-        <h3 className="text-xl font-heading font-extrabold text-on-surface">{title}</h3>
-        <div className="flex items-baseline mt-4 mb-2">
-          <span className="text-4xl font-extrabold font-heading">{price}</span>
+      </section>
+
+      {/* Preview Section */}
+      <section className="py-24 bg-surface-container-lowest overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col items-center">
+          <h2 className="text-3xl font-extrabold font-headline text-primary mb-4">Veja o contrato antes de pagar</h2>
+          <p className="text-on-surface-variant mb-12 font-body text-center max-w-md">Escolha o tom de voz e o nível de detalhamento do seu documento.</p>
+          <div className="flex flex-wrap justify-center gap-2 mb-12 bg-surface-container-low p-2 rounded-full">
+            <button className="px-6 py-2 rounded-full bg-primary text-white font-bold text-sm">Completo + Formal</button>
+            <button className="px-6 py-2 rounded-full text-on-surface-variant font-medium text-sm hover:bg-surface-container transition-colors">Direto + Simples</button>
+            <button className="px-6 py-2 rounded-full text-on-surface-variant font-medium text-sm hover:bg-surface-container transition-colors">Amigável + Moderno</button>
+          </div>
+          <div className="w-full max-w-4xl bg-white shadow-2xl rounded-t-3xl p-12 border border-outline-variant/10 relative h-[400px]">
+            <div className="space-y-6">
+              <div className="h-6 w-1/3 bg-surface-container rounded"></div>
+              <div className="h-4 w-full bg-surface-container-low rounded"></div>
+              <div className="h-4 w-full bg-surface-container-low rounded"></div>
+              <div className="h-4 w-4/5 bg-surface-container-low rounded"></div>
+            </div>
+            <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-white via-white/90 to-transparent flex items-end justify-center pb-8 border-b-0">
+              <p className="text-sm text-outline font-medium tracking-tight font-body">O restante do documento será revelado após a conclusão.</p>
+            </div>
+          </div>
         </div>
-        <p className="text-on-surface-variant text-sm leading-relaxed">{description}</p>
-      </div>
-      <div className="mt-auto pt-8">
-        <Button variant="tertiary" fullWidth className="h-12 border border-surface-container-highest bg-surface hover:bg-surface-container-low">
-          Começar agora
-        </Button>
-      </div>
-    </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section className="py-24 bg-surface-container-low">
+        <div className="max-w-7xl mx-auto px-6">
+          <h2 className="text-4xl font-extrabold font-headline text-center text-primary mb-16">Planos que cabem no seu momento</h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Grátis */}
+            <div className="bg-surface-container-lowest p-8 rounded-2xl flex flex-col items-center text-center shadow-sm">
+              <span className="text-xs font-bold uppercase tracking-widest text-outline mb-4">Grátis</span>
+              <div className="mb-6">
+                <span className="text-3xl font-extrabold font-headline">R$ 0</span>
+              </div>
+              <ul className="text-xs space-y-3 mb-8 text-on-surface-variant text-left w-full font-body">
+                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm text-green-500">check</span> 2 Contratos/mês</li>
+                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm text-green-500">check</span> Exportação PDF</li>
+              </ul>
+              <Link href="/gerar" className="block w-full py-3 rounded-full bg-surface-container-highest text-on-surface font-bold text-sm mt-auto text-center hover:bg-surface-container transition-colors">Começar</Link>
+            </div>
+            {/* Avulso */}
+            <div className="bg-surface-container-lowest p-8 rounded-2xl flex flex-col items-center text-center shadow-xl border-2 border-primary relative">
+              <div className="absolute -top-3 px-4 py-1 bg-amber-400 text-on-tertiary-fixed text-[10px] font-black uppercase rounded-full">Destaque</div>
+              <span className="text-xs font-bold uppercase tracking-widest text-primary mb-4">Avulso</span>
+              <div className="mb-6 flex">
+                <span className="text-sm font-bold align-top mt-1">R$</span>
+                <span className="text-4xl font-extrabold font-headline text-primary">4,90</span>
+              </div>
+              <ul className="text-xs space-y-3 mb-8 text-on-surface-variant text-left w-full font-body">
+                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm text-green-500">check</span> 1 Contrato único</li>
+                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm text-green-500">check</span> Sem assinatura</li>
+                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm text-green-500">check</span> Formato Word</li>
+              </ul>
+              <Link href="/gerar" className="block w-full py-3 rounded-full signature-gradient text-white font-bold text-sm mt-auto shadow-md hover:shadow-lg transition-all text-center hover:scale-[1.02]">Comprar</Link>
+            </div>
+            {/* Mensal */}
+            <div className="bg-surface-container-lowest p-8 rounded-2xl flex flex-col items-center text-center shadow-sm">
+              <span className="text-xs font-bold uppercase tracking-widest text-outline mb-4">Mensal</span>
+              <div className="mb-6">
+                <span className="text-3xl font-extrabold font-headline">R$ 19</span>
+              </div>
+              <ul className="text-xs space-y-3 mb-8 text-on-surface-variant text-left w-full font-body">
+                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm text-green-500">check</span> Contratos ilimitados</li>
+                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm text-green-500">check</span> Cloud</li>
+              </ul>
+              <Link href="/planos" className="block w-full py-3 rounded-full bg-surface-container-highest text-on-surface font-bold text-sm mt-auto text-center hover:bg-surface-container transition-colors">Assinar</Link>
+            </div>
+            {/* Anual */}
+            <div className="bg-surface-container-lowest p-8 rounded-2xl flex flex-col items-center text-center shadow-sm">
+              <span className="text-xs font-bold uppercase tracking-widest text-outline mb-4">Anual</span>
+              <div className="mb-6">
+                <span className="text-3xl font-extrabold font-headline text-primary">R$ 149</span>
+              </div>
+              <p className="text-[10px] text-on-surface-variant mb-6 font-bold">ECONOMIA DE 35%</p>
+              <Link href="/planos" className="block w-full py-3 rounded-full bg-surface-container-highest text-on-surface font-bold text-sm mt-auto text-center hover:bg-surface-container transition-colors">Assinar</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FINAL CTA */}
+      <section className="py-24 px-6 mb-12">
+        <div className="max-w-5xl mx-auto rounded-3xl bg-primary overflow-hidden relative">
+          <div className="absolute inset-0 opacity-10 mix-blend-overlay bg-black"></div>
+          <div className="relative z-10 py-20 px-8 flex flex-col items-center text-center">
+            <h2 className="text-4xl md:text-5xl font-extrabold font-headline text-white mb-8 tracking-tight">Comece a proteger seu negócio hoje.</h2>
+            <Link href="/gerar" className="bg-white text-primary px-10 py-5 rounded-full font-extrabold text-lg hover:bg-surface-container-lowest transition-all hover:scale-105 active:scale-95 shadow-2xl">
+              Gerar meu primeiro contrato
+            </Link>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }
