@@ -68,7 +68,8 @@ SERVIÇO:
 - Descrição: ${formulario.servico.descricao}
 - Valor: R$ ${formulario.servico.valor.toFixed(2).replace(".", ",")}
 - Prazo: ${formulario.servico.prazoEntrega}
-- Forma de pagamento: ${formulario.servico.formaPagamento}`;
+- Forma de pagamento: ${formulario.servico.formaPagamento}
+${formulario.servico.clausulasEspeciais ? `- Cláusulas Especiais/Observações: ${formulario.servico.clausulasEspeciais}\n\nATENÇÃO: Inclua as Cláusulas Especiais/Observações descritas acima na íntegra no contrato aplicável a essa prestação.` : ""}`;
 
     const conteudo = await gerarContrato(systemPrompt, userPrompt);
 

@@ -21,7 +21,7 @@ export default function Formulario({
   const [formData, setFormData] = useState({
     prestador: { nomeCompleto: "", cpfCnpj: "" },
     cliente: { nomeRazaoSocial: "", cpfCnpj: "" },
-    servico: { descricao: "", valor: 0, prazoEntrega: "", formaPagamento: "" },
+    servico: { descricao: "", valor: 0, prazoEntrega: "", formaPagamento: "", clausulasEspeciais: "" },
   });
 
   const [saved, setSaved] = useState(false);
@@ -204,6 +204,16 @@ export default function Formulario({
                 value={formData.servico.formaPagamento}
                 onChange={e => handleChange("servico", "formaPagamento", e.target.value)}
                 className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+              />
+            </div>
+            <div className="mt-4">
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Cláusulas Especiais / Observações (Opcional)</label>
+              <textarea 
+                placeholder="Ex: Multa de 10% por atraso; Adicional de urgência; Entrega via Google Drive..."
+                rows={3}
+                value={formData.servico.clausulasEspeciais || ""}
+                onChange={e => handleChange("servico", "clausulasEspeciais", e.target.value)}
+                className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all resize-none"
               />
             </div>
           </div>
