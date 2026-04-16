@@ -34,6 +34,9 @@ export default function Header() {
           <span className="text-xl font-extrabold bg-gradient-to-r from-[#0040a1] to-[#0056d2] bg-clip-text text-transparent font-headline tracking-tight">ContratoFácil</span>
         </Link>
         <div className="hidden md:flex items-center gap-8">
+          <Link href="/" className={`text-sm font-medium transition-colors duration-300 font-body ${pathname === '/' ? 'text-primary font-bold border-b-2 border-primary pb-1' : 'text-slate-600 hover:text-[#0056d2]'}`}>
+            Início
+          </Link>
           <Link href="/gerar" className={`text-sm font-medium transition-colors duration-300 font-body ${pathname === '/gerar' ? 'text-primary font-bold border-b-2 border-primary pb-1' : 'text-slate-600 hover:text-[#0056d2]'}`}>
             Gerar Contrato
           </Link>
