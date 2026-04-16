@@ -38,6 +38,7 @@ export interface DadosServico {
   valor: number;
   prazoEntrega: string;
   formaPagamento: string;
+  clausulasEspeciais?: string;
 }
 
 export interface FormularioContrato {

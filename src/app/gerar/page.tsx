@@ -195,6 +195,11 @@ export default function GerarPage() {
                 <label className="text-[10px] font-bold uppercase tracking-wider text-outline-variant font-body px-1">Forma de pagamento acordada</label>
                 <input type="text" placeholder="Ex: PIX (50% entrada, 50% entrega)" className="w-full bg-surface-container-highest border-none rounded-xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-[#002b73] font-body text-on-surface" />
               </div>
+              
+              <div className="flex flex-col gap-1 mt-4">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-outline-variant font-body px-1">Cláusulas Especiais / Observações (Opcional)</label>
+                <textarea rows={3} placeholder="Ex: Multa de 10% por atraso; Adicional de urgência; Entrega via Google Drive..." className="w-full bg-surface-container-highest border-none rounded-xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-[#002b73] font-body text-on-surface resize-none"></textarea>
+              </div>
             </section>
 
             <div className="mt-8 flex flex-col gap-4">
