@@ -13,6 +13,8 @@ export type CategoriaContrato =
   | "ilustrador"
   | "motion-designer"
   | "editor-de-video"
+  | "consultor"
+  | "servicos-gerais"
   | "outros";
 
 export type TipoContrato =

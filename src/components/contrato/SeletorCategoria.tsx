@@ -7,12 +7,12 @@ interface SeletorCategoriaProps {
 }
 
 const categoriasExemplo = [
-  { id: "DESIGNER", icon: "palette", title: "Designer / Freelancer Digital", desc: "Logos, UI/UX, Social Media" },
-  { id: "DESENVOLVEDOR", icon: "code", title: "Desenvolvedor de Software", desc: "Sites, Apps, Sistemas" },
-  { id: "FOTOGRAFO", icon: "photo_camera", title: "Fotógrafo / Videomaker", desc: "Eventos, Ensaios, Edição" },
-  { id: "CONSULTOR", icon: "school", title: "Consultor / Professor", desc: "Aulas, Mentorias, Estratégia" },
-  { id: "SERVICOS_GERAIS", icon: "construction", title: "Eletricista / Encanador", desc: "Reparos e Manutenção" },
-  { id: "OUTROS", icon: "more_horiz", title: "Outros", desc: "Personalizado" },
+  { id: "designer-grafico", icon: "palette", title: "Designer / Freelancer Digital", desc: "Logos, UI/UX, Social Media" },
+  { id: "desenvolvedor-web", icon: "code", title: "Desenvolvedor de Software", desc: "Sites, Apps, Sistemas" },
+  { id: "fotografo", icon: "photo_camera", title: "Fotógrafo / Videomaker", desc: "Eventos, Ensaios, Edição" },
+  { id: "consultor", icon: "school", title: "Consultor / Professor", desc: "Aulas, Mentorias, Estratégia" },
+  { id: "servicos-gerais", icon: "construction", title: "Eletricista / Encanador", desc: "Reparos e Manutenção" },
+  { id: "outros", icon: "more_horiz", title: "Outros", desc: "Personalizado" },
 ];
 
 export default function SeletorCategoria({ onSelect }: SeletorCategoriaProps) {
@@ -21,7 +21,7 @@ export default function SeletorCategoria({ onSelect }: SeletorCategoriaProps) {
   const [customRole, setCustomRole] = useState("");
 
   const handleSelect = (id: string) => {
-    if (id === "OUTROS") {
+    if (id === "outros") {
       setShowCustom(true);
     } else {
       onSelect(id);
@@ -30,7 +30,7 @@ export default function SeletorCategoria({ onSelect }: SeletorCategoriaProps) {
 
   const handleCustomSubmit = () => {
     if (customRole.trim()) {
-      onSelect("OUTROS", customRole.trim());
+      onSelect("outros", customRole.trim());
     }
   };
 
@@ -72,7 +72,7 @@ export default function SeletorCategoria({ onSelect }: SeletorCategoriaProps) {
           <button 
             key={cat.id}
             onClick={() => handleSelect(cat.id)}
-            className={`flex items-center text-left bg-surface-container-lowest rounded-2xl p-5 shadow-sm hover:bg-primary-fixed/30 active:scale-95 transition-all outline-none focus-visible:ring-2 focus-visible:ring-primary ${showCustom && cat.id === 'OUTROS' ? 'border-2 border-primary' : 'border-2 border-transparent'}`}
+            className={`flex items-center text-left bg-surface-container-lowest rounded-2xl p-5 shadow-sm hover:bg-primary-fixed/30 active:scale-95 transition-all outline-none focus-visible:ring-2 focus-visible:ring-primary ${showCustom && cat.id === 'outros' ? 'border-2 border-primary' : 'border-2 border-transparent'}`}
           >
             <div className="w-12 h-12 flex-shrink-0 bg-secondary-container text-on-secondary-container rounded-xl flex items-center justify-center mr-4">
               <span className="material-symbols-outlined text-2xl">{cat.icon}</span>

@@ -19,9 +19,9 @@ export default function Formulario({
   onSubmit,
 }: FormularioProps) {
   const [formData, setFormData] = useState({
-    prestador: { nome: "", documento: "" },
-    cliente: { nome: "", documento: "" },
-    servico: { descricao: "", valor: "", prazo: "", formaPagamento: "" },
+    prestador: { nomeCompleto: "", cpfCnpj: "" },
+    cliente: { nomeRazaoSocial: "", cpfCnpj: "" },
+    servico: { descricao: "", valor: 0, prazoEntrega: "", formaPagamento: "" },
   });
 
   const [saved, setSaved] = useState(false);
@@ -59,7 +59,7 @@ export default function Formulario({
     });
   };
 
-  const getLabel = () => categoria === "OUTROS" ? categoriaCustom : categoria;
+  const getLabel = () => categoria === "outros" ? categoriaCustom : categoria;
 
   return (
     <div className="w-full max-w-2xl mx-auto flex flex-col pt-4">
@@ -102,8 +102,8 @@ export default function Formulario({
                 required 
                 type="text" 
                 placeholder="Seu nome completo"
-                value={formData.prestador.nome}
-                onChange={e => handleChange("prestador", "nome", e.target.value)}
+                value={formData.prestador.nomeCompleto}
+                onChange={e => handleChange("prestador", "nomeCompleto", e.target.value)}
                 className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
               />
             </div>
@@ -113,8 +113,8 @@ export default function Formulario({
                 required 
                 type="text" 
                 placeholder="000.000.000-00"
-                value={formData.prestador.documento}
-                onChange={e => handleChange("prestador", "documento", e.target.value)}
+                value={formData.prestador.cpfCnpj}
+                onChange={e => handleChange("prestador", "cpfCnpj", e.target.value)}
                 className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
               />
             </div>
@@ -134,8 +134,8 @@ export default function Formulario({
                 required 
                 type="text" 
                 placeholder="Nome ou Razão Social"
-                value={formData.cliente.nome}
-                onChange={e => handleChange("cliente", "nome", e.target.value)}
+                value={formData.cliente.nomeRazaoSocial}
+                onChange={e => handleChange("cliente", "nomeRazaoSocial", e.target.value)}
                 className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
               />
             </div>
@@ -145,8 +145,8 @@ export default function Formulario({
                 required 
                 type="text" 
                 placeholder="000.000.000-00"
-                value={formData.cliente.documento}
-                onChange={e => handleChange("cliente", "documento", e.target.value)}
+                value={formData.cliente.cpfCnpj}
+                onChange={e => handleChange("cliente", "cpfCnpj", e.target.value)}
                 className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
               />
             </div>
@@ -189,8 +189,8 @@ export default function Formulario({
                   required 
                   type="text" 
                   placeholder="Ex: 15 dias"
-                  value={formData.servico.prazo}
-                  onChange={e => handleChange("servico", "prazo", e.target.value)}
+                  value={formData.servico.prazoEntrega}
+                  onChange={e => handleChange("servico", "prazoEntrega", e.target.value)}
                   className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
                 />
               </div>
