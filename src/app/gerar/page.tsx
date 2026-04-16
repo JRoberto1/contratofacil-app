@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Formulario from "@/components/contrato/Formulario";
+import VisualizadorContrato from "@/components/contrato/VisualizadorContrato";
 
 export default function GerarPage() {
   const router = useRouter();
@@ -10,6 +12,12 @@ export default function GerarPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isOther, setIsOther] = useState(false);
   const [otherValue, setOtherValue] = useState("");
+  const [formData, setFormData] = useState<any>(null);
+
+  const handleFormSubmit = (dados: any) => {
+    setFormData(dados);
+    setStep(2);
+  };
 
   const categories = [
     { id: "designer", icon: "palette", title: "Designer / Freelancer Digital", desc: "Logos, UI/UX, Social Media" },
@@ -115,107 +123,22 @@ export default function GerarPage() {
       )}
 
       {step === 1 && (
-        <main className="flex-1 max-w-2xl mx-auto w-full px-6 pb-24">
-          
-          {/* Progress Ribbon */}
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[#002b73] font-bold text-xs uppercase tracking-widest font-body">Passo 1 de 3</span>
-            <span className="font-bold text-xs text-on-surface-variant font-body">33%</span>
-          </div>
-          <div className="w-full bg-surface-container-highest rounded-full h-1.5 mb-8 overflow-hidden">
-            <div className="bg-[#002b73] h-full rounded-full" style={{ width: "33%" }}></div>
-          </div>
-          
-          <h1 className="text-3xl font-extrabold font-headline mb-10 text-primary">Dados do Contrato</h1>
+        <main className="flex-1 w-full px-4 md:px-6 pb-24">
+          <Formulario
+            categoria={selectedCategory as any}
+            categoriaCustom={isOther ? otherValue : undefined}
+            onBack={() => setStep(0)}
+            onSubmit={handleFormSubmit}
+          />
+        </main>
+      )}
 
-          <form className="flex flex-col gap-8">
-            
-            {/* Prestador */}
-            <section className="flex flex-col gap-4">
-              <div className="flex items-center gap-2 text-[#002b73] mb-2">
-                <span className="material-symbols-outlined text-lg">badge</span>
-                <h2 className="text-xs font-bold uppercase tracking-widest font-body">Prestador (Autônomo)</h2>
-              </div>
-              
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] font-bold uppercase tracking-wider text-outline-variant font-body px-1">Nome Completo</label>
-                <input type="text" placeholder="Seu nome completo" className="w-full bg-surface-container-highest border-none rounded-xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-[#002b73] font-body text-on-surface" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] font-bold uppercase tracking-wider text-outline-variant font-body px-1">CPF ou CNPJ</label>
-                <input type="text" placeholder="000.000.000-00" className="w-full bg-surface-container-highest border-none rounded-xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-[#002b73] font-body text-on-surface" />
-              </div>
-            </section>
-
-            <hr className="border-outline-variant/10" />
-
-            {/* Cliente */}
-            <section className="flex flex-col gap-4">
-              <div className="flex items-center gap-2 text-[#002b73] mb-2">
-                <span className="material-symbols-outlined text-lg">person</span>
-                <h2 className="text-xs font-bold uppercase tracking-widest font-body">Cliente (Contratante)</h2>
-              </div>
-              
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] font-bold uppercase tracking-wider text-outline-variant font-body px-1">Nome do Cliente</label>
-                <input type="text" placeholder="Nome ou Razão Social" className="w-full bg-surface-container-highest border-none rounded-xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-[#002b73] font-body text-on-surface" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] font-bold uppercase tracking-wider text-outline-variant font-body px-1">CPF ou CNPJ</label>
-                <input type="text" placeholder="000.000.000-00" className="w-full bg-surface-container-highest border-none rounded-xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-[#002b73] font-body text-on-surface" />
-              </div>
-            </section>
-
-            <hr className="border-outline-variant/10" />
-
-            {/* Detalhes do Serviço */}
-            <section className="flex flex-col gap-4">
-              <div className="flex items-center gap-2 text-[#002b73] mb-2">
-                <span className="material-symbols-outlined text-lg">description</span>
-                <h2 className="text-xs font-bold uppercase tracking-widest font-body">Detalhes do Serviço</h2>
-              </div>
-              
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] font-bold uppercase tracking-wider text-outline-variant font-body px-1">Descrição do Serviço</label>
-                <textarea rows={3} placeholder="O que será entregue?" className="w-full bg-surface-container-highest border-none rounded-xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-[#002b73] font-body text-on-surface resize-none"></textarea>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-outline-variant font-body px-1">Valor (R$)</label>
-                  <input type="text" placeholder="0.000,00" className="w-full bg-surface-container-highest border-none rounded-xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-[#002b73] font-body text-on-surface" />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-outline-variant font-body px-1">Prazo</label>
-                  <input type="text" placeholder="Ex: 15 dias" className="w-full bg-surface-container-highest border-none rounded-xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-[#002b73] font-body text-on-surface" />
-                </div>
-              </div>
-              
-              <div className="flex flex-col gap-1 mt-1">
-                <label className="text-[10px] font-bold uppercase tracking-wider text-outline-variant font-body px-1">Forma de pagamento acordada</label>
-                <input type="text" placeholder="Ex: PIX (50% entrada, 50% entrega)" className="w-full bg-surface-container-highest border-none rounded-xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-[#002b73] font-body text-on-surface" />
-              </div>
-              
-              <div className="flex flex-col gap-1 mt-4">
-                <label className="text-[10px] font-bold uppercase tracking-wider text-outline-variant font-body px-1">Cláusulas Especiais / Observações (Opcional)</label>
-                <textarea rows={3} placeholder="Ex: Multa de 10% por atraso; Adicional de urgência; Entrega via Google Drive..." className="w-full bg-surface-container-highest border-none rounded-xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-[#002b73] font-body text-on-surface resize-none"></textarea>
-              </div>
-            </section>
-
-            <div className="mt-8 flex flex-col gap-4">
-              <button type="button" className="signature-gradient text-white rounded-full py-4 font-bold font-headline w-full shadow-md hover:shadow-lg transition-all active:scale-95 text-lg">
-                Próxima Etapa →
-              </button>
-              <button type="button" className="text-[#002b73] bg-transparent font-bold font-headline py-3 w-full hover:bg-surface-container-lowest rounded-full transition-all text-sm">
-                Salvar Rascunho
-              </button>
-            </div>
-            
-          </form>
-          
-          <div className="mt-12 text-center">
-            <span className="text-xs font-medium font-body text-on-surface-variant opacity-60">Um produto FlowIQ</span>
-          </div>
+      {step === 2 && formData && (
+        <main className="flex-1 w-full px-4 md:px-6 pb-24">
+          <VisualizadorContrato 
+            formulario={formData}
+            onBack={() => setStep(1)}
+          />
         </main>
       )}
     </div>
