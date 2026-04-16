@@ -4,7 +4,7 @@ export default function Footer() {
       <div className="flex flex-col md:flex-row justify-between items-center px-8 w-full max-w-7xl mx-auto border-t border-outline-variant/15 pt-8">
         <div className="mb-4 md:mb-0">
           <p className="text-xs font-medium font-body text-slate-500 opacity-70">
-            ContratoFácil — Um produto FlowIQ © 2024
+            ContratoFácil — Um produto FlowIQ © {new Date().getFullYear()}
           </p>
         </div>
         <div className="flex gap-8">

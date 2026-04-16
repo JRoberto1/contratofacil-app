@@ -1,13 +1,8 @@
 import Link from "next/link";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import BottomNav from "@/components/layout/BottomNav";
 
 export default function PlanosPage() {
   return (
     <>
-      <Header />
-
       <main className="max-w-7xl mx-auto px-6 py-12 md:py-20">
         {/* Hero Section */}
         <div className="text-center mb-16 max-w-2xl mx-auto">
@@ -172,9 +167,6 @@ export default function PlanosPage() {
           </div>
         </div>
       </main>
-
-      <Footer />
-      <BottomNav />
     </>
   );
 }
