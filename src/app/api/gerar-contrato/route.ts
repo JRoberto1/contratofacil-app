@@ -49,30 +49,35 @@ export async function POST(req: NextRequest) {
 
 Gere um contrato ${labelTipo[tipo]} para a categoria "${categoria}".
 
-REGRAS OBRIGATÓRIAS:
-- Inclua cabeçalho "CONTRATO DE PRESTAÇÃO DE SERVIÇOS"
-- Inclua data, local (a definir pelas partes) e número fictício de referência
-- Inclua cláusulas: objeto, obrigações, valor e pagamento, prazo, propriedade intelectual (quando aplicável), rescisão, LGPD, foro
-- Inclua campos de assinatura para ambas as partes ao final
+REGRAS OBRIGATÓRIAS E INEGOCIÁVEIS:
+- Estrutura clara e bem dividida em cláusulas numeradas.
+- Inclua cabeçalho "CONTRATO DE PRESTAÇÃO DE SERVIÇOS" e "DAS PARTES" contendo os dados do CONTRATANTE e CONTRATADO.
+- OBRIGATÓRIO: Cláusula de Eleição de Foro (para dirimir dúvidas).
+- OBRIGATÓRIO: Embasamento legal com a LGPD (Lei Geral de Proteção de Dados).
+- OBRIGATÓRIO: Inclusão de multas rescisórias ou penalidades claras em caso de inadimplência/cancelamento.
+- OBRIGATÓRIO: Espaço explícito para as assinaturas do CONTRATANTE, CONTRATADO e pelo menos 2 Testemunhas.
 - Use sempre "CONTRATANTE" para o cliente e "CONTRATADO" para o prestador
-- Responda APENAS com o texto do contrato, sem explicações ou comentários extras`;
+- Responda APENAS com o texto do contrato, sem introduções ou comentários.
+`;
 
     const userPrompt = `Gere o contrato com os seguintes dados:
 
 CONTRATADO (Prestador):
 - Nome: ${formulario.prestador.nomeCompleto}
 - CPF/CNPJ: ${formulario.prestador.cpfCnpj}
-
+- Endereço/Sede: ${formulario.prestador.cidadeEstado}
+${formulario.prestador.email ? `- Email: ${formulario.prestador.email}\n` : ""}
 CONTRATANTE (Cliente):
 - Nome: ${formulario.cliente.nomeRazaoSocial}
 - CPF/CNPJ: ${formulario.cliente.cpfCnpj}
-
+- Endereço/Sede: ${formulario.cliente.cidadeEstado}
+${formulario.cliente.email ? `- Email: ${formulario.cliente.email}\n` : ""}
 SERVIÇO:
 - Descrição: ${formulario.servico.descricao}
 - Valor: R$ ${formulario.servico.valor}
-- Prazo: ${formulario.servico.prazoEntrega}
+- Prazo de entrega/vigência: ${formulario.servico.prazoEntrega}
 - Forma de pagamento: ${formulario.servico.formaPagamento}
-${formulario.servico.clausulasEspeciais ? `- Cláusulas Especiais/Observações: ${formulario.servico.clausulasEspeciais}\n\nATENÇÃO: Inclua as Cláusulas Especiais/Observações descritas acima na íntegra no contrato aplicável a essa prestação.` : ""}`;
+${formulario.servico.localPrestacao ? `- Local de Prestação: ${formulario.servico.localPrestacao}\n` : ""}${formulario.servico.formaEntrega ? `- Forma de Entrega: ${formulario.servico.formaEntrega}\n` : ""}${formulario.servico.clausulasEspeciais ? `- Cláusulas Especiais/Observações: ${formulario.servico.clausulasEspeciais}\n\nATENÇÃO: Inclua e formalize essas Cláusulas Especiais de forma adequada no contrato.` : ""}`;
 
     const conteudo = await gerarContrato(systemPrompt, userPrompt);
 

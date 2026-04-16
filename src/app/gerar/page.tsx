@@ -14,10 +14,21 @@ export default function GerarPage() {
   const [otherValue, setOtherValue] = useState("");
   const [formData, setFormData] = useState<any>(null);
 
-  const handleFormSubmit = (dados: any) => {
-    setFormData(dados);
-    setStep(2);
+  const handleFormSubmit = (dados: any, tipoAtivo: import("@/types/contrato").TipoContrato) => {
+    localStorage.setItem("contratofacil_rascunho_completo", JSON.stringify({
+      formulario: dados,
+      tipo: tipoAtivo,
+      timestamp: new Date().toISOString()
+    }));
+    router.push("/contrato/rascunho");
   };
+
+  // Se vier com o query param ?passo=1, inicia na etapa 1 (Formulário)
+  if (typeof window !== "undefined" && step === 0 && window.location.search.includes("passo=1")) {
+    setStep(1);
+    // Remove query param sem dar reload
+    window.history.replaceState(null, "", "/gerar");
+  }
 
   const categories = [
     { id: "designer", icon: "palette", title: "Designer / Freelancer Digital", desc: "Logos, UI/UX, Social Media" },
@@ -129,15 +140,6 @@ export default function GerarPage() {
             categoriaCustom={isOther ? otherValue : undefined}
             onBack={() => setStep(0)}
             onSubmit={handleFormSubmit}
-          />
-        </main>
-      )}
-
-      {step === 2 && formData && (
-        <main className="flex-1 w-full px-4 md:px-6 pb-24">
-          <VisualizadorContrato 
-            formulario={formData}
-            onBack={() => setStep(1)}
           />
         </main>
       )}

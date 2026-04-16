@@ -26,18 +26,24 @@ export type TipoContrato =
 export interface DadosPrestador {
   nomeCompleto: string;
   cpfCnpj: string;
+  cidadeEstado: string;
+  email?: string;
 }
 
 export interface DadosCliente {
   nomeRazaoSocial: string;
   cpfCnpj: string;
+  cidadeEstado: string;
+  email?: string;
 }
 
 export interface DadosServico {
   descricao: string;
-  valor: number;
+  valor: string;
   prazoEntrega: string;
   formaPagamento: string;
+  localPrestacao?: string;
+  formaEntrega?: string;
   clausulasEspeciais?: string;
 }
 

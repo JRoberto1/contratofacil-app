@@ -14,11 +14,12 @@ const tipos: { id: TipoContrato; label: string }[] = [
 
 interface VisualizadorContratoProps {
   formulario: FormularioContrato;
+  tipoInicial?: TipoContrato;
   onBack?: () => void;
 }
 
-export default function VisualizadorContrato({ formulario, onBack }: VisualizadorContratoProps) {
-  const [tipoAtivo, setTipoAtivo] = useState<TipoContrato>("completo-formal");
+export default function VisualizadorContrato({ formulario, tipoInicial = "completo-formal", onBack }: VisualizadorContratoProps) {
+  const [tipoAtivo, setTipoAtivo] = useState<TipoContrato>(tipoInicial);
   const [conteudo, setConteudo] = useState<Record<TipoContrato, string>>({} as Record<TipoContrato, string>);
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -63,7 +64,7 @@ export default function VisualizadorContrato({ formulario, onBack }: Visualizado
   }, [formulario, conteudo]);
 
   useEffect(() => {
-    gerarTipo("completo-formal");
+    gerarTipo(tipoInicial);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -84,41 +85,60 @@ export default function VisualizadorContrato({ formulario, onBack }: Visualizado
   }
 
   const baixarPdf = async () => {
-    if (!user) {
-      // triggers login guard in this new approach
-      window.dispatchEvent(new CustomEvent("abrir-login", { detail: { acao: "baixar-pdf" } }));
-      return;
-    }
-
     if (!conteudo[tipoAtivo]) return;
 
     setProcessandoDownload(true);
     setErro(null);
 
     try {
-      const resSalvar = await fetch("/api/salvar-contrato", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          formulario,
-          tipo: tipoAtivo,
-          conteudo: conteudo[tipoAtivo]
-        })
-      });
-      const dataSalvar = await resSalvar.json();
-      if (!resSalvar.ok) throw new Error(dataSalvar.error || "Erro ao salvar contrato.");
+      // 1. Opcional: Se estiver logado, salva no banco.
+      let contratoId = null;
+      if (user) {
+        try {
+          const resSalvar = await fetch("/api/salvar-contrato", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              formulario,
+              tipo: tipoAtivo,
+              conteudo: conteudo[tipoAtivo]
+            })
+          });
+          const dataSalvar = await resSalvar.json();
+          if (resSalvar.ok) contratoId = dataSalvar.id;
+        } catch (e) {
+          console.error("Erro ignorado ao salvar histórico", e);
+        }
+      }
 
-      const contratoId = dataSalvar.id;
-
+      // 2. Transforma em PDF diretamente via API de renderização 
+      // Enviamos o conteúdo limpo ao invés do ID, e a API devolve um Base64.
       const resGerar = await fetch("/api/gerar-pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contratoId })
+        body: JSON.stringify({ conteudo: conteudo[tipoAtivo], contratoId }), // contratoId opcional
       });
+      
       const dataGerar = await resGerar.json();
-      if (!resGerar.ok) throw new Error(dataGerar.error || "Erro ao gerar PDF criptografado.");
+      if (!resGerar.ok) throw new Error(dataGerar.error || "Erro ao gerar arquivo PDF.");
 
-      window.location.href = `/api/baixar-pdf-salvo?id=${contratoId}`;
+      // 3. Renderiza o Base64 em Blob para Download NATIVO no Navegador
+      const byteCharacters = atob(dataGerar.base64);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: "application/pdf" });
+      
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = `contrato-${tipoAtivo}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
       
     } catch (e: any) {
       setErro(e.message);

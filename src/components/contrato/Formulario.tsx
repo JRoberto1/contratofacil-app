@@ -8,7 +8,7 @@ interface FormularioProps {
   categoriaCustom?: string;
   initialData?: Omit<FormularioContrato, "categoria" | "categoriaCustom">;
   onBack: () => void;
-  onSubmit: (dados: FormularioContrato) => void;
+  onSubmit: (dados: FormularioContrato, tipo: import("@/types/contrato").TipoContrato) => void;
 }
 
 export default function Formulario({
@@ -19,10 +19,12 @@ export default function Formulario({
   onSubmit,
 }: FormularioProps) {
   const [formData, setFormData] = useState({
-    prestador: { nomeCompleto: "", cpfCnpj: "" },
-    cliente: { nomeRazaoSocial: "", cpfCnpj: "" },
-    servico: { descricao: "", valor: 0, prazoEntrega: "", formaPagamento: "", clausulasEspeciais: "" },
+    prestador: { nomeCompleto: "", cpfCnpj: "", cidadeEstado: "", email: "" },
+    cliente: { nomeRazaoSocial: "", cpfCnpj: "", cidadeEstado: "", email: "" },
+    servico: { descricao: "", valor: "", prazoEntrega: "", formaPagamento: "", localPrestacao: "", formaEntrega: "", clausulasEspeciais: "" },
   });
+
+  const [tipoAtivo, setTipoAtivo] = useState<import("@/types/contrato").TipoContrato>("completo-formal");
 
   const [saved, setSaved] = useState(false);
 
@@ -50,13 +52,33 @@ export default function Formulario({
     setTimeout(() => setSaved(false), 2000);
   };
 
+  const formatarMoeda = (valor: string) => {
+    const apenasNumeros = valor.replace(/\D/g, "");
+    if (!apenasNumeros) return "";
+    const numero = (Number(apenasNumeros) / 100).toFixed(2);
+    return numero.replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
+
+  const handleChangeValor = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let raw = e.target.value;
+    // Permite digitação livre, mas quando sai (blur) ou algo assim, formata.
+    handleChange("servico", "valor", raw);
+  };
+
+  const handleBlurValor = (e: React.FocusEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    if (raw) {
+      handleChange("servico", "valor", formatarMoeda(raw));
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
       categoria,
       categoriaCustom,
       ...(formData as any),
-    });
+    }, tipoAtivo);
   };
 
   const getLabel = () => categoria === "outros" ? categoriaCustom : categoria;
@@ -107,14 +129,37 @@ export default function Formulario({
                 className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
               />
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">CPF ou CNPJ</label>
+                <input 
+                  required 
+                  type="text" 
+                  placeholder="000.000.000-00"
+                  value={formData.prestador.cpfCnpj}
+                  onChange={e => handleChange("prestador", "cpfCnpj", e.target.value)}
+                  className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Cidade e Estado</label>
+                <input 
+                  required 
+                  type="text" 
+                  placeholder="Ex: Vitória, ES"
+                  value={formData.prestador.cidadeEstado}
+                  onChange={e => handleChange("prestador", "cidadeEstado", e.target.value)}
+                  className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                />
+              </div>
+            </div>
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">CPF ou CNPJ</label>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">E-mail (opcional)</label>
               <input 
-                required 
-                type="text" 
-                placeholder="000.000.000-00"
-                value={formData.prestador.cpfCnpj}
-                onChange={e => handleChange("prestador", "cpfCnpj", e.target.value)}
+                type="email" 
+                placeholder="seu@email.com"
+                value={formData.prestador.email}
+                onChange={e => handleChange("prestador", "email", e.target.value)}
                 className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
               />
             </div>
@@ -139,14 +184,37 @@ export default function Formulario({
                 className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
               />
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">CPF ou CNPJ</label>
+                <input 
+                  required 
+                  type="text" 
+                  placeholder="000.000.000-00"
+                  value={formData.cliente.cpfCnpj}
+                  onChange={e => handleChange("cliente", "cpfCnpj", e.target.value)}
+                  className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Cidade e Estado</label>
+                <input 
+                  required 
+                  type="text" 
+                  placeholder="Ex: São Paulo, SP"
+                  value={formData.cliente.cidadeEstado}
+                  onChange={e => handleChange("cliente", "cidadeEstado", e.target.value)}
+                  className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                />
+              </div>
+            </div>
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">CPF ou CNPJ</label>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">E-mail (opcional)</label>
               <input 
-                required 
-                type="text" 
-                placeholder="000.000.000-00"
-                value={formData.cliente.cpfCnpj}
-                onChange={e => handleChange("cliente", "cpfCnpj", e.target.value)}
+                type="email" 
+                placeholder="cliente@email.com"
+                value={formData.cliente.email}
+                onChange={e => handleChange("cliente", "email", e.target.value)}
                 className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
               />
             </div>
@@ -177,9 +245,10 @@ export default function Formulario({
                 <input 
                   required 
                   type="text" 
-                  placeholder="0.000,00"
+                  placeholder="Ex: 1.500,00"
                   value={formData.servico.valor}
-                  onChange={e => handleChange("servico", "valor", e.target.value)}
+                  onChange={handleChangeValor}
+                  onBlur={handleBlurValor}
                   className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
                 />
               </div>
@@ -206,6 +275,29 @@ export default function Formulario({
                 className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
               />
             </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Local de Prestação (opcional)</label>
+                <input 
+                  type="text" 
+                  placeholder="Ex: Remoto / Sede do cliente"
+                  value={formData.servico.localPrestacao}
+                  onChange={e => handleChange("servico", "localPrestacao", e.target.value)}
+                  className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Forma de Entrega (opcional)</label>
+                <input 
+                  type="text" 
+                  placeholder="Ex: Google Drive, E-mail"
+                  value={formData.servico.formaEntrega}
+                  onChange={e => handleChange("servico", "formaEntrega", e.target.value)}
+                  className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                />
+              </div>
+            </div>
             <div className="mt-4">
               <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Cláusulas Especiais / Observações (Opcional)</label>
               <textarea 
@@ -216,6 +308,49 @@ export default function Formulario({
                 className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all resize-none"
               />
             </div>
+          </div>
+        </div>
+
+        {/* Escolha do Modelo */}
+        <div className="space-y-4 pt-4 border-t border-outline-variant/10">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="material-symbols-outlined text-primary">article</span>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-primary font-body">Modelo do Contrato</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button
+              type="button"
+              onClick={() => setTipoAtivo("completo-formal")}
+              className={`p-4 rounded-2xl border text-left transition-all ${tipoAtivo === "completo-formal" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-outline-variant/20 hover:border-primary/50"}`}
+            >
+              <h3 className="font-bold text-on-surface text-sm mb-1">Completo Formal</h3>
+              <p className="text-xs text-on-surface-variant leading-relaxed">Todas as cláusulas, linguagem jurídica técnica</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setTipoAtivo("resumido-formal")}
+              className={`p-4 rounded-2xl border text-left transition-all ${tipoAtivo === "resumido-formal" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-outline-variant/20 hover:border-primary/50"}`}
+            >
+              <h3 className="font-bold text-on-surface text-sm mb-1">Simplificado</h3>
+              <p className="text-xs text-on-surface-variant leading-relaxed">Cláusulas essenciais, linguagem acessível</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setTipoAtivo("completo-dia-a-dia")}
+              className={`p-4 rounded-2xl border text-left transition-all ${tipoAtivo === "completo-dia-a-dia" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-outline-variant/20 hover:border-primary/50"}`}
+            >
+              <h3 className="font-bold text-on-surface text-sm mb-1">Executivo</h3>
+              <p className="text-xs text-on-surface-variant leading-relaxed">Formato profissional compacto para negócios</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setTipoAtivo("resumido-dia-a-dia")}
+              className={`p-4 rounded-2xl border text-left transition-all ${tipoAtivo === "resumido-dia-a-dia" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-outline-variant/20 hover:border-primary/50"}`}
+            >
+              <h3 className="font-bold text-on-surface text-sm mb-1">Minimalista</h3>
+              <p className="text-xs text-on-surface-variant leading-relaxed">Versão enxuta para serviços de baixo valor</p>
+            </button>
           </div>
         </div>
 
