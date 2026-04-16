@@ -21,22 +21,64 @@ export default function Formulario({
   const [formData, setFormData] = useState({
     prestador: { nomeCompleto: "", cpfCnpj: "", cidade: "", estado: "", email: "" },
     cliente: { nomeRazaoSocial: "", cpfCnpj: "", cidade: "", estado: "", email: "" },
-    servico: { descricao: "", valor: "", prazoEntrega: "", formaPagamento: "", multaContratante: "20", multaContratado: "20", localPrestacao: "", formaEntrega: "", clausulasEspeciais: "" },
+    servico: { descricao: "", valor: "", prazoEntrega: "", formaPagamento: "", multaRescisao: "", localPrestacao: "", formaEntrega: "", clausulasEspeciais: "" },
   });
+
+  const [modoAssinatura, setModoAssinatura] = useState<"fisica_com_testemunhas" | "fisica_sem_testemunhas" | "eletronica">("fisica_com_testemunhas");
+
+  function capitalizeWords(str: string): string {
+    if (!str) return "";
+    const exceptions = ['de','da','do','das','dos','e','em','a','o','para','com','por','no','na','nos','nas'];
+    return str
+      .toLowerCase()
+      .split(' ')
+      .map((word, index) => {
+        if (index === 0) return word.charAt(0).toUpperCase() + word.slice(1);
+        if (exceptions.includes(word)) return word;
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      })
+      .join(' ');
+  }
+
+  function normalizeState(str: string): string {
+    if (!str) return "";
+    const trimmed = str.trim();
+    if (trimmed.length <= 2) return trimmed.toUpperCase();
+    return capitalizeWords(trimmed);
+  }
+
+  function capitalizeSentence(str: string): string {
+    if (!str) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
 
   const [tipoAtivo, setTipoAtivo] = useState<import("@/types/contrato").TipoContrato>("completo-formal");
 
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
+    // Definir assinatura padrão com base na categoria
+    const criativos = ["designer-grafico", "desenvolvedor-web", "fotografo", "videomaker", "social-media", "redator", "consultor", "ilustrador", "motion-designer", "editor-de-video", "professor"];
+    const manuais = ["servicos-gerais", "eletricista", "encanador", "pedreiro", "pintor", "marceneiro"];
+    if (criativos.includes(categoria)) setModoAssinatura("eletronica");
+    else if (manuais.includes(categoria)) setModoAssinatura("fisica_com_testemunhas");
+    else setModoAssinatura("fisica_sem_testemunhas");
+
     // Load local storage draft if available and no initialData
     if (initialData) {
       setFormData(initialData as any);
+      if ((initialData as any).modoAssinatura) {
+        setModoAssinatura((initialData as any).modoAssinatura);
+      }
     } else {
       const draft = localStorage.getItem("contratofacil_draft");
-      if (draft) setFormData(JSON.parse(draft));
+      if (draft) {
+        const parsedDraft = JSON.parse(draft);
+        setFormData(parsedDraft);
+        if (parsedDraft.modoAssinatura) setModoAssinatura(parsedDraft.modoAssinatura);
+      }
     }
-  }, [initialData]);
+  }, [initialData, categoria]);
 
   const handleChange = (section: "prestador" | "cliente" | "servico", field: string, value: string) => {
     setFormData((prev) => ({
@@ -47,7 +89,7 @@ export default function Formulario({
   };
 
   const saveDraft = () => {
-    localStorage.setItem("contratofacil_draft", JSON.stringify(formData));
+    localStorage.setItem("contratofacil_draft", JSON.stringify({...formData, modoAssinatura}));
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -74,11 +116,61 @@ export default function Formulario({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validações no frontend
+    if (!formData.prestador.cidade || !formData.prestador.estado) {
+      alert("Preencha a cidade e o estado do Prestador.");
+      return;
+    }
+    if (!formData.cliente.cidade || !formData.cliente.estado) {
+      alert("Preencha a cidade e o estado do Cliente.");
+      return;
+    }
+    const rawValor = formData.servico.valor.replace(/\D/g, "");
+    if (!rawValor || rawValor === "0" || rawValor === "00" || rawValor === "000") {
+      alert("Informe um valor válido para o serviço (maior que zero).");
+      return;
+    }
+    if (!modoAssinatura) {
+      alert("Selecione um modo de assinatura.");
+      return;
+    }
+    if (formData.servico.multaRescisao) {
+      const parsedMul = Number(formData.servico.multaRescisao);
+      if (isNaN(parsedMul) || parsedMul < 1 || parsedMul > 100) {
+        alert("A multa rescisória deve ser um valor entre 1 e 100.");
+        return;
+      }
+    }
+
+    // Normalização
+    const normalizedData = {
+      ...formData,
+      prestador: {
+        ...formData.prestador,
+        nomeCompleto: capitalizeWords(formData.prestador.nomeCompleto),
+        cidade: capitalizeWords(formData.prestador.cidade),
+        estado: normalizeState(formData.prestador.estado),
+      },
+      cliente: {
+        ...formData.cliente,
+        nomeRazaoSocial: capitalizeWords(formData.cliente.nomeRazaoSocial),
+        cidade: capitalizeWords(formData.cliente.cidade),
+        estado: normalizeState(formData.cliente.estado),
+      },
+      servico: {
+        ...formData.servico,
+        descricao: capitalizeSentence(formData.servico.descricao),
+        formaPagamento: capitalizeSentence(formData.servico.formaPagamento),
+      }
+    };
+
     onSubmit({
       categoria,
       categoriaCustom,
-      ...(formData as any),
-    }, tipoAtivo);
+      ...normalizedData,
+      modoAssinatura
+    } as any, tipoAtivo);
   };
 
   const getLabel = () => categoria === "outros" ? categoriaCustom : categoria;
@@ -302,35 +394,22 @@ export default function Formulario({
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Multa (Contratante rescindir)</label>
-                <div className="relative">
-                  <input 
-                    type="text" 
-                    placeholder="Ex: 20"
-                    value={formData.servico.multaContratante}
-                    onChange={e => handleChange("servico", "multaContratante", e.target.value)}
-                    className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 pr-10 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
-                  />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant font-bold text-sm">%</span>
-                </div>
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Multa por rescisão (%) (opcional)</label>
+              <div className="relative">
+                <input 
+                  type="number"
+                  min="1"
+                  max="100" 
+                  placeholder="Ex: 20"
+                  value={formData.servico.multaRescisao || ""}
+                  onChange={e => handleChange("servico", "multaRescisao", e.target.value)}
+                  className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 pr-10 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant font-bold text-sm">%</span>
               </div>
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Multa (Contratado rescindir)</label>
-                <div className="relative">
-                  <input 
-                    type="text" 
-                    placeholder="Ex: 20"
-                    value={formData.servico.multaContratado}
-                    onChange={e => handleChange("servico", "multaContratado", e.target.value)}
-                    className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 pr-10 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
-                  />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant font-bold text-sm">%</span>
-                </div>
-              </div>
+              <p className="text-[10px] text-outline-variant italic mt-1 ml-1">Se preenchido, será aplicada essa porcentagem sobre o valor total em caso de cancelamento por qualquer das partes.</p>
             </div>
-            <p className="text-[10px] text-outline-variant italic mt-[-8px] ml-1">Atenção: Percentuais acima de 30% podem ser considerados abusivos judicialmente.</p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -364,6 +443,50 @@ export default function Formulario({
                 className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all resize-none"
               />
             </div>
+          </div>
+        </div>
+
+        {/* Escolha do Modo de Assinatura */}
+        <div className="space-y-4 pt-4 border-t border-outline-variant/10">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="material-symbols-outlined text-primary">draw</span>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-primary font-body">Modo de Assinatura</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button
+              type="button"
+              onClick={() => setModoAssinatura("fisica_com_testemunhas")}
+              className={`p-4 rounded-2xl border text-left transition-all ${modoAssinatura === "fisica_com_testemunhas" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-outline-variant/20 hover:border-primary/50"}`}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <span className="material-symbols-outlined text-primary text-lg">how_to_reg</span>
+                <h3 className="font-bold text-on-surface text-sm">Física + Testemunhas</h3>
+              </div>
+              <p className="text-[10px] text-on-surface-variant leading-relaxed">Indicado para serviços presenciais, obras e contratos de maior valor.</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setModoAssinatura("fisica_sem_testemunhas")}
+              className={`p-4 rounded-2xl border text-left transition-all ${modoAssinatura === "fisica_sem_testemunhas" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-outline-variant/20 hover:border-primary/50"}`}
+            >
+               <div className="flex items-center gap-2 mb-2">
+                <span className="material-symbols-outlined text-primary text-lg">edit</span>
+                <h3 className="font-bold text-on-surface text-sm">Física (Simples)</h3>
+              </div>
+              <p className="text-[10px] text-on-surface-variant leading-relaxed">Para serviços de menor valor quando as partes dispensam testemunhas.</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setModoAssinatura("eletronica")}
+              className={`p-4 rounded-2xl border text-left transition-all ${modoAssinatura === "eletronica" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-outline-variant/20 hover:border-primary/50"}`}
+            >
+               <div className="flex items-center gap-2 mb-2">
+                <span className="material-symbols-outlined text-primary text-lg">link</span>
+                <h3 className="font-bold text-on-surface text-sm">Aceite Eletrônico</h3>
+              </div>
+              <p className="text-[10px] text-on-surface-variant leading-relaxed">Para serviços online ou cliente em outra cidade. Válido pelo CPC.</p>
+            </button>
           </div>
         </div>
 

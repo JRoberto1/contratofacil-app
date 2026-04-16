@@ -44,8 +44,7 @@ export interface DadosServico {
   valor: string;
   prazoEntrega: string;
   formaPagamento: string;
-  multaContratante?: string;
-  multaContratado?: string;
+  multaRescisao?: string;
   localPrestacao?: string;
   formaEntrega?: string;
   clausulasEspeciais?: string;
@@ -57,6 +56,7 @@ export interface FormularioContrato {
   prestador: DadosPrestador;
   cliente: DadosCliente;
   servico: DadosServico;
+  modoAssinatura: "fisica_com_testemunhas" | "fisica_sem_testemunhas" | "eletronica";
 }
 
 export interface ContratoGerado {

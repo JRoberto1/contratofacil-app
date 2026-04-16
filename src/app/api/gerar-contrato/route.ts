@@ -28,12 +28,13 @@ const labelCategoria: Record<string, string> = {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { formulario, tipo } = body as {
-      formulario: FormularioContrato;
+    const { formulario, tipo, modoAssinatura } = body as {
+      formulario: FormularioContrato & { modoAssinatura: string };
       tipo: TipoContrato;
+      modoAssinatura: "fisica_com_testemunhas" | "fisica_sem_testemunhas" | "eletronica";
     };
 
-    if (!formulario || !tipo) {
+    if (!formulario || !tipo || !modoAssinatura) {
       return NextResponse.json(
         { error: "Dados inválidos" },
         { status: 400 }
@@ -46,49 +47,57 @@ export async function POST(req: NextRequest) {
         : labelCategoria[formulario.categoria] ?? "Prestador de Serviços";
 
     const dataAtual = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long' }).format(new Date());
+    const localAssinatura = `${formulario.prestador.cidade}, ${dataAtual}`;
+
+    const clausulaMulta = formulario.servico.multaRescisao
+      ? `- DA RESCISÃO: Em caso de rescisão por qualquer das partes, será aplicada multa de ${formulario.servico.multaRescisao}% sobre o valor total do contrato.`
+      : `- DA RESCISÃO: O presente contrato poderá ser rescindido por qualquer das partes mediante notificação por escrito com antecedência mínima de 5 (cinco) dias, sem aplicação de multa.`;
+
+    let clausulaAssinatura = "";
+    if (modoAssinatura === "eletronica") {
+      clausulaAssinatura = `- MODO DE ASSINATURA: O documento gerado não terá campos físicos para assinatura/testemunhas. Ao final, inclua ESTRITAMENTE: "Este contrato será aceito eletronicamente pelas partes mediante link de confirmação enviado para os e-mails cadastrados, com validade jurídica conforme Art. 10 da MP 2.200-2/2001."`;
+    } else if (modoAssinatura === "fisica_sem_testemunhas") {
+      clausulaAssinatura = `- MODO DE ASSINATURA: Inclua campos para assinatura física apenas do CONTRATANTE e do CONTRATADO. Dispensam-se testemunhas.`;
+    } else {
+      clausulaAssinatura = `- MODO DE ASSINATURA: Inclua campos para assinatura física do CONTRATANTE, do CONTRATADO e obrigatoriamente 2 (duas) TESTEMUNHAS.`;
+    }
+
+    const categoriasCriativas = ["fotografo", "videomaker", "designer-grafico", "desenvolvedor-web", "social-media", "redator", "ilustrador", "motion-designer", "editor-de-video"];
+    const isCriativo = categoriasCriativas.includes(formulario.categoria);
+
+    const instrucaoPropriedadeIntelectual = isCriativo 
+      ? `\n- PROPRIEDADE INTELECTUAL: Como se trata de serviço criativo, inclua obrigatoriamente a cláusula de cessão de direitos: "Os direitos patrimoniais sobre o material produzido serão cedidos ao CONTRATANTE após a quitação integral. O CONTRATADO mantém o direito de exibir o trabalho em portfólio, salvo acordo em contrário por escrito."`
+      : "";
 
 const systemPrompt = `Você é um especialista jurídico brasileiro processando a geração de um contrato.
 
 Gere um contrato ${labelTipo[tipo]} para a categoria/modelo "${categoria}".
 
-REGRAS OBRIGATÓRIAS E INEGOCIÁVEIS (Aplicáveis a QUALQUER modelo ou categoria gerada):
+REGRAS OBRIGATÓRIAS E INEGOCIÁVEIS:
 - Estrutura clara e bem dividida em cláusulas numeradas.
-- Inclua cabeçalho apropriado para o contrato e a seção "DAS PARTES" contendo os dados do CONTRATANTE e CONTRATADO.
-- FORO OBRIGATÓRIO: A cláusula de Eleição de Foro deve sempre ser preenchida com a cidade e estado do CONTRATADO, no seguinte formato exato: "Fica eleito o Foro da Comarca de [Cidade do Contratado], Estado de [Estado do Contratado por extenso]".
-- ESTRUTURAÇÃO DO OBJETO: Avalie o texto do objeto e estruture-o de forma lógica em sub-itens ao longo da cláusula. Não copie o texto passivo do usuário, crie blocos detalhados e estruturados de acordo com o modelo (ex: entregáveis, limitações, revisões inclusas, conforme aplicável à categoria gerada).
-- MULTA RESCISÓRIA: Se a categoria ou modelo comportar rescisão, inclua uma cláusula de rescisão (cancelamento) aplicando exatamente os percentuais para ambas as partes informados nos dados.
-- ASSINATURAS (Data e Local Automáticos): O bloco de assinaturas DEVE conter a data informada abaixo preenchida automaticamente e o local DEVE ser a cidade do contratado (ex: "São Paulo, 16 de Abril de 2026"). Não deixe linhas em branco ou dados para preenchimento posterior. Deixe os devidos espaços para rubricas/assinaturas do CONTRATANTE, CONTRATADO e por padrão 2 Testemunhas.
-- PROIBIDO: É ESTRITAMENTE PROIBIDO o uso da expressão "irrevogável e irretratável" ou similares em qualquer parte do documento (principalmente Disposições Finais), pois entram em contradição lógica com qualquer cláusula rescisória.
-- Embasamento legal com a LGPD (Lei Geral de Proteção de Dados).
-- Use sempre "CONTRATANTE" para o cliente e "CONTRATADO" para o prestador.
-- Responda APENAS com o texto do contrato final e formatado, sem comentários adicionais.
+- INÍCIO DO CONTRATO: Qualifique as partes corretamente usando os dados informados de CONTRATANTE e CONTRATADO. Se não possuir o campo email, omita-o.
+- FORO OBRIGATÓRIO: A cláusula de Eleição de Foro deve ser redigida no exato formato: "Foro da Comarca de ${formulario.prestador.cidade}, Estado de ${formulario.prestador.estado}".
+- ESTRUTURAÇÃO DO OBJETO: Avalie o texto da descrição do serviço para dividir de forma lógica em sub-itens (ex: O que será entregue, Em qual formato, Quantas revisões, etc). Nunca copie o texto bruto fornecido pelo usuário, trabalhe a redação em formato contratual coerente.
+- PAGAMENTO PARCELADO E PRAZO: Na cláusula de pagamento, se a forma de pagamento revelar parcelas, escreva os percentuais e momentos exatos de forma extensa. Se não houver previsão clara de prazo de quitação final, inclua a diretriz genérica: "O pagamento deverá ser efetuado em até 2 (dois) dias úteis após a entrega do serviço."
+${clausulaMulta}
+${instrucaoPropriedadeIntelectual}
+- DATA E LOCAL: Você deve obrigatoriamente informar a data e local do fechamento usando: "${localAssinatura}". Nunca use sublinhados (_) ou campos vazios no local e data.
+${clausulaAssinatura}
+- PROIBIDO: É ESTRITAMENTE PROIBIDO o uso da expressão "irrevogável e irretratável" ou similares em qualquer parte do documento, pois entram em contradição com cláusulas rescisórias.
+- Embasamento legal com a LGPD.
+- Responda APENAS com o texto do contrato final e formatado, sem comentários adicionais (em markdown).
 `;
 
-    const userPrompt = `Gere o contrato com os seguintes dados:
+    const userPrompt = `CONTRATANTE: ${formulario.cliente.nomeRazaoSocial}, CPF/CNPJ ${formulario.cliente.cpfCnpj}, com sede em ${formulario.cliente.cidade} - ${formulario.cliente.estado}.${formulario.cliente.email ? ` E-mail: ${formulario.cliente.email}` : ""}
 
-CONTRATADO (Prestador):
-- Nome: ${formulario.prestador.nomeCompleto}
-- CPF/CNPJ: ${formulario.prestador.cpfCnpj}
-- Sede: ${formulario.prestador.cidade} - ${formulario.prestador.estado}
-${formulario.prestador.email ? `- Email: ${formulario.prestador.email}\n` : ""}
-CONTRATANTE (Cliente):
-- Nome: ${formulario.cliente.nomeRazaoSocial}
-- CPF/CNPJ: ${formulario.cliente.cpfCnpj}
-- Sede: ${formulario.cliente.cidade} - ${formulario.cliente.estado}
-${formulario.cliente.email ? `- Email: ${formulario.cliente.email}\n` : ""}
+CONTRATADO: ${formulario.prestador.nomeCompleto}, CPF/CNPJ ${formulario.prestador.cpfCnpj}, com sede em ${formulario.prestador.cidade} - ${formulario.prestador.estado}.${formulario.prestador.email ? ` E-mail: ${formulario.prestador.email}` : ""}
+
 SERVIÇO/OBJETO:
 - Descrição: ${formulario.servico.descricao}
 - Valor: R$ ${formulario.servico.valor}
 - Prazo de entrega/vigência: ${formulario.servico.prazoEntrega}
 - Forma de pagamento: ${formulario.servico.formaPagamento}
-${formulario.servico.localPrestacao ? `- Local de Prestação: ${formulario.servico.localPrestacao}\n` : ""}${formulario.servico.formaEntrega ? `- Forma de Entrega: ${formulario.servico.formaEntrega}\n` : ""}${formulario.servico.clausulasEspeciais ? `- Cláusulas Especiais/Observações: ${formulario.servico.clausulasEspeciais}\n\nATENÇÃO: Inclua e formalize essas Cláusulas Especiais de forma adequada no contrato.\n` : ""}
-RESCISÃO:
-- Multa se Contratante rescindir: ${formulario.servico.multaContratante || "20"}%
-- Multa se Contratado rescindir: ${formulario.servico.multaContratado || "20"}%
-
-DADOS DE GERAÇÃO E FECHAMENTO:
-- Data da Assinatura: ${dataAtual}
-- Local da Assinatura: ${formulario.prestador.cidade} - ${formulario.prestador.estado}
+${formulario.servico.localPrestacao ? `- Local de Prestação: ${formulario.servico.localPrestacao}\n` : ""}${formulario.servico.formaEntrega ? `- Forma de Entrega: ${formulario.servico.formaEntrega}\n` : ""}${formulario.servico.clausulasEspeciais ? `- Cláusulas Especiais/Observações (ATENÇÃO, FORME CLÁUSULAS A PARTIR DISSO): ${formulario.servico.clausulasEspeciais}\n` : ""}
 `;
 
     const conteudo = await gerarContrato(systemPrompt, userPrompt);
