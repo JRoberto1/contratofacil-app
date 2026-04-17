@@ -79,7 +79,7 @@ REGRAS OBRIGATÓRIAS E INEGOCIÁVEIS:
 - INÍCIO DO CONTRATO: Qualifique as partes corretamente usando os dados informados de CONTRATANTE e CONTRATADO. Se não possuir o campo email, omita-o.
 - FORO OBRIGATÓRIO: A cláusula de Eleição de Foro deve ser redigida no exato formato: "Foro da Comarca de ${formulario.prestador.cidade}, Estado de ${formulario.prestador.estado}".
 - ESTRUTURAÇÃO DO OBJETO: Avalie o texto da descrição do serviço para dividir de forma lógica em sub-itens (ex: O que será entregue, Em qual formato, Quantas revisões, etc). Nunca copie o texto bruto fornecido pelo usuário, trabalhe a redação em formato contratual coerente.
-- PAGAMENTO PARCELADO E PRAZO: Na cláusula de pagamento, se a forma de pagamento revelar parcelas, escreva os percentuais e momentos exatos de forma extensa. Se não houver previsão clara de prazo de quitação final, inclua a diretriz genérica: "O pagamento deverá ser efetuado em até 2 (dois) dias úteis após a entrega do serviço."
+- CONDIÇÕES DE PAGAMENTO INEGOCIÁVEIS: Transcreva INTEGRALMENTE a string fornecida no campo "Forma de pagamento". É ABSOLUTAMENTE PROIBIDO inventar, inferir, deduzir ou criar parcelas, entradas ou prazos que não estejam explicitamente declarados ali. Você deve apenas incorporar a instrução fornecida pelo usuário, estruturando juridicamente sem alterar os números, valores percentuais e dias.
 ${clausulaMulta}
 ${instrucaoPropriedadeIntelectual}
 - DATA E LOCAL: Você deve obrigatoriamente informar a data e local do fechamento usando: "${localAssinatura}". Nunca use sublinhados (_) ou campos vazios no local e data.
@@ -94,7 +94,7 @@ ${clausulaAssinatura}
 CONTRATADO: ${formulario.prestador.nomeCompleto}, CPF/CNPJ ${formulario.prestador.cpfCnpj}, com sede em ${formulario.prestador.cidade} - ${formulario.prestador.estado}.${formulario.prestador.email ? ` E-mail: ${formulario.prestador.email}` : ""}
 
 SERVIÇO/OBJETO:
-- Descrição: ${formulario.servico.descricao}
+${formulario.servico.numeroPedido ? `- Número do Pedido/Proposta: ${formulario.servico.numeroPedido}\n` : ""}- Descrição: ${formulario.servico.descricao}
 - Valor: R$ ${formulario.servico.valor}
 - Prazo de entrega/vigência: ${formulario.servico.prazoEntrega}
 - Forma de pagamento: ${formulario.servico.formaPagamento}

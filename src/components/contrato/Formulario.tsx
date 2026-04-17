@@ -21,7 +21,30 @@ export default function Formulario({
   const [formData, setFormData] = useState({
     prestador: { nomeCompleto: "", cpfCnpj: "", cidade: "", estado: "", email: "" },
     cliente: { nomeRazaoSocial: "", cpfCnpj: "", cidade: "", estado: "", email: "" },
-    servico: { descricao: "", valor: "", prazoEntrega: "", formaPagamento: "", multaRescisao: "", localPrestacao: "", formaEntrega: "", clausulasEspeciais: "" },
+    servico: { 
+      descricao: "", 
+      valor: "", 
+      prazoEntrega: "", 
+      formaPagamento: "", // preenchido na submissão
+      formaPagamentoTipo: "unico" as import("@/types/contrato").FormaPagamentoOpcao,
+      formaPagamentoDetalhes: {
+        quandoUnico: "assinatura" as any,
+        dataUnico: "",
+        percentualEntrada: "50",
+        quandoSaldo: "entrega" as any,
+        diasSaldo: "",
+        numeroParcelas: "3",
+        vencimentoParcelas: "dia_mes" as any,
+        diaMesVencimento: "10",
+        comEntrada: false,
+      },
+      prazoPagamentoAposEntrega: "",
+      numeroPedido: "",
+      multaRescisao: "", 
+      localPrestacao: "", 
+      formaEntrega: "", 
+      clausulasEspeciais: "" 
+    }
   });
 
   const [modoAssinatura, setModoAssinatura] = useState<"fisica_com_testemunhas" | "fisica_sem_testemunhas" | "eletronica">("fisica_com_testemunhas");
@@ -80,10 +103,24 @@ export default function Formulario({
     }
   }, [initialData, categoria]);
 
-  const handleChange = (section: "prestador" | "cliente" | "servico", field: string, value: string) => {
+  const handleChange = (section: "prestador" | "cliente" | "servico", field: string, value: any) => {
     setFormData((prev) => ({
       ...prev,
       [section]: { ...prev[section], [field]: value },
+    }));
+    setSaved(false);
+  };
+
+  const handlePagamentoDetalhes = (field: string, value: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      servico: {
+        ...prev.servico,
+        formaPagamentoDetalhes: {
+          ...prev.servico.formaPagamentoDetalhes,
+          [field]: value
+        }
+      }
     }));
     setSaved(false);
   };
@@ -143,6 +180,39 @@ export default function Formulario({
       }
     }
 
+    // Geração textual da forma de pagamento
+    const s = formData.servico;
+    let pagtoFinal = "A forma de pagamento será acordada.";
+    
+    switch (s.formaPagamentoTipo) {
+      case "unico":
+        if (s.formaPagamentoDetalhes?.quandoUnico === "assinatura") pagtoFinal = "Pagamento único no ato da assinatura do contrato.";
+        else if (s.formaPagamentoDetalhes?.quandoUnico === "entrega") pagtoFinal = `Pagamento único no momento da entrega do serviço${s.prazoPagamentoAposEntrega ? `, com prazo limite de pagamento de ${s.prazoPagamentoAposEntrega} dias após a entrega` : ""}.`;
+        else if (s.formaPagamentoDetalhes?.quandoUnico === "data") pagtoFinal = `Pagamento único até a data de ${s.formaPagamentoDetalhes.dataUnico}.`;
+        else pagtoFinal = "Pagamento único.";
+        break;
+      case "entrada_saldo": {
+        const perc = s.formaPagamentoDetalhes?.percentualEntrada || "50";
+        const saldoQuando = s.formaPagamentoDetalhes?.quandoSaldo === "dias" 
+          ? `em até ${s.formaPagamentoDetalhes?.diasSaldo || ""} dias após a entrega` 
+          : `no ato da entrega${s.prazoPagamentoAposEntrega ? ` (prazo de tolerância de ${s.prazoPagamentoAposEntrega} dias)` : ""}`;
+        pagtoFinal = `Entrada de ${perc}% no momento da contratação/assinatura e o saldo de ${100 - Number(perc)}% será pago ${saldoQuando}.`;
+        break;
+      }
+      case "parcelado": {
+        const parcelas = s.formaPagamentoDetalhes?.numeroParcelas || "3";
+        const entradaStr = s.formaPagamentoDetalhes?.comEntrada ? `Entrada de ${s.formaPagamentoDetalhes.percentualEntrada || "50"}% do valor e o restante p` : "P";
+        const vencimento = s.formaPagamentoDetalhes?.vencimentoParcelas === "dia_mes" 
+          ? `com vencimento todo dia ${s.formaPagamentoDetalhes.diaMesVencimento || "10"} de cada mês subseqüente`
+          : `a cada ${s.formaPagamentoDetalhes?.diaMesVencimento || "30"} dias após a data de assinatura`;
+        pagtoFinal = `${entradaStr}arcelado em ${parcelas} vezes mensais de valores iguais, ${vencimento}.`;
+        break;
+      }
+      case "a_combinar":
+        pagtoFinal = "A forma e as datas de pagamento serão acordadas entre as partes mediante instrumento complementar ou comunicação escrita.";
+        break;
+    }
+
     // Normalização
     const normalizedData = {
       ...formData,
@@ -161,7 +231,7 @@ export default function Formulario({
       servico: {
         ...formData.servico,
         descricao: capitalizeSentence(formData.servico.descricao),
-        formaPagamento: capitalizeSentence(formData.servico.formaPagamento),
+        formaPagamento: pagtoFinal,
       }
     };
 
@@ -347,6 +417,16 @@ export default function Formulario({
           </div>
           <div className="space-y-4">
             <div>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Número do pedido ou proposta (opcional)</label>
+              <input 
+                type="text" 
+                placeholder="Ex: PROP-2026-042"
+                value={formData.servico.numeroPedido || ""}
+                onChange={e => handleChange("servico", "numeroPedido", e.target.value)}
+                className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+              />
+            </div>
+            <div>
               <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Descrição do Serviço</label>
               <textarea 
                 required 
@@ -382,16 +462,181 @@ export default function Formulario({
                 />
               </div>
             </div>
+
+            {/* Payment Mode Selection */}
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Forma de pagamento acordada</label>
-              <input 
-                required 
-                type="text" 
-                placeholder="Ex: PIX (50% entrada, 50% entrega)"
-                value={formData.servico.formaPagamento}
-                onChange={e => handleChange("servico", "formaPagamento", e.target.value)}
-                className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
-              />
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Como será o pagamento?</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                <button
+                  type="button"
+                  onClick={() => handleChange("servico", "formaPagamentoTipo", "unico")}
+                  className={`p-4 rounded-xl border text-left transition-all ${formData.servico.formaPagamentoTipo === "unico" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-outline-variant/20 hover:border-primary/50"}`}
+                >
+                  <h3 className="font-bold text-on-surface text-sm">Pagamento único</h3>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleChange("servico", "formaPagamentoTipo", "entrada_saldo")}
+                  className={`p-4 rounded-xl border text-left transition-all ${formData.servico.formaPagamentoTipo === "entrada_saldo" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-outline-variant/20 hover:border-primary/50"}`}
+                >
+                  <h3 className="font-bold text-on-surface text-sm">Entrada + saldo</h3>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleChange("servico", "formaPagamentoTipo", "parcelado")}
+                  className={`p-4 rounded-xl border text-left transition-all ${formData.servico.formaPagamentoTipo === "parcelado" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-outline-variant/20 hover:border-primary/50"}`}
+                >
+                  <h3 className="font-bold text-on-surface text-sm">Parcelado</h3>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleChange("servico", "formaPagamentoTipo", "a_combinar")}
+                  className={`p-4 rounded-xl border text-left transition-all ${formData.servico.formaPagamentoTipo === "a_combinar" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-outline-variant/20 hover:border-primary/50"}`}
+                >
+                  <h3 className="font-bold text-on-surface text-sm">A combinar com o cliente</h3>
+                </button>
+              </div>
+
+              {/* Sub-fields for Unico */}
+              {formData.servico.formaPagamentoTipo === "unico" && (
+                <div className="bg-surface-container-low p-4 rounded-xl border border-outline-variant/20 space-y-4">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Quando?</label>
+                    <select
+                      value={formData.servico.formaPagamentoDetalhes?.quandoUnico}
+                      onChange={(e) => handlePagamentoDetalhes("quandoUnico", e.target.value)}
+                      className="w-full bg-surface-container-highest rounded-xl py-3 px-4 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body text-sm"
+                    >
+                      <option value="assinatura">Na assinatura</option>
+                      <option value="entrega">Na entrega</option>
+                      <option value="data">Em data específica</option>
+                    </select>
+                  </div>
+                  {formData.servico.formaPagamentoDetalhes?.quandoUnico === "data" && (
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Qual data?</label>
+                      <input 
+                        type="date"
+                        value={formData.servico.formaPagamentoDetalhes?.dataUnico || ""}
+                        onChange={(e) => handlePagamentoDetalhes("dataUnico", e.target.value)}
+                        className="w-full bg-surface-container-highest rounded-xl py-3 px-4 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body text-sm"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Sub-fields for Entrada + Saldo */}
+              {formData.servico.formaPagamentoTipo === "entrada_saldo" && (
+                <div className="bg-surface-container-low p-4 rounded-xl border border-outline-variant/20 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">% de entrada</label>
+                    <input 
+                      type="number" min="1" max="99" placeholder="Ex: 50"
+                      value={formData.servico.formaPagamentoDetalhes?.percentualEntrada || ""}
+                      onChange={(e) => handlePagamentoDetalhes("percentualEntrada", e.target.value)}
+                      className="w-full bg-surface-container-highest rounded-xl py-3 px-4 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Quando pagar o saldo?</label>
+                    <select
+                      value={formData.servico.formaPagamentoDetalhes?.quandoSaldo}
+                      onChange={(e) => handlePagamentoDetalhes("quandoSaldo", e.target.value)}
+                      className="w-full bg-surface-container-highest rounded-xl py-3 px-4 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body text-sm"
+                    >
+                      <option value="entrega">Na entrega</option>
+                      <option value="dias">Em X dias após entrega</option>
+                    </select>
+                  </div>
+                  {formData.servico.formaPagamentoDetalhes?.quandoSaldo === "dias" && (
+                     <div className="md:col-span-2">
+                       <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Quantos dias após a entrega?</label>
+                       <input 
+                         type="number" min="1" placeholder="Ex: 15"
+                         value={formData.servico.formaPagamentoDetalhes?.diasSaldo || ""}
+                         onChange={(e) => handlePagamentoDetalhes("diasSaldo", e.target.value)}
+                         className="w-full bg-surface-container-highest rounded-xl py-3 px-4 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body text-sm"
+                       />
+                     </div>
+                  )}
+                </div>
+              )}
+
+              {/* Sub-fields for Parcelado */}
+              {formData.servico.formaPagamentoTipo === "parcelado" && (
+                <div className="bg-surface-container-low p-4 rounded-xl border border-outline-variant/20 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Número de parcelas</label>
+                      <input 
+                        type="number" min="2" max="24" placeholder="Ex: 3"
+                        value={formData.servico.formaPagamentoDetalhes?.numeroParcelas || ""}
+                        onChange={(e) => handlePagamentoDetalhes("numeroParcelas", e.target.value)}
+                        className="w-full bg-surface-container-highest rounded-xl py-3 px-4 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Vencimento</label>
+                      <select
+                        value={formData.servico.formaPagamentoDetalhes?.vencimentoParcelas}
+                        onChange={(e) => handlePagamentoDetalhes("vencimentoParcelas", e.target.value)}
+                        className="w-full bg-surface-container-highest rounded-xl py-3 px-4 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body text-sm"
+                      >
+                        <option value="dia_mes">Todo dia X do mês</option>
+                        <option value="dias_apos">A cada X dias após assinatura</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">
+                      {formData.servico.formaPagamentoDetalhes?.vencimentoParcelas === "dia_mes" ? "Qual dia do mês?" : "Quantos dias?"}
+                    </label>
+                    <input 
+                      type="number" placeholder={formData.servico.formaPagamentoDetalhes?.vencimentoParcelas === "dia_mes" ? "Ex: 10" : "Ex: 30"}
+                      value={formData.servico.formaPagamentoDetalhes?.diaMesVencimento || ""}
+                      onChange={(e) => handlePagamentoDetalhes("diaMesVencimento", e.target.value)}
+                      className="w-full bg-surface-container-highest rounded-xl py-3 px-4 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body text-sm"
+                    />
+                  </div>
+                  <div className="pt-2">
+                    <label className="flex items-center gap-2 text-sm font-bold text-on-surface cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={formData.servico.formaPagamentoDetalhes?.comEntrada || false}
+                        onChange={(e) => handlePagamentoDetalhes("comEntrada", e.target.checked)}
+                        className="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary"
+                      />
+                       Tem entrada?
+                    </label>
+                  </div>
+                  {formData.servico.formaPagamentoDetalhes?.comEntrada && (
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">% de Entrada</label>
+                      <input 
+                        type="number" placeholder="Ex: 50" min="1" max="99"
+                        value={formData.servico.formaPagamentoDetalhes?.percentualEntrada || ""}
+                        onChange={(e) => handlePagamentoDetalhes("percentualEntrada", e.target.value)}
+                        className="w-full bg-surface-container-highest rounded-xl py-3 px-4 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body text-sm"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Conditional Prazo Pagamento apos entrega */}
+              {((formData.servico.formaPagamentoTipo === "unico" && formData.servico.formaPagamentoDetalhes?.quandoUnico === "entrega") || (formData.servico.formaPagamentoTipo === "entrada_saldo" && formData.servico.formaPagamentoDetalhes?.quandoSaldo === "entrega")) && (
+                <div className="mt-4 bg-[#002b73]/5 p-4 rounded-xl border border-[#002b73]/10">
+                   <label className="block text-[10px] font-bold uppercase tracking-wider text-primary mb-2">Em quantos dias após a entrega o pagamento deve ser feito?</label>
+                   <input 
+                     type="number" min="0" placeholder="Ex: 2"
+                     value={formData.servico.prazoPagamentoAposEntrega || ""}
+                     onChange={(e) => handleChange("servico", "prazoPagamentoAposEntrega", e.target.value)}
+                     className="w-full bg-white rounded-xl py-3 px-4 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body text-sm"
+                   />
+                   <p className="text-[10px] text-outline-variant italic mt-2 ml-1">Deixe em branco para usar o padrão de 2 (dois) dias úteis.</p>
+                </div>
+              )}
             </div>
 
             <div>

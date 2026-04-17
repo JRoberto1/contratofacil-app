@@ -23,6 +23,21 @@ export type TipoContrato =
   | "completo-dia-a-dia"
   | "resumido-dia-a-dia";
 
+export type FormaPagamentoOpcao = "unico" | "entrada_saldo" | "parcelado" | "a_combinar";
+
+export interface FormaPagamentoDetalhes {
+  quandoUnico?: "assinatura" | "entrega" | "data";
+  dataUnico?: string;
+  percentualEntrada?: string;
+  quandoSaldo?: "entrega" | "dias";
+  diasSaldo?: string;
+  numeroParcelas?: string;
+  vencimentoParcelas?: "dia_mes" | "dias_apos";
+  diaMesVencimento?: string;
+  comEntrada?: boolean;
+}
+
+
 export interface DadosPrestador {
   nomeCompleto: string;
   cpfCnpj: string;
@@ -44,6 +59,10 @@ export interface DadosServico {
   valor: string;
   prazoEntrega: string;
   formaPagamento: string;
+  formaPagamentoTipo?: FormaPagamentoOpcao;
+  formaPagamentoDetalhes?: FormaPagamentoDetalhes;
+  prazoPagamentoAposEntrega?: string;
+  numeroPedido?: string;
   multaRescisao?: string;
   localPrestacao?: string;
   formaEntrega?: string;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import type { FormularioContrato, TipoContrato } from "@/types/contrato";
@@ -19,10 +20,12 @@ interface VisualizadorContratoProps {
 }
 
 export default function VisualizadorContrato({ formulario, tipoInicial = "completo-formal", onBack }: VisualizadorContratoProps) {
+  const router = useRouter();
   const [tipoAtivo, setTipoAtivo] = useState<TipoContrato>(tipoInicial);
   const [conteudo, setConteudo] = useState<Record<TipoContrato, string>>({} as Record<TipoContrato, string>);
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [mostrarToast, setMostrarToast] = useState(false);
   const [editando, setEditando] = useState(false);
   const [textoEditado, setTextoEditado] = useState("");
   const [user, setUser] = useState<User | null>(null);
@@ -140,6 +143,12 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
       document.body.removeChild(link);
       URL.revokeObjectURL(blobUrl);
       
+      setMostrarToast(true);
+      setTimeout(() => {
+        setMostrarToast(false);
+        router.push("/meus-contratos");
+      }, 3000);
+      
     } catch (e: any) {
       setErro(e.message);
     } finally {
@@ -150,7 +159,13 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
   const textoAtual = editando ? textoEditado : (conteudo[tipoAtivo] ?? "");
 
   return (
-    <div className="w-full pb-12 animate-in fade-in duration-500">
+    <div className="w-full pb-12 animate-in fade-in duration-500 relative">
+      {/* Toast Notification */}
+      <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-[#e6f4ea] text-[#137333] px-6 py-4 rounded-xl shadow-[0_10px_40px_rgba(19,115,51,0.2)] transition-all duration-300 border border-[#137333]/20 ${mostrarToast ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
+        <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+        <span className="font-bold font-body text-sm">Contrato baixado com sucesso!</span>
+      </div>
+
       <header className="mb-12">
         <div className="inline-flex items-center gap-2 bg-secondary-container/20 text-primary px-4 py-1.5 rounded-full mb-6">
           <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
@@ -181,13 +196,24 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 space-y-8">
           <div className="bg-surface-container-lowest rounded-2xl p-10 md:p-16 shadow-[0_20px_40px_rgba(0,43,115,0.03)] relative flex flex-col min-h-[600px]">
-            <div className="absolute top-8 right-8 flex items-center gap-2 border border-outline-variant/30 rounded-lg p-3 bg-white/50 backdrop-blur-sm z-20">
+            <div className="absolute top-8 right-8 flex items-center gap-2 border border-outline-variant/30 rounded-lg p-3 bg-white/50 backdrop-blur-sm z-20 group relative cursor-help">
               <div className="w-10 h-10 rounded-full bg-secondary-container/30 flex items-center justify-center text-primary">
-                <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>new_releases</span>
+                <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  {formulario.modoAssinatura === "eletronica" ? "link" : "edit"}
+                </span>
               </div>
               <div className="hidden sm:block">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-outline leading-none mb-1 font-label">Status</p>
-                <p className="text-[12px] font-bold text-primary leading-none font-body">Autenticação Digital</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-outline leading-none mb-1 font-label">
+                  {formulario.modoAssinatura === "eletronica" ? "ACEITE ELETRÔNICO" : "ASSINATURA FÍSICA"}
+                </p>
+                <p className="text-[12px] font-bold text-primary leading-none font-body">
+                  {formulario.modoAssinatura === "eletronica" ? "Link enviado p/ e-mail" : "Imprima e assine"}
+                </p>
+              </div>
+              
+              {/* Tooltip */}
+              <div className="absolute top-full right-0 mt-2 w-64 bg-surface-container-highest p-3 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 text-xs font-body text-on-surface-variant border border-outline-variant/20">
+                Este contrato foi gerado pelo ContratoFácil e possui registro de criação com data e hora. {formulario.modoAssinatura === "eletronica" ? "O aceite eletrônico tem validade jurídica conforme o Art. 10 da MP 2.200-2/2001 e o CPC." : "A assinatura física requerida deve ser acordada em ambas as partes para garantir validade jurídica."}
               </div>
             </div>
 
