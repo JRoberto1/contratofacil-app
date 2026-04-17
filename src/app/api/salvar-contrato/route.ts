@@ -55,8 +55,11 @@ export async function POST(req: NextRequest) {
       .select('id')
       .single();
 
+    console.log(">>>>>>>>>> [salvar-contrato] TENTOU INSERIR <<<<<<<<<<");
+    console.log("Payload:", payload);
+
     if (error) {
-      console.error("[salvar-contrato] Banco de dados:", error);
+      console.error("[salvar-contrato] ERRO no Banco de dados:", error);
       return NextResponse.json(
         { error: "Falha ao gravar contrato no banco de dados." },
         { status: 500 }

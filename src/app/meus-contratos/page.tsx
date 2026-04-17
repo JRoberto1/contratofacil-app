@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { DashboardContratosLayout } from "@/components/contrato/DashboardContratosLayout";
 
+export const dynamic = 'force-dynamic';
+
 export default async function MeusContratosPage() {
   const supabase = await createClient();
 

@@ -118,9 +118,15 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
             })
           });
           const dataSalvar = await resSalvar.json();
-          if (resSalvar.ok) contratoId = dataSalvar.id;
-        } catch (e) {
-          console.error("Erro ignorado ao salvar histórico", e);
+          if (resSalvar.ok) {
+            contratoId = dataSalvar.id;
+          } else {
+            console.error("Erro explícito do backend ao salvar:", dataSalvar);
+            throw new Error(`Erro ao salvar no seu histórico: ${dataSalvar.error || "Desconhecido"}`);
+          }
+        } catch (e: any) {
+          console.error("Falha crassa no salvar-contrato", e);
+          throw new Error(e.message || "Não foi possível registrar o contrato na sua conta.");
         }
       }
 
