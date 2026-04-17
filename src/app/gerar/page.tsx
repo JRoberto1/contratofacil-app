@@ -14,13 +14,33 @@ export default function GerarPage() {
   const [otherValue, setOtherValue] = useState("");
   const [formData, setFormData] = useState<any>(null);
 
-  const handleFormSubmit = (dados: any, tipoAtivo: import("@/types/contrato").TipoContrato) => {
-    localStorage.setItem("contratofacil_rascunho_completo", JSON.stringify({
-      formulario: dados,
-      tipo: tipoAtivo,
-      timestamp: new Date().toISOString()
-    }));
-    router.push("/contrato/rascunho");
+  const handleFormSubmit = async (dados: any, tipoAtivo: import("@/types/contrato").TipoContrato) => {
+    try {
+      const res = await fetch("/api/salvar-contrato", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          formulario: dados,
+          tipo: tipoAtivo,
+          conteudo: "",
+          status_override: "gerando"
+        })
+      });
+      
+      if (!res.ok) throw new Error("Falha ao preparar geração");
+      
+      const { id } = await res.json();
+      router.push(`/contrato/${id}`);
+    } catch (e) {
+      console.error(e);
+      // Fallback para fluxo local antigo se der erro
+      localStorage.setItem("contratofacil_rascunho_completo", JSON.stringify({
+        formulario: dados,
+        tipo: tipoAtivo,
+        timestamp: new Date().toISOString()
+      }));
+      router.push("/contrato/rascunho");
+    }
   };
 
   // Se vier com o query param ?passo=1, inicia na etapa 1 (Formulário)

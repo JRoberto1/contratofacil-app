@@ -14,15 +14,22 @@ const tipos: { id: TipoContrato; label: string }[] = [
 ];
 
 interface VisualizadorContratoProps {
-  formulario: FormularioContrato;
+  formulario: FormularioContrato | null;
   tipoInicial?: TipoContrato;
   onBack?: () => void;
+  contratoId?: string;
+  conteudoDB?: string | null;
 }
 
-export default function VisualizadorContrato({ formulario, tipoInicial = "completo-formal", onBack }: VisualizadorContratoProps) {
+export default function VisualizadorContrato({ formulario, tipoInicial = "completo-formal", onBack, contratoId, conteudoDB }: VisualizadorContratoProps) {
   const router = useRouter();
   const [tipoAtivo, setTipoAtivo] = useState<TipoContrato>(tipoInicial);
-  const [conteudo, setConteudo] = useState<Record<TipoContrato, string>>({} as Record<TipoContrato, string>);
+  const [conteudo, setConteudo] = useState<Record<TipoContrato, string>>(() => {
+    if (conteudoDB) {
+      return { [tipoInicial]: conteudoDB } as any;
+    }
+    return {} as Record<TipoContrato, string>;
+  });
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [mostrarToast, setMostrarToast] = useState(false);
@@ -47,14 +54,16 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
   }, [supabase]);
 
   const gerarTipo = useCallback(async (tipo: TipoContrato) => {
-    if (conteudo[tipo]) return;
+    if (conteudo[tipo] || conteudoDB) return;
     setCarregando(true);
     setErro(null);
     try {
+      if (!formulario) throw new Error("Faltando formulário para geração.");
+      
       const res = await fetch("/api/gerar-contrato", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ formulario, tipo }),
+        body: JSON.stringify({ formulario, tipo, contratoId }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erro ao gerar");
@@ -115,25 +124,19 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
       }
 
       // 2. Transforma em PDF diretamente via API de renderização 
-      // Enviamos o conteúdo limpo ao invés do ID, e a API devolve um Base64.
       const resGerar = await fetch("/api/gerar-pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ conteudo: conteudo[tipoAtivo], contratoId }), // contratoId opcional
       });
       
-      const dataGerar = await resGerar.json();
-      if (!resGerar.ok) throw new Error(dataGerar.error || "Erro ao gerar arquivo PDF.");
-
-      // 3. Renderiza o Base64 em Blob para Download NATIVO no Navegador
-      const byteCharacters = atob(dataGerar.base64);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      if (!resGerar.ok) {
+        const errorData = await resGerar.json().catch(() => ({}));
+        throw new Error(errorData.error || "Erro ao gerar arquivo PDF.");
       }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: "application/pdf" });
-      
+
+      // 3. Renderiza o Blob para Download NATIVO no Navegador
+      const blob = await resGerar.blob();      
       const blobUrl = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = blobUrl;
@@ -199,21 +202,21 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
             <div className="absolute top-8 right-8 flex items-center gap-2 border border-outline-variant/30 rounded-lg p-3 bg-white/50 backdrop-blur-sm z-20 group relative cursor-help">
               <div className="w-10 h-10 rounded-full bg-secondary-container/30 flex items-center justify-center text-primary">
                 <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  {formulario.modoAssinatura === "eletronica" ? "link" : "edit"}
+                  {formulario?.modoAssinatura === "eletronica" ? "link" : "edit"}
                 </span>
               </div>
               <div className="hidden sm:block">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-outline leading-none mb-1 font-label">
-                  {formulario.modoAssinatura === "eletronica" ? "ACEITE ELETRÔNICO" : "ASSINATURA FÍSICA"}
+                  {formulario?.modoAssinatura === "eletronica" ? "ACEITE ELETRÔNICO" : "ASSINATURA FÍSICA"}
                 </p>
                 <p className="text-[12px] font-bold text-primary leading-none font-body">
-                  {formulario.modoAssinatura === "eletronica" ? "Link enviado p/ e-mail" : "Imprima e assine"}
+                  {formulario?.modoAssinatura === "eletronica" ? "Link enviado p/ e-mail" : "Documento Impresso"}
                 </p>
               </div>
               
               {/* Tooltip */}
               <div className="absolute top-full right-0 mt-2 w-64 bg-surface-container-highest p-3 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 text-xs font-body text-on-surface-variant border border-outline-variant/20">
-                Este contrato foi gerado pelo ContratoFácil e possui registro de criação com data e hora. {formulario.modoAssinatura === "eletronica" ? "O aceite eletrônico tem validade jurídica conforme o Art. 10 da MP 2.200-2/2001 e o CPC." : "A assinatura física requerida deve ser acordada em ambas as partes para garantir validade jurídica."}
+                Este contrato foi gerado pelo ContratoFácil e possui registro de criação com data e hora. {formulario?.modoAssinatura === "eletronica" ? "O aceite eletrônico tem validade jurídica conforme o Art. 10 da MP 2.200-2/2001 e o CPC." : "A assinatura física requerida deve ser acordada em ambas as partes para garantir validade jurídica."}
               </div>
             </div>
 

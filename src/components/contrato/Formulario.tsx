@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { FormularioContrato, CategoriaContrato } from "@/types/contrato";
+import { categorias, CategoriaSlug } from "@/lib/categorias";
+import type { FormularioContrato } from "@/types/contrato";
 
 interface FormularioProps {
-  categoria: CategoriaContrato;
+  categoria: string;
   categoriaCustom?: string;
   initialData?: Omit<FormularioContrato, "categoria" | "categoriaCustom">;
   onBack: () => void;
@@ -43,9 +44,12 @@ export default function Formulario({
       multaRescisao: "", 
       localPrestacao: "", 
       formaEntrega: "", 
-      clausulasEspeciais: "" 
+      clausulasEspeciais: "",
+      camposExtrasCategoria: {} as Record<string, any>
     }
   });
+
+  const catExtra = categorias[categoria as CategoriaSlug] || categorias['other'];
 
   const [modoAssinatura, setModoAssinatura] = useState<"fisica_com_testemunhas" | "fisica_sem_testemunhas" | "eletronica">("fisica_com_testemunhas");
 
@@ -234,6 +238,15 @@ export default function Formulario({
         formaPagamento: pagtoFinal,
       }
     };
+
+    // Analytics
+    if (typeof window !== "undefined" && (window as any).gtag) {
+      (window as any).gtag('event', 'generate_contract_start', {
+        event_category: 'Contrato',
+        event_label: categoria,
+        value: 1
+      });
+    }
 
     onSubmit({
       categoria,
@@ -688,6 +701,67 @@ export default function Formulario({
                 className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all resize-none"
               />
             </div>
+            
+            {catExtra && catExtra.camposExtras && catExtra.camposExtras.length > 0 && (
+              <div className="mt-8 pt-6 border-t border-outline-variant/10">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="material-symbols-outlined text-primary">psychology</span>
+                  <h3 className="font-bold text-sm tracking-widest uppercase text-primary font-body">Detalhes de {catExtra.title}</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {catExtra.camposExtras.map(campo => (
+                    <div key={campo.id}>
+                      <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">
+                        {campo.label}
+                      </label>
+                      {campo.type === 'enum' && campo.options ? (
+                        <select
+                          className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                          value={formData.servico.camposExtrasCategoria?.[campo.id] || ""}
+                          onChange={(e) => {
+                            setFormData(prev => ({
+                              ...prev,
+                              servico: {
+                                ...prev.servico,
+                                camposExtrasCategoria: {
+                                  ...(prev.servico.camposExtrasCategoria || {}),
+                                  [campo.id]: e.target.value
+                                }
+                              }
+                            }));
+                          }}
+                        >
+                          <option value="">Selecione...</option>
+                          {campo.options.map(opt => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          type={campo.type === 'number' ? 'number' : 'text'}
+                          placeholder={campo.placeholder}
+                          className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                          value={formData.servico.camposExtrasCategoria?.[campo.id] || ""}
+                          onChange={(e) => {
+                            setFormData(prev => ({
+                              ...prev,
+                              servico: {
+                                ...prev.servico,
+                                camposExtrasCategoria: {
+                                  ...(prev.servico.camposExtrasCategoria || {}),
+                                  [campo.id]: e.target.value
+                                }
+                              }
+                            }));
+                          }}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
           </div>
         </div>
 

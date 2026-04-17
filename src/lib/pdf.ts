@@ -1,10 +1,10 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
 /**
- * Gera um PDF a partir de um texto, retornando os bytes em Base64.
+ * Gera um PDF a partir de um texto, retornando os bytes em Uint8Array.
  * Inclui paginação automática e quebra nativa de linha garantida para o texto.
  */
-export async function gerarPDFBase64(texto: string): Promise<string> {
+export async function gerarPDFBuffer(texto: string): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
@@ -76,5 +76,10 @@ export async function gerarPDFBase64(texto: string): Promise<string> {
   }
 
   const pdfBytes = await pdfDoc.save();
+  return pdfBytes;
+}
+
+export async function gerarPDFBase64(texto: string): Promise<string> {
+  const pdfBytes = await gerarPDFBuffer(texto);
   return Buffer.from(pdfBytes).toString('base64');
 }

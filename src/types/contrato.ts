@@ -67,6 +67,7 @@ export interface DadosServico {
   localPrestacao?: string;
   formaEntrega?: string;
   clausulasEspeciais?: string;
+  camposExtrasCategoria?: Record<string, string | boolean | number>;
 }
 
 export interface FormularioContrato {

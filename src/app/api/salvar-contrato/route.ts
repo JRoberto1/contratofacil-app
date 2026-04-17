@@ -17,13 +17,14 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { formulario, tipo, conteudo } = body as {
+    const { formulario, tipo, conteudo, status_override } = body as {
       formulario: FormularioContrato;
       tipo: TipoContrato;
-      conteudo: string;
+      conteudo?: string;
+      status_override?: string;
     };
 
-    if (!formulario || !tipo || !conteudo) {
+    if (!formulario || !tipo) {
       return NextResponse.json(
         { error: "Dados incompletos para salvar o contrato." },
         { status: 400 }
@@ -44,8 +45,8 @@ export async function POST(req: NextRequest) {
       servico_prazo: formulario.servico.prazoEntrega,
       servico_pagamento: formulario.servico.formaPagamento,
       tipo: tipo,
-      conteudo: conteudo,
-      status: 'rascunho'
+      conteudo: conteudo || '',
+      status: status_override || 'rascunho'
     };
 
     const { data, error } = await supabase
