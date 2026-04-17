@@ -12,11 +12,15 @@ export default async function MeusContratosPage() {
     redirect("/login");
   }
 
-  const { data: contratos } = await supabase
+  const { data: contratos, error: contratosError } = await supabase
     .from('contratos')
     .select('id, referencia, usuario_id, categoria, categoria_custom, cliente_nome, prestador_nome, servico_valor, status, conteudo, tipo, imutavel, downloads_count, criado_em')
     .eq('usuario_id', user.id)
     .order('criado_em', { ascending: false });
+
+  if (contratosError) {
+    console.error("ERRO [meus-contratos] select contratos:", contratosError);
+  }
 
   const { data: perfil } = await supabase
     .from('perfis')
@@ -25,6 +29,25 @@ export default async function MeusContratosPage() {
     .single();
 
   const cotaDisponivel = perfil ? Math.max(0, perfil.contratos_mes - (perfil.contratos_usados_mes || 0)) : 0;
+
+  if (contratosError) {
+    return (
+      <div className="min-h-screen bg-surface flex flex-col pt-12 pb-24 px-6 md:px-12 items-center justify-center text-center animate-in fade-in duration-500">
+        <div className="w-16 h-16 bg-error/10 text-error rounded-full flex items-center justify-center mb-6">
+          <span className="material-symbols-outlined text-3xl">database</span>
+        </div>
+        <h1 className="text-3xl font-headline font-bold text-on-surface mb-4">Atualização de Banco Pendente</h1>
+        <p className="text-on-surface-variant font-body mb-8 max-w-md leading-relaxed">
+          Nós criamos a nova aba de Meus Contratos, mas ela requer que o <strong>banco de dados (Supabase)</strong> seja atualizado com as novas configurações de segurança.<br/><br/>
+          Por favor, rode o script SQL que te enviei no painel do Supabase.
+        </p>
+        <div className="bg-surface-container-lowest border border-error/20 p-4 rounded-xl text-left">
+          <p className="text-xs font-mono text-error/80 font-bold mb-1">ERRO TÉCNICO:</p>
+          <code className="text-sm font-mono text-on-surface-variant">{contratosError.message}</code>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-surface flex flex-col pt-12 pb-24 px-6 md:px-12 animate-in fade-in duration-500">
