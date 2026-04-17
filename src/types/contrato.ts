@@ -91,6 +91,24 @@ export interface ContratoGerado {
   pdfUrl?: string;
 }
 
+export interface Contrato {
+  id: string;
+  referencia: string;
+  usuario_id: string;
+  cliente_nome: string; // DB col mapping
+  prestador_nome?: string;
+  categoria: string;
+  categoria_custom?: string;
+  servico_valor: string; // DB col mapping
+  status: 'rascunho' | 'gerado' | 'baixado';
+  conteudo: string;
+  tipo: string;
+  imutavel: boolean;
+  downloads_count: number;
+  criado_em?: string;
+  updated_at?: string;
+}
+
 export type PlanoAssinatura = "gratis" | "avulso" | "mensal" | "semestral" | "anual";
 
 export interface Plano {
