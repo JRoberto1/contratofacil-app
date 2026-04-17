@@ -41,7 +41,8 @@ export default function Formulario({
       },
       prazoPagamentoAposEntrega: "",
       numeroPedido: "",
-      multaRescisao: "", 
+      multaRescisao: "",
+      jurosAtraso: "",
       localPrestacao: "", 
       formaEntrega: "", 
       clausulasEspeciais: "",
@@ -652,21 +653,34 @@ export default function Formulario({
               )}
             </div>
 
-            <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Multa por rescisão (%) (opcional)</label>
-              <div className="relative">
-                <input 
-                  type="number"
-                  min="1"
-                  max="100" 
-                  placeholder="Ex: 20"
-                  value={formData.servico.multaRescisao || ""}
-                  onChange={e => handleChange("servico", "multaRescisao", e.target.value)}
-                  className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 pr-10 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
-                />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant font-bold text-sm">%</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Multa por rescisão (%) (opcional)</label>
+                <div className="relative">
+                  <input 
+                    type="number"
+                    min="1"
+                    max="100" 
+                    placeholder="Ex: 20"
+                    value={formData.servico.multaRescisao || ""}
+                    onChange={e => handleChange("servico", "multaRescisao", e.target.value)}
+                    className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 pr-10 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                  />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant font-bold text-sm">%</span>
+                </div>
+                <p className="text-[10px] text-outline-variant italic mt-1 ml-1">Aplicada em cancelamento de contrato.</p>
               </div>
-              <p className="text-[10px] text-outline-variant italic mt-1 ml-1">Se preenchido, será aplicada essa porcentagem sobre o valor total em caso de cancelamento por qualquer das partes.</p>
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Juros por atraso no pagamento (opcional)</label>
+                <input 
+                  type="text" 
+                  placeholder="Ex: 1% ao mês"
+                  value={formData.servico.jurosAtraso || ""}
+                  onChange={e => handleChange("servico", "jurosAtraso", e.target.value)}
+                  className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                />
+                <p className="text-[10px] text-outline-variant italic mt-1 ml-1">Deixe em branco para contrato sem cláusula de juros.</p>
+              </div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

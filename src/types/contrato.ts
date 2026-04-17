@@ -64,6 +64,7 @@ export interface DadosServico {
   prazoPagamentoAposEntrega?: string;
   numeroPedido?: string;
   multaRescisao?: string;
+  jurosAtraso?: string;
   localPrestacao?: string;
   formaEntrega?: string;
   clausulasEspeciais?: string;

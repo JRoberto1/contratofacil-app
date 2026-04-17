@@ -5,12 +5,18 @@ export function prepararPrompt(formulario: FormularioContrato, tipoContrato: Tip
   // Configs padrão
   const categoriaInfo = categorias[(formulario.categoria as CategoriaSlug)] || categorias['other'];
   
-  // Base legal
-  const penalidadeAtraso = formulario.servico.formaPagamento === "A Combinar" 
-    ? "" 
-    : "Em caso de atraso superior a 5 dias corridos no pagamento de qualquer parcela, incidirá multa não-compensatória de 2% (dois por cento) sobre o valor total do contrato, além de juros moratórios de 1% (um por cento) ao mês pro rata die.";
+  // Base legal - Dinâmica de Juros e Multas
+  const penalidadeAtraso = formulario.servico.jurosAtraso
+    ? `Em caso de atraso no pagamento, incidirá juros moratórios de ${formulario.servico.jurosAtraso}.`
+    : "";
     
-  const quebraRescisao = "O contrato prescreve cláusula penal correspondente a 20% do valor global em caso de rescisão imotivada por qualquer das partes, sem prejuízo da cobrança de serviços já realizados.";
+  const quebraRescisao = formulario.servico.multaRescisao
+    ? `O contrato prescreve cláusula penal correspondente a ${formulario.servico.multaRescisao}% do valor global em caso de rescisão imotivada por qualquer das partes.`
+    : "";
+
+  const instrucoesFinanceiras = (penalidadeAtraso || quebraRescisao) 
+    ? `\n- MULTAS E JUROS AUTORIZADOS: ${penalidadeAtraso} ${quebraRescisao}`
+    : `\n- MULTAS E JUROS: NÃO FOI autorizada nenhuma cláusula de multa por atraso, juros ou cláusula penal. O contrato NÃO deve conter nenhuma estipulação financeira punitiva.`;
   
   // Transformando os campos extras numa string
   let extrasString = "";
@@ -30,11 +36,20 @@ export function prepararPrompt(formulario: FormularioContrato, tipoContrato: Tip
     ? "O contrato deve ser enxuto, direto e condensado, limitando-se ao essencial (1 a 2 páginas). Use linguagem clara."
     : "O contrato deve ser abrangente, exaustivo e longo, cobrindo com detalhes minúcias jurídicas padrão, definição de termos, multas, casos fortuitos, sucessão e legislação aplicável (cerca de 3 a 5 páginas).";
 
-  const systemPrompt = `
+const systemPrompt = `
 Você é um advogado brasileiro experiente, especialista em Direito Civil e Contratual. Seu papel é atuar como o motor gerador de contratos do ContratoFácil.
 
 OBJETIVO DA MISSÃO: 
 Você receberá os dados extraídos de um formulário preenchido por um prestador de serviço autônomo (ou MEI) no Brasil. Sua tarefa é redigir UM CONTRATO DE PRESTAÇÃO DE SERVIÇOS juridicamente estruturado, seguro, protegendo o prestador, sem alucinar dados financeiros ou pessoais.
+
+REGRAS DE INVENÇÃO ZERO — NUNCA VIOLAR:
+1. MULTAS E JUROS: Nunca incluir percentuais de multa por atraso, juros moratórios ou cláusula penal que o usuário não tenha informado explicitamente. 
+   - Nunca usar valores padrão como "2%", "1% ao mês", "20%" se não foram expressamente autorizados em "MULTAS E JUROS AUTORIZADOS".
+2. DATAS ESPECÍFICAS: Nunca inventar datas de vencimento, prazos intermediários ou marcos que o usuário não definiu.
+3. ENDEREÇOS: Nunca completar endereços. Usar exatamente a cidade e estado informados.
+4. OBRIGAÇÕES EXTRAS: Nunca adicionar obrigações além das descritas na categoria ou pelo usuário.
+5. VALORES DERIVADOS: Nunca calcular ou inventar valores parciais, honorários adicionais ou custos extras não informados.
+TESTE ANTES DE GERAR: Para cada cláusula com número ou percentual, pergunte a si mesmo: "o usuário ou sistema informaram esse valor?" Se não, remova.
 
 FORMATO E DIRETRIZES TÉCNICAS:
 - ${diretrizTamanho}
@@ -52,8 +67,7 @@ FORMATO DE SAÍDA:
 - Utilize as cláusulas listadas a seguir como regras fundamentais inegociáveis para este contrato:
 ${clausulasEspeciais}
 
-- DADOS DE PAGAMENTO (REGRA ABSOLUTA): A cláusula de remuneração deve ser a TRANSCRIÇÃO JURÍDICA FIEL da "Forma de pagamento" passada pelo usuário. É PROIBIDO CRIAR CONDIÇÕES NÃO MENCIONADAS.
-- MULTAS (Se não isento pelo usuário): ${penalidadeAtraso} ${quebraRescisao}
+- DADOS DE PAGAMENTO (REGRA ABSOLUTA): A cláusula de remuneração deve ser a TRANSCRIÇÃO JURÍDICA FIEL da "Forma de pagamento" passada pelo usuário. É PROIBIDO CRIAR CONDIÇÕES NÃO MENCIONADAS.${instrucoesFinanceiras}
 - O Foro de eleição deverá ser da comarca do Prestador (${formulario.prestador.cidade}/${formulario.prestador.estado}).
 - Responda APENAS com o texto do contrato. Não adicione "Aqui está o contrato" nem assine como IA.
 `;
