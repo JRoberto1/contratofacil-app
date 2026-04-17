@@ -39,7 +39,16 @@ Você receberá os dados extraídos de um formulário preenchido por um prestado
 FORMATO E DIRETRIZES TÉCNICAS:
 - ${diretrizTamanho}
 - Categoria do negócio: ${categoriaInfo.title}
-- Escreva usando "CLÁUSULA PRIMEIRA", "CLÁUSULA SEGUNDA" e não em markdown de títulos. USE APENAS TEXTO CORRIDO SEM MARKDOWN. Sem asteriscos (**), sem hashtags (#). 
+FORMATO DE SAÍDA:
+- Use # apenas para o título principal do contrato
+- Use ## para cada seção principal (DAS PARTES, DO OBJETO, etc.)
+- Use ### apenas se precisar de subseção
+- Use **negrito** para nomes das partes, valores em reais e datas importantes
+- Use listas com - para obrigações e sub-itens
+- Use tabelas markdown para milestones de pagamento quando houver mais de 2 marcos
+- Separe seções principais com ---
+- Nunca use markdown decorativo — apenas o necessário para estrutura
+- O texto deve ler como um documento jurídico real, não como uma página web
 - Utilize as cláusulas listadas a seguir como regras fundamentais inegociáveis para este contrato:
 ${clausulasEspeciais}
 

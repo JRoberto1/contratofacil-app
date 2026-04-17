@@ -107,3 +107,167 @@ h1, h2, h3, h4, h5, h6 {
 .material-symbols-outlined {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
+
+/* Estilos do contrato gerado — simulam documento jurídico real */
+.contrato-preview {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #191c1d;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 56px;
+  background: #ffffff;
+  border-radius: 12px;
+}
+
+/* Título principal do contrato */
+.contrato-preview h1 {
+  font-family: 'Manrope', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #002b73;
+  margin: 0 0 32px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e6e8ea;
+}
+
+/* Títulos de seção: DAS PARTES, DO OBJETO, etc. */
+.contrato-preview h2 {
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #002b73;
+  margin: 28px 0 10px;
+  padding-bottom: 4px;
+}
+
+/* Subtítulos */
+.contrato-preview h3 {
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #191c1d;
+  margin: 20px 0 8px;
+}
+
+/* Parágrafos */
+.contrato-preview p {
+  margin: 0 0 12px;
+  text-align: justify;
+}
+
+/* Listas de obrigações e cláusulas */
+.contrato-preview ul,
+.contrato-preview ol {
+  margin: 8px 0 16px 0;
+  padding-left: 24px;
+}
+
+.contrato-preview li {
+  margin-bottom: 6px;
+  text-align: justify;
+}
+
+/* Negrito — nomes das partes, valores importantes */
+.contrato-preview strong {
+  font-weight: 700;
+  color: #191c1d;
+}
+
+/* Texto em itálico */
+.contrato-preview em {
+  font-style: italic;
+}
+
+/* Separadores horizontais entre grandes seções */
+.contrato-preview hr {
+  border: none;
+  border-top: 1px solid #e6e8ea;
+  margin: 24px 0;
+}
+
+/* Bloco de assinatura */
+.contrato-preview .assinaturas {
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+
+.contrato-preview .campo-assinatura {
+  border-top: 1px solid #737785;
+  padding-top: 8px;
+}
+
+.contrato-preview .campo-assinatura p {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #737785;
+  margin: 0;
+  text-align: left;
+}
+
+/* Rodapé do documento */
+.contrato-preview .rodape-documento {
+  margin-top: 48px;
+  text-align: center;
+  font-size: 10px;
+  color: #b4b2a9;
+  border-top: 1px solid #e6e8ea;
+  padding-top: 16px;
+}
+
+/* Tabelas (para milestones de pagamento) */
+.contrato-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 13px;
+}
+
+.contrato-preview th {
+  background: #f2f4f6;
+  font-family: 'Manrope', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #434652;
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e6e8ea;
+}
+
+.contrato-preview td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f2f4f6;
+  color: #191c1d;
+}
+
+.contrato-preview tr:last-child td {
+  border-bottom: none;
+}
+
+/* Versão mobile */
+@media (max-width: 640px) {
+  .contrato-preview {
+    padding: 24px 20px;
+    font-size: 13px;
+  }
+
+  .contrato-preview h1 {
+    font-size: 14px;
+  }
+
+  .contrato-preview .assinaturas {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}

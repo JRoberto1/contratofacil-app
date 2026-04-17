@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import type { FormularioContrato, TipoContrato } from "@/types/contrato";
+import { ContratoPreview } from "./ContratoPreview";
 
 const tipos: { id: TipoContrato; label: string }[] = [
   { id: "completo-formal", label: "Completo Formal" },
@@ -251,7 +252,7 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
                       className="w-full h-full min-h-[500px] bg-transparent text-on-surface text-sm leading-relaxed outline-none resize-none font-body py-4"
                     />
                   ) : (
-                    <div className="text-on-surface text-sm leading-relaxed whitespace-pre-wrap font-body py-4">{textoAtual}</div>
+                    <ContratoPreview conteudo={textoAtual} />
                   )
                 )}
             </div>
