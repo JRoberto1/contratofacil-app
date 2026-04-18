@@ -38,6 +38,8 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
   const [textoEditado, setTextoEditado] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [processandoDownload, setProcessandoDownload] = useState(false);
+  // true quando o usuário editou o texto ou trocou de tipo — gera novo contrato no download
+  const [fezModificacoes, setFezModificacoes] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
@@ -84,6 +86,8 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
   async function trocarTipo(tipo: TipoContrato) {
     setTipoAtivo(tipo);
     setEditando(false);
+    // Trocar de tipo = conteúdo diferente do original → conta como modificação
+    if (tipo !== tipoInicial) setFezModificacoes(true);
     await gerarTipo(tipo);
   }
 
@@ -95,6 +99,8 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
   function salvarEdicao() {
     setConteudo((prev) => ({ ...prev, [tipoAtivo]: textoEditado }));
     setEditando(false);
+    // Edição manual do texto → conta como modificação
+    setFezModificacoes(true);
   }
 
   const baixarPdf = async () => {
@@ -104,23 +110,28 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
     setErro(null);
 
     try {
-      // 1. Se logado: atualiza contrato existente ou cria novo
+      // 1. Registra no banco conforme regra de negócio:
+      //    - contratoId existe + sem modificações → só incrementa downloads (sem cobrança)
+      //    - contratoId existe + fez modificações → cria NOVO contrato (cobrança)
+      //    - sem contratoId → cria novo contrato (primeiro download)
       let dbContratoId = contratoId ?? null;
       if (user) {
         try {
-          if (contratoId) {
-            // Contrato já existe no banco — atualiza conteúdo e incrementa downloads
-            const resAtualizar = await fetch("/api/atualizar-contrato", {
+          const deveApenasIncrementar = !!contratoId && !fezModificacoes;
+
+          if (deveApenasIncrementar) {
+            // Mesmo contrato, sem edição → só contabiliza o download
+            const res = await fetch("/api/atualizar-contrato", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ contratoId, conteudo: conteudo[tipoAtivo], tipo: tipoAtivo })
+              body: JSON.stringify({ contratoId })
             });
-            if (!resAtualizar.ok) {
-              const err = await resAtualizar.json().catch(() => ({}));
+            if (!res.ok) {
+              const err = await res.json().catch(() => ({}));
               throw new Error(`Erro ao registrar download: ${err.error || "Desconhecido"}`);
             }
           } else {
-            // Fluxo rascunho local — cria contrato no banco agora
+            // Novo contrato: primeiro download ou conteúdo foi modificado
             const resSalvar = await fetch("/api/salvar-contrato", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -131,11 +142,11 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
               throw new Error(`Erro ao salvar no seu histórico: ${dataSalvar.error || "Desconhecido"}`);
             }
             dbContratoId = dataSalvar.id;
-            // Registra o download imediatamente após criar
+            // Conta o download no contrato recém-criado
             await fetch("/api/atualizar-contrato", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ contratoId: dbContratoId, conteudo: conteudo[tipoAtivo], tipo: tipoAtivo })
+              body: JSON.stringify({ contratoId: dbContratoId })
             });
           }
         } catch (e: any) {
