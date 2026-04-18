@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
 
       await supabase
         .from('contratos')
-        .update({ conteudo, status: 'rascunho' })
+        .update({ conteudo })
         .eq('id', contratoId);
     }
 
