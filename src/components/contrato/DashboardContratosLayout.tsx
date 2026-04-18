@@ -23,10 +23,10 @@ function getAvatarParams(nome: string) {
 
 function getStatusChip(status: string) {
   switch (status) {
-    case 'gerado':
-      return { bg: '#E1F5EE', text: '#085041', label: 'Gerado' };
-    case 'baixado':
-      return { bg: '#E6F1FB', text: '#0C447C', label: 'Baixado' };
+    case 'pago':
+      return { bg: '#E1F5EE', text: '#085041', label: 'Pago' };
+    case 'enviado':
+      return { bg: '#E6F1FB', text: '#0C447C', label: 'Enviado' };
     case 'rascunho':
       return { bg: '#FAEEDA', text: '#633806', label: 'Rascunho' };
     default:
@@ -51,7 +51,7 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
     : contratos.filter(c => (c.categoria_custom || c.categoria) === filtroCategoria);
 
   // Metricas
-  const totalGerados = contratos.filter(c => c.status === 'gerado' || c.status === 'baixado').length;
+  const totalGerados = contratos.filter(c => c.status === 'pago' || c.status === 'enviado').length;
   const totalDownloads = contratos.reduce((acc, c) => acc + (c.downloads_count || 0), 0);
   const totalRascunhos = contratos.filter(c => c.status === 'rascunho').length;
 
