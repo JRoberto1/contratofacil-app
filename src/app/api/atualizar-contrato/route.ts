@@ -16,36 +16,36 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "ID do contrato é obrigatório." }, { status: 400 });
     }
 
-    // Busca status e downloads_count atuais
-    const { data: atual, error: fetchError } = await supabase
-      .from('contratos')
-      .select('downloads_count, status')
-      .eq('id', contratoId)
-      .eq('usuario_id', user.id)
-      .single();
+    // Usa RPC para evitar validação de cache do PostgREST e trigger check_imutavel
+    const { data: rpcData, error: rpcError } = await supabase.rpc('registrar_download', {
+      p_contrato_id: contratoId,
+      p_usuario_id: user.id,
+    });
 
-    if (fetchError || !atual) {
+    if (rpcError) {
+      console.error("[atualizar-contrato] RPC erro:", rpcError);
+      return NextResponse.json({ error: `Falha ao atualizar contrato: ${rpcError.message}` }, { status: 500 });
+    }
+
+    if (rpcData?.error === 'not_found') {
       return NextResponse.json({ error: "Contrato não encontrado." }, { status: 404 });
     }
 
-    const updatePayload: Record<string, unknown> = {
-      downloads_count: (atual.downloads_count || 0) + 1,
-    };
-    if (atual.status === 'rascunho') {
-      updatePayload.status = 'gerado';
-    }
-    if (conteudo !== undefined) updatePayload.conteudo = conteudo;
-    if (tipo !== undefined) updatePayload.tipo = tipo;
+    // Atualiza conteudo/tipo se enviados (edição manual)
+    if (conteudo !== undefined || tipo !== undefined) {
+      const editPayload: Record<string, unknown> = {};
+      if (conteudo !== undefined) editPayload.conteudo = conteudo;
+      if (tipo !== undefined) editPayload.tipo = tipo;
 
-    const { error: updateError } = await supabase
-      .from('contratos')
-      .update(updatePayload)
-      .eq('id', contratoId)
-      .eq('usuario_id', user.id);
+      const { error: editError } = await supabase
+        .from('contratos')
+        .update(editPayload)
+        .eq('id', contratoId)
+        .eq('usuario_id', user.id);
 
-    if (updateError) {
-      console.error("[atualizar-contrato] Erro:", updateError);
-      return NextResponse.json({ error: `Falha ao atualizar contrato: ${updateError.message}` }, { status: 500 });
+      if (editError) {
+        console.error("[atualizar-contrato] Erro ao atualizar conteudo/tipo:", editError);
+      }
     }
 
     return NextResponse.json({ ok: true });
