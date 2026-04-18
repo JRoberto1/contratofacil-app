@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     if (updateError) {
       console.error("[atualizar-contrato] Erro:", updateError);
-      return NextResponse.json({ error: "Falha ao atualizar contrato." }, { status: 500 });
+      return NextResponse.json({ error: `Falha ao atualizar contrato: ${updateError.message}` }, { status: 500 });
     }
 
     return NextResponse.json({ ok: true });
