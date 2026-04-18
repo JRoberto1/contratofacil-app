@@ -31,6 +31,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Converte valor formatado BR ("1.500,00") para número decimal
+    const valorNumerico = parseFloat(
+      String(formulario.servico.valor).replace(/\./g, '').replace(',', '.')
+    );
+
     // Preparar dados para inserção no banco de dados baseado no schema
     const payload = {
       usuario_id: user.id,
@@ -41,7 +46,7 @@ export async function POST(req: NextRequest) {
       cliente_nome: formulario.cliente.nomeRazaoSocial,
       cliente_doc: formulario.cliente.cpfCnpj,
       servico_descricao: formulario.servico.descricao,
-      servico_valor: formulario.servico.valor,
+      servico_valor: isNaN(valorNumerico) ? 0 : valorNumerico,
       servico_prazo: formulario.servico.prazoEntrega,
       servico_pagamento: formulario.servico.formaPagamento,
       tipo: tipo,

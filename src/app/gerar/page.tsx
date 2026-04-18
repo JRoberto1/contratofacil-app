@@ -22,8 +22,7 @@ export default function GerarPage() {
         body: JSON.stringify({
           formulario: dados,
           tipo: tipoAtivo,
-          conteudo: "",
-          status_override: "gerando"
+          conteudo: ""
         })
       });
       
