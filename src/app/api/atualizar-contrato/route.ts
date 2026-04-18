@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
 
     const { data: atual, error: fetchError } = await supabase
       .from('contratos')
-      .select('downloads_count')
+      .select('downloads_count, status')
       .eq('id', contratoId)
       .eq('usuario_id', user.id)
       .single();
@@ -27,22 +27,39 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Contrato não encontrado." }, { status: 404 });
     }
 
-    // Apenas incrementa downloads — status já é definido no INSERT (salvar-contrato)
-    const updatePayload: Record<string, unknown> = {
-      downloads_count: (atual.downloads_count || 0) + 1,
-    };
-    if (conteudo !== undefined) updatePayload.conteudo = conteudo;
-    if (tipo !== undefined) updatePayload.tipo = tipo;
+    const novoCount = (atual.downloads_count || 0) + 1;
 
-    const { error: updateError } = await supabase
+    // Tenta incrementar downloads E promover status rascunho→gerado
+    const payloadCompleto: Record<string, unknown> = { downloads_count: novoCount };
+    if (atual.status === 'rascunho') payloadCompleto.status = 'gerado';
+    if (conteudo !== undefined) payloadCompleto.conteudo = conteudo;
+    if (tipo !== undefined) payloadCompleto.tipo = tipo;
+
+    const { error: errCompleto } = await supabase
       .from('contratos')
-      .update(updatePayload)
+      .update(payloadCompleto)
       .eq('id', contratoId)
       .eq('usuario_id', user.id);
 
-    if (updateError) {
-      console.error("[atualizar-contrato] Erro:", updateError);
-      return NextResponse.json({ error: `Falha ao atualizar contrato: ${updateError.message}` }, { status: 500 });
+    if (!errCompleto) {
+      return NextResponse.json({ ok: true });
+    }
+
+    // Se falhou (trigger antigo), faz só o downloads_count para não quebrar o download
+    console.warn("[atualizar-contrato] Falha ao atualizar status, tentando só downloads_count:", errCompleto.message);
+    const payloadSafe: Record<string, unknown> = { downloads_count: novoCount };
+    if (conteudo !== undefined) payloadSafe.conteudo = conteudo;
+    if (tipo !== undefined) payloadSafe.tipo = tipo;
+
+    const { error: errSafe } = await supabase
+      .from('contratos')
+      .update(payloadSafe)
+      .eq('id', contratoId)
+      .eq('usuario_id', user.id);
+
+    if (errSafe) {
+      console.error("[atualizar-contrato] Erro fallback:", errSafe);
+      return NextResponse.json({ error: `Falha ao atualizar contrato: ${errSafe.message}` }, { status: 500 });
     }
 
     return NextResponse.json({ ok: true });
