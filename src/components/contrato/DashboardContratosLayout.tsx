@@ -51,7 +51,7 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
     : contratos.filter(c => (c.categoria_custom || c.categoria) === filtroCategoria);
 
   // Metricas
-  const totalGerados = contratos.filter(c => c.status === 'pago' || c.status === 'enviado').length;
+  const totalGerados = contratos.filter(c => c.conteudo && c.conteudo.trim().length > 0).length;
   const totalDownloads = contratos.reduce((acc, c) => acc + (c.downloads_count || 0), 0);
   const totalRascunhos = contratos.filter(c => c.status === 'rascunho').length;
 

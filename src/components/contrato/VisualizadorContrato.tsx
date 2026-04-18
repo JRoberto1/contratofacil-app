@@ -104,28 +104,41 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
     setErro(null);
 
     try {
-      // 1. Opcional: Se estiver logado, salva no banco.
-      let contratoId = null;
+      // 1. Se logado: atualiza contrato existente ou cria novo
+      let dbContratoId = contratoId ?? null;
       if (user) {
         try {
-          const resSalvar = await fetch("/api/salvar-contrato", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              formulario,
-              tipo: tipoAtivo,
-              conteudo: conteudo[tipoAtivo]
-            })
-          });
-          const dataSalvar = await resSalvar.json();
-          if (resSalvar.ok) {
-            contratoId = dataSalvar.id;
+          if (contratoId) {
+            // Contrato já existe no banco — atualiza conteúdo e incrementa downloads
+            const resAtualizar = await fetch("/api/atualizar-contrato", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ contratoId, conteudo: conteudo[tipoAtivo], tipo: tipoAtivo })
+            });
+            if (!resAtualizar.ok) {
+              const err = await resAtualizar.json().catch(() => ({}));
+              throw new Error(`Erro ao registrar download: ${err.error || "Desconhecido"}`);
+            }
           } else {
-            console.error("Erro explícito do backend ao salvar:", dataSalvar);
-            throw new Error(`Erro ao salvar no seu histórico: ${dataSalvar.error || "Desconhecido"}`);
+            // Fluxo rascunho local — cria contrato no banco agora
+            const resSalvar = await fetch("/api/salvar-contrato", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ formulario, tipo: tipoAtivo, conteudo: conteudo[tipoAtivo] })
+            });
+            const dataSalvar = await resSalvar.json();
+            if (!resSalvar.ok) {
+              throw new Error(`Erro ao salvar no seu histórico: ${dataSalvar.error || "Desconhecido"}`);
+            }
+            dbContratoId = dataSalvar.id;
+            // Registra o download imediatamente após criar
+            await fetch("/api/atualizar-contrato", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ contratoId: dbContratoId, conteudo: conteudo[tipoAtivo], tipo: tipoAtivo })
+            });
           }
         } catch (e: any) {
-          console.error("Falha crassa no salvar-contrato", e);
           throw new Error(e.message || "Não foi possível registrar o contrato na sua conta.");
         }
       }
