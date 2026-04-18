@@ -16,10 +16,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "ID do contrato é obrigatório." }, { status: 400 });
     }
 
-    // Busca o valor atual de downloads_count
+    // Busca status e downloads_count atuais
     const { data: atual, error: fetchError } = await supabase
       .from('contratos')
-      .select('downloads_count')
+      .select('downloads_count, status')
       .eq('id', contratoId)
       .eq('usuario_id', user.id)
       .single();
@@ -31,6 +31,10 @@ export async function POST(req: NextRequest) {
     const updatePayload: Record<string, unknown> = {
       downloads_count: (atual.downloads_count || 0) + 1,
     };
+    // Promove de rascunho para gerado no primeiro download
+    if (atual.status === 'rascunho') {
+      updatePayload.status = 'gerado';
+    }
     if (conteudo !== undefined) updatePayload.conteudo = conteudo;
     if (tipo !== undefined) updatePayload.tipo = tipo;
 
