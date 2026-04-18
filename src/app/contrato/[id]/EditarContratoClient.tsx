@@ -14,7 +14,7 @@ export default function EditarContratoClient({ contrato, contratoId }: { contrat
   useEffect(() => {
     // Se já tem conteúdo no DB, nós apenas exibimos. O formulário pode ser um mockup só pra VisualizadorContrato não quebrar,
     // OU ensinamos VisualizadorContrato a aceitar formulario NULL se alreadyHasConteudo for true.
-    if (contrato.conteudo && contrato.status !== "gerando") {
+    if (contrato.conteudo) {
       setConteudoInicial(contrato.conteudo);
       setTipo(contrato.tipo as TipoContrato);
       

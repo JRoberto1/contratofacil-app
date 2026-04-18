@@ -15,6 +15,13 @@ export default function GerarPage() {
   const [formData, setFormData] = useState<any>(null);
 
   const handleFormSubmit = async (dados: any, tipoAtivo: import("@/types/contrato").TipoContrato) => {
+    // Salva sempre no localStorage para que EditarContratoClient possa gerar o conteúdo via IA
+    localStorage.setItem("contratofacil_rascunho_completo", JSON.stringify({
+      formulario: dados,
+      tipo: tipoAtivo,
+      timestamp: new Date().toISOString()
+    }));
+
     try {
       const res = await fetch("/api/salvar-contrato", {
         method: "POST",
@@ -25,19 +32,13 @@ export default function GerarPage() {
           conteudo: ""
         })
       });
-      
+
       if (!res.ok) throw new Error("Falha ao preparar geração");
-      
+
       const { id } = await res.json();
       router.push(`/contrato/${id}`);
     } catch (e) {
       console.error(e);
-      // Fallback para fluxo local antigo se der erro
-      localStorage.setItem("contratofacil_rascunho_completo", JSON.stringify({
-        formulario: dados,
-        tipo: tipoAtivo,
-        timestamp: new Date().toISOString()
-      }));
       router.push("/contrato/rascunho");
     }
   };
