@@ -20,8 +20,8 @@ export default function Formulario({
   onSubmit,
 }: FormularioProps) {
   const [formData, setFormData] = useState({
-    prestador: { nomeCompleto: "", cpfCnpj: "", cidade: "", estado: "", email: "" },
-    cliente: { nomeRazaoSocial: "", cpfCnpj: "", cidade: "", estado: "", email: "" },
+    prestador: { nomeCompleto: "", cpfCnpj: "", cidade: "", estado: "", email: "", tipoPessoa: "PF" as "PF" | "PJ", nacionalidade: "brasileiro", estadoCivil: "", profissao: "", representanteLegal: "", cargoRepresentante: "" },
+    cliente: { nomeRazaoSocial: "", cpfCnpj: "", cidade: "", estado: "", email: "", tipoPessoa: "PF" as "PF" | "PJ", nacionalidade: "brasileiro", estadoCivil: "", profissao: "", representanteLegal: "", cargoRepresentante: "" },
     servico: { 
       descricao: "", 
       valor: "", 
@@ -351,14 +351,80 @@ export default function Formulario({
             </div>
             <div>
               <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">E-mail (opcional)</label>
-              <input 
-                type="email" 
+              <input
+                type="email"
                 placeholder="seu@email.com"
                 value={formData.prestador.email}
                 onChange={e => handleChange("prestador", "email", e.target.value)}
                 className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
               />
             </div>
+            {/* Tipo de Pessoa */}
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Tipo de Pessoa</label>
+              <div className="flex gap-3">
+                {(["PF", "PJ"] as const).map(tp => (
+                  <button key={tp} type="button"
+                    onClick={() => handleChange("prestador", "tipoPessoa", tp)}
+                    className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all border ${formData.prestador.tipoPessoa === tp ? "border-primary bg-primary/5 ring-1 ring-primary text-primary" : "border-outline-variant/20 text-on-surface-variant hover:border-primary/50"}`}>
+                    {tp === "PF" ? "Pessoa Física" : "Pessoa Jurídica"}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {formData.prestador.tipoPessoa === "PF" && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Nacionalidade</label>
+                  <input type="text" placeholder="Ex: brasileiro"
+                    value={formData.prestador.nacionalidade || ""}
+                    onChange={e => handleChange("prestador", "nacionalidade", e.target.value)}
+                    className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Estado Civil</label>
+                  <select value={formData.prestador.estadoCivil || ""}
+                    onChange={e => handleChange("prestador", "estadoCivil", e.target.value)}
+                    className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all">
+                    <option value="">Não informar</option>
+                    <option value="solteiro">Solteiro(a)</option>
+                    <option value="casado">Casado(a)</option>
+                    <option value="divorciado">Divorciado(a)</option>
+                    <option value="viúvo">Viúvo(a)</option>
+                    <option value="união estável">União Estável</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Profissão</label>
+                  <input type="text" placeholder="Ex: fotógrafo"
+                    value={formData.prestador.profissao || ""}
+                    onChange={e => handleChange("prestador", "profissao", e.target.value)}
+                    className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                  />
+                </div>
+              </div>
+            )}
+            {formData.prestador.tipoPessoa === "PJ" && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Representante Legal</label>
+                  <input type="text" placeholder="Nome do sócio/representante"
+                    value={formData.prestador.representanteLegal || ""}
+                    onChange={e => handleChange("prestador", "representanteLegal", e.target.value)}
+                    className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Cargo</label>
+                  <input type="text" placeholder="Ex: Sócio-Administrador"
+                    value={formData.prestador.cargoRepresentante || ""}
+                    onChange={e => handleChange("prestador", "cargoRepresentante", e.target.value)}
+                    className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -419,14 +485,80 @@ export default function Formulario({
             </div>
             <div>
               <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">E-mail (opcional)</label>
-              <input 
-                type="email" 
+              <input
+                type="email"
                 placeholder="cliente@email.com"
                 value={formData.cliente.email}
                 onChange={e => handleChange("cliente", "email", e.target.value)}
                 className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
               />
             </div>
+            {/* Tipo de Pessoa */}
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Tipo de Pessoa</label>
+              <div className="flex gap-3">
+                {(["PF", "PJ"] as const).map(tp => (
+                  <button key={tp} type="button"
+                    onClick={() => handleChange("cliente", "tipoPessoa", tp)}
+                    className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all border ${formData.cliente.tipoPessoa === tp ? "border-primary bg-primary/5 ring-1 ring-primary text-primary" : "border-outline-variant/20 text-on-surface-variant hover:border-primary/50"}`}>
+                    {tp === "PF" ? "Pessoa Física" : "Pessoa Jurídica"}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {formData.cliente.tipoPessoa === "PF" && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Nacionalidade</label>
+                  <input type="text" placeholder="Ex: brasileiro"
+                    value={formData.cliente.nacionalidade || ""}
+                    onChange={e => handleChange("cliente", "nacionalidade", e.target.value)}
+                    className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Estado Civil</label>
+                  <select value={formData.cliente.estadoCivil || ""}
+                    onChange={e => handleChange("cliente", "estadoCivil", e.target.value)}
+                    className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all">
+                    <option value="">Não informar</option>
+                    <option value="solteiro">Solteiro(a)</option>
+                    <option value="casado">Casado(a)</option>
+                    <option value="divorciado">Divorciado(a)</option>
+                    <option value="viúvo">Viúvo(a)</option>
+                    <option value="união estável">União Estável</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Profissão</label>
+                  <input type="text" placeholder="Ex: empresário"
+                    value={formData.cliente.profissao || ""}
+                    onChange={e => handleChange("cliente", "profissao", e.target.value)}
+                    className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                  />
+                </div>
+              </div>
+            )}
+            {formData.cliente.tipoPessoa === "PJ" && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Representante Legal</label>
+                  <input type="text" placeholder="Nome do sócio/representante"
+                    value={formData.cliente.representanteLegal || ""}
+                    onChange={e => handleChange("cliente", "representanteLegal", e.target.value)}
+                    className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">Cargo</label>
+                  <input type="text" placeholder="Ex: Diretor Comercial"
+                    value={formData.cliente.cargoRepresentante || ""}
+                    onChange={e => handleChange("cliente", "cargoRepresentante", e.target.value)}
+                    className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -848,24 +980,24 @@ export default function Formulario({
             </button>
             <button
               type="button"
-              onClick={() => setTipoAtivo("resumido-formal")}
-              className={`p-4 rounded-2xl border text-left transition-all ${tipoAtivo === "resumido-formal" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-outline-variant/20 hover:border-primary/50"}`}
+              onClick={() => setTipoAtivo("simplificado")}
+              className={`p-4 rounded-2xl border text-left transition-all ${tipoAtivo === "simplificado" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-outline-variant/20 hover:border-primary/50"}`}
             >
               <h3 className="font-bold text-on-surface text-sm mb-1">Simplificado</h3>
               <p className="text-xs text-on-surface-variant leading-relaxed">Cláusulas essenciais, linguagem acessível</p>
             </button>
             <button
               type="button"
-              onClick={() => setTipoAtivo("completo-dia-a-dia")}
-              className={`p-4 rounded-2xl border text-left transition-all ${tipoAtivo === "completo-dia-a-dia" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-outline-variant/20 hover:border-primary/50"}`}
+              onClick={() => setTipoAtivo("executivo")}
+              className={`p-4 rounded-2xl border text-left transition-all ${tipoAtivo === "executivo" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-outline-variant/20 hover:border-primary/50"}`}
             >
               <h3 className="font-bold text-on-surface text-sm mb-1">Executivo</h3>
               <p className="text-xs text-on-surface-variant leading-relaxed">Formato profissional compacto para negócios</p>
             </button>
             <button
               type="button"
-              onClick={() => setTipoAtivo("resumido-dia-a-dia")}
-              className={`p-4 rounded-2xl border text-left transition-all ${tipoAtivo === "resumido-dia-a-dia" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-outline-variant/20 hover:border-primary/50"}`}
+              onClick={() => setTipoAtivo("minimalista")}
+              className={`p-4 rounded-2xl border text-left transition-all ${tipoAtivo === "minimalista" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-outline-variant/20 hover:border-primary/50"}`}
             >
               <h3 className="font-bold text-on-surface text-sm mb-1">Minimalista</h3>
               <p className="text-xs text-on-surface-variant leading-relaxed">Versão enxuta para serviços de baixo valor</p>

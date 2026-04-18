@@ -19,9 +19,9 @@ export type CategoriaContrato =
 
 export type TipoContrato =
   | "completo-formal"
-  | "resumido-formal"
-  | "completo-dia-a-dia"
-  | "resumido-dia-a-dia";
+  | "simplificado"
+  | "executivo"
+  | "minimalista";
 
 export type FormaPagamentoOpcao = "unico" | "entrada_saldo" | "parcelado" | "a_combinar";
 
@@ -44,6 +44,12 @@ export interface DadosPrestador {
   cidade: string;
   estado: string;
   email?: string;
+  tipoPessoa?: "PF" | "PJ";
+  nacionalidade?: string;
+  estadoCivil?: string;
+  profissao?: string;
+  representanteLegal?: string;
+  cargoRepresentante?: string;
 }
 
 export interface DadosCliente {
@@ -52,6 +58,12 @@ export interface DadosCliente {
   cidade: string;
   estado: string;
   email?: string;
+  tipoPessoa?: "PF" | "PJ";
+  nacionalidade?: string;
+  estadoCivil?: string;
+  profissao?: string;
+  representanteLegal?: string;
+  cargoRepresentante?: string;
 }
 
 export interface DadosServico {

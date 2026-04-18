@@ -9,9 +9,9 @@ import { ContratoPreview } from "./ContratoPreview";
 
 const tipos: { id: TipoContrato; label: string }[] = [
   { id: "completo-formal", label: "Completo Formal" },
-  { id: "resumido-formal", label: "Simplificado" },
-  { id: "completo-dia-a-dia", label: "Executivo" },
-  { id: "resumido-dia-a-dia", label: "Minimalista" },
+  { id: "simplificado", label: "Simplificado" },
+  { id: "executivo", label: "Executivo" },
+  { id: "minimalista", label: "Minimalista" },
 ];
 
 interface VisualizadorContratoProps {
