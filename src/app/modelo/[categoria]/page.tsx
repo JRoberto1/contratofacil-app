@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 
 interface CategoriaPageProps {
-  params: { categoria: string };
+  params: Promise<{ categoria: string }>;
 }
 
 // Gera páginas estáticas (SSG) no build para SEO
@@ -16,8 +16,9 @@ export function generateStaticParams() {
     }));
 }
 
-export function generateMetadata({ params }: CategoriaPageProps): Metadata {
-  const info = categorias[params.categoria as CategoriaSlug];
+export async function generateMetadata({ params }: CategoriaPageProps): Promise<Metadata> {
+  const { categoria } = await params;
+  const info = categorias[categoria as CategoriaSlug];
   if (!info) return { title: 'Modelo não encontrado' };
 
   return {
@@ -30,10 +31,11 @@ export function generateMetadata({ params }: CategoriaPageProps): Metadata {
   };
 }
 
-export default function ModeloCategoriaPage({ params }: CategoriaPageProps) {
-  const cat = categorias[params.categoria as CategoriaSlug];
-  
-  if (!cat || params.categoria === 'other') {
+export default async function ModeloCategoriaPage({ params }: CategoriaPageProps) {
+  const { categoria } = await params;
+  const cat = categorias[categoria as CategoriaSlug];
+
+  if (!cat || categoria === 'other') {
     notFound();
   }
 

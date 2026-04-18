@@ -2,7 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound, redirect } from "next/navigation";
 import EditarContratoClient from "./EditarContratoClient";
 
-export default async function ContratoIdPage({ params }: { params: { id: string } }) {
+export default async function ContratoIdPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -14,7 +15,7 @@ export default async function ContratoIdPage({ params }: { params: { id: string 
   const { data: contrato, error } = await supabase
     .from('contratos')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', id)
     .single();
 
   if (error || !contrato) {
@@ -25,5 +26,5 @@ export default async function ContratoIdPage({ params }: { params: { id: string 
     redirect("/meus-contratos");
   }
 
-  return <EditarContratoClient contrato={contrato} contratoId={params.id} />;
+  return <EditarContratoClient contrato={contrato} contratoId={id} />;
 }
