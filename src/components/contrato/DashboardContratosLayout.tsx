@@ -23,8 +23,8 @@ function getAvatarParams(nome: string) {
 
 function getStatusChip(status: string) {
   switch (status) {
-    case 'gerado':
-      return { bg: '#E1F5EE', text: '#085041', label: 'Gerado' };
+    case 'concluido':
+      return { bg: '#E1F5EE', text: '#085041', label: 'Concluído' };
     case 'enviado':
       return { bg: '#E6F1FB', text: '#0C447C', label: 'Enviado' };
     case 'pago':
@@ -53,7 +53,7 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
     : contratos.filter(c => (c.categoria_custom || c.categoria) === filtroCategoria);
 
   // Metricas
-  const totalGerados = contratos.filter(c => c.status === 'gerado' || c.status === 'pago' || c.status === 'enviado').length;
+  const totalGerados = contratos.filter(c => c.status === 'concluido' || c.status === 'pago' || c.status === 'enviado').length;
   const totalDownloads = contratos.reduce((acc, c) => acc + (c.downloads_count || 0), 0);
   const totalRascunhos = contratos.filter(c => c.status === 'rascunho').length;
 
@@ -136,7 +136,7 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
       {/* Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         <div className="bg-surface-container-low rounded-2xl p-6 shadow-sm">
-          <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">Total Gerados</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">Total Concluídos</p>
           <p className="text-4xl font-headline font-extrabold text-primary">{totalGerados}</p>
         </div>
         <div className="bg-surface-container-low rounded-2xl p-6 shadow-sm">

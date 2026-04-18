@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
       servico_pagamento: formulario.servico.formaPagamento,
       tipo: tipo,
       conteudo: conteudo || '',
-      status: status_override || (conteudo ? 'gerado' : 'rascunho')
+      status: status_override || 'rascunho'
     };
 
     const { data, error } = await supabase

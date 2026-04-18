@@ -112,7 +112,7 @@ export interface Contrato {
   categoria: string;
   categoria_custom?: string;
   servico_valor: string; // DB col mapping
-  status: 'rascunho' | 'gerado' | 'pago' | 'enviado';
+  status: 'rascunho' | 'concluido' | 'pago' | 'enviado';
   conteudo: string;
   tipo: string;
   imutavel: boolean;

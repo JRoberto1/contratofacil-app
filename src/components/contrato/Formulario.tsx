@@ -54,6 +54,27 @@ export default function Formulario({
 
   const [modoAssinatura, setModoAssinatura] = useState<"fisica_com_testemunhas" | "fisica_sem_testemunhas" | "eletronica">("fisica_com_testemunhas");
 
+  function formatCpfCnpj(value: string): string {
+    const digits = value.replace(/\D/g, '').slice(0, 14);
+    if (digits.length <= 11) {
+      return digits
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    }
+    return digits
+      .replace(/(\d{2})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1/$2')
+      .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+  }
+
+  function getCpfCnpjLabel(value: string): string {
+    const digits = value.replace(/\D/g, '');
+    if (digits.length === 0) return 'CPF / CNPJ';
+    return digits.length <= 11 ? 'CPF' : 'CNPJ';
+  }
+
   function capitalizeWords(str: string): string {
     if (!str) return "";
     const exceptions = ['de','da','do','das','dos','e','em','a','o','para','com','por','no','na','nos','nas'];
@@ -314,13 +335,15 @@ export default function Formulario({
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">CPF ou CNPJ</label>
-                <input 
-                  required 
-                  type="text" 
-                  placeholder="000.000.000-00"
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">
+                  {getCpfCnpjLabel(formData.prestador.cpfCnpj)}
+                </label>
+                <input
+                  required
+                  type="text"
+                  placeholder="000.000.000-00 ou 00.000.000/0000-00"
                   value={formData.prestador.cpfCnpj}
-                  onChange={e => handleChange("prestador", "cpfCnpj", e.target.value)}
+                  onChange={e => handleChange("prestador", "cpfCnpj", formatCpfCnpj(e.target.value))}
                   className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
                 />
               </div>
@@ -448,13 +471,15 @@ export default function Formulario({
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">CPF ou CNPJ</label>
-                <input 
-                  required 
-                  type="text" 
-                  placeholder="000.000.000-00"
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-outline-variant mb-2">
+                  {getCpfCnpjLabel(formData.cliente.cpfCnpj)}
+                </label>
+                <input
+                  required
+                  type="text"
+                  placeholder="000.000.000-00 ou 00.000.000/0000-00"
                   value={formData.cliente.cpfCnpj}
-                  onChange={e => handleChange("cliente", "cpfCnpj", e.target.value)}
+                  onChange={e => handleChange("cliente", "cpfCnpj", formatCpfCnpj(e.target.value))}
                   className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
                 />
               </div>

@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
     // Tenta incrementar downloads E promover status rascunho→gerado
     const payloadCompleto: Record<string, unknown> = { downloads_count: novoCount };
-    if (atual.status === 'rascunho') payloadCompleto.status = 'gerado';
+    if (atual.status === 'rascunho') payloadCompleto.status = 'concluido';
     if (conteudo !== undefined) payloadCompleto.conteudo = conteudo;
     if (tipo !== undefined) payloadCompleto.tipo = tipo;
 
