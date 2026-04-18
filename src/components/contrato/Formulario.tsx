@@ -136,24 +136,31 @@ export default function Formulario({
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const formatarMoeda = (valor: string) => {
-    const apenasNumeros = valor.replace(/\D/g, "");
-    if (!apenasNumeros) return "";
-    const numero = (Number(apenasNumeros) / 100).toFixed(2);
-    return numero.replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  };
-
   const handleChangeValor = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let raw = e.target.value;
-    // Permite digitação livre, mas quando sai (blur) ou algo assim, formata.
-    handleChange("servico", "valor", raw);
+    handleChange("servico", "valor", e.target.value);
   };
 
   const handleBlurValor = (e: React.FocusEvent<HTMLInputElement>) => {
-    const raw = e.target.value;
-    if (raw) {
-      handleChange("servico", "valor", formatarMoeda(raw));
+    const raw = e.target.value.trim();
+    if (!raw) return;
+
+    let numero: number;
+    if (raw.includes(',')) {
+      // Formato BR: "1.500,00" ou "1500,00" → remove pontos e troca vírgula por ponto
+      numero = parseFloat(raw.replace(/\./g, '').replace(',', '.'));
+    } else {
+      // Apenas dígitos (ou ponto como separador de milhar): "15000" ou "1.500"
+      // Trata tudo como reais inteiros — "15000" = R$ 15.000,00
+      numero = parseFloat(raw.replace(/\./g, ''));
     }
+
+    if (!numero || isNaN(numero)) return;
+
+    const formatado = numero.toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    handleChange("servico", "valor", formatado);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
