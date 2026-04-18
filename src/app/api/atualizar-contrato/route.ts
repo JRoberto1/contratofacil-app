@@ -31,6 +31,9 @@ export async function POST(req: NextRequest) {
     const updatePayload: Record<string, unknown> = {
       downloads_count: (atual.downloads_count || 0) + 1,
     };
+    if (atual.status === 'rascunho') {
+      updatePayload.status = 'gerado';
+    }
     if (conteudo !== undefined) updatePayload.conteudo = conteudo;
     if (tipo !== undefined) updatePayload.tipo = tipo;
 
