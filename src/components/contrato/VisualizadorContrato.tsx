@@ -237,8 +237,10 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
           nomeDestinatario: formulario?.cliente?.nomeRazaoSocial ?? "",
         }),
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error?.message ?? "Erro ao enviar");
+      const text = await res.text();
+      let json: any = {};
+      try { json = JSON.parse(text); } catch { throw new Error(`Erro no servidor (${res.status}): resposta inválida`); }
+      if (!res.ok) throw new Error(json.error?.message ?? `Erro ao enviar (${res.status})`);
       setModalEmail(false);
       setEmailPara("");
       setMostrarToast(true);
