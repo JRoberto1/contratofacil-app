@@ -6,6 +6,13 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Contrato } from "@/types/contrato";
 import { ContratoPreview } from "./ContratoPreview";
+import { categorias } from "@/lib/categorias";
+
+function nomeCategoria(cat: string | null, catCustom: string | null): string {
+  if (catCustom) return catCustom;
+  if (!cat) return "—";
+  return categorias[cat as keyof typeof categorias]?.title ?? cat;
+}
 
 interface Props {
   contratos: Contrato[];
@@ -46,10 +53,11 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isDuplicating, setIsDuplicating] = useState(false);
 
-  const categoriasUnicas = Array.from(new Set(contratos.map(c => c.categoria_custom || c.categoria))).filter(Boolean);
-  
-  const contratosFiltrados = filtroCategoria === "Todos" 
-    ? contratos 
+  // Slugs únicos para filtro; labels em português para exibição
+  const categoriasUnicas = Array.from(new Set(contratos.map(c => c.categoria_custom || c.categoria))).filter(Boolean) as string[];
+
+  const contratosFiltrados = filtroCategoria === "Todos"
+    ? contratos
     : contratos.filter(c => (c.categoria_custom || c.categoria) === filtroCategoria);
 
   // Metricas
@@ -159,13 +167,13 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
           >
             Todos
           </button>
-          {categoriasUnicas.map(cat => (
+          {categoriasUnicas.map(slug => (
             <button
-              key={cat}
-              onClick={() => setFiltroCategoria(cat)}
-              className={`px-5 py-2 rounded-full text-sm font-bold font-headline transition-all ${filtroCategoria === cat ? 'bg-primary text-white shadow-sm' : 'bg-surface-container border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-high'}`}
+              key={slug}
+              onClick={() => setFiltroCategoria(slug)}
+              className={`px-5 py-2 rounded-full text-sm font-bold font-headline transition-all ${filtroCategoria === slug ? 'bg-primary text-white shadow-sm' : 'bg-surface-container border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-high'}`}
             >
-              {cat}
+              {nomeCategoria(slug, null)}
             </button>
           ))}
         </div>
@@ -203,7 +211,7 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
                     </div>
                   </td>
                   <td className="p-5 text-sm text-on-surface-variant font-medium">
-                    {item.categoria_custom || item.categoria}
+                    {nomeCategoria(item.categoria, item.categoria_custom)}
                   </td>
                   <td className="p-5 text-sm font-medium text-on-surface">
                     {item.servico_valor ? `R$ ${(item.servico_valor / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '-'}
@@ -267,7 +275,7 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
               </div>
               
               <div className="text-sm text-on-surface-variant flex flex-col gap-1 mb-4">
-                <p><span className="font-medium text-on-surface">Categoria:</span> {item.categoria_custom || item.categoria}</p>
+                <p><span className="font-medium text-on-surface">Categoria:</span> {nomeCategoria(item.categoria, item.categoria_custom)}</p>
                 <p><span className="font-medium text-on-surface">Valor:</span> {item.servico_valor ? `R$ ${(item.servico_valor / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '-'}</p>
               </div>
 
