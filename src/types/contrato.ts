@@ -111,7 +111,7 @@ export interface Contrato {
   prestador_nome?: string;
   categoria: string;
   categoria_custom?: string;
-  servico_valor: string; // DB col mapping
+  servico_valor: number; // centavos inteiros (ex: 150000 = R$ 1.500,00)
   status: 'rascunho' | 'concluido' | 'pago' | 'enviado';
   conteudo: string;
   tipo: string;

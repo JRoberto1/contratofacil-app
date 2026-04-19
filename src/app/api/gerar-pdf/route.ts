@@ -1,28 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { gerarPDFBuffer } from "@/lib/pdf";
+import { GerarPdfSchema } from "@/lib/schemas";
+import { err, fromZodError } from "@/lib/api-response";
 
 export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { conteudo } = body;
+    const parsed = GerarPdfSchema.safeParse(body);
+    if (!parsed.success) return fromZodError(parsed.error);
 
-    if (!conteudo) {
-      return NextResponse.json({ error: "Conteúdo é obrigatório." }, { status: 400 });
-    }
+    const pdfBytes = await gerarPDFBuffer(parsed.data.conteudo);
 
-    // Gerar PDF em Buffer
-    const pdfBytes = await gerarPDFBuffer(conteudo);
-
-    return new Response(pdfBytes as any, {
+    return new NextResponse(pdfBytes as unknown as BodyInit, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="contratofacil-${Date.now()}.pdf"`,
       },
     });
-  } catch (error) {
-    console.error("[gerar-pdf] Interno:", error);
-    return NextResponse.json({ error: "Erro interno ao gerar o PDF." }, { status: 500 });
+  } catch (error: unknown) {
+    console.error("[gerar-pdf]", error);
+    return err("INTERNAL_ERROR", "Erro interno ao gerar o PDF.", 500);
   }
 }

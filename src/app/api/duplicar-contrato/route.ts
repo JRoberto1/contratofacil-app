@@ -1,40 +1,35 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { DuplicarContratoSchema } from "@/lib/schemas";
+import { ok, err, fromZodError } from "@/lib/api-response";
 import crypto from "crypto";
 
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-    }
+
+    if (!user) return err("UNAUTHORIZED", "Não autorizado.", 401);
 
     const body = await req.json();
-    const { contratoId } = body;
-    
-    if (!contratoId) {
-      return NextResponse.json({ error: "Falta contratoId" }, { status: 400 });
-    }
+    const parsed = DuplicarContratoSchema.safeParse(body);
+    if (!parsed.success) return fromZodError(parsed.error);
 
-    // 1. Verificar cota disponível
+    const { contratoId } = parsed.data;
+
     const { data: perfil } = await supabase
       .from('perfis')
       .select('contratos_mes, contratos_usados_mes')
       .eq('user_id', user.id)
       .single();
 
-    if (!perfil) {
-      return NextResponse.json({ error: "Perfil não encontrado" }, { status: 404 });
-    }
+    if (!perfil) return err("NOT_FOUND", "Perfil não encontrado.", 404);
 
     const cotaDisponivel = perfil.contratos_mes - perfil.contratos_usados_mes;
     if (cotaDisponivel <= 0) {
-      return NextResponse.json({ error: "Cota excedida", redirect: "/planos" }, { status: 403 });
+      return err("QUOTA_EXCEEDED", "Cota de contratos esgotada.", 403);
     }
 
-    // 2. Extrair o contrato original
     const { data: original, error: origError } = await supabase
       .from('contratos')
       .select('*')
@@ -43,10 +38,9 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (origError || !original) {
-      return NextResponse.json({ error: "Contrato não encontrado" }, { status: 404 });
+      return err("NOT_FOUND", "Contrato não encontrado.", 404);
     }
 
-    // 3. Gerar número de referência sequencial por usuário
     const { count } = await supabase
       .from('contratos')
       .select('*', { count: 'exact', head: true })
@@ -56,17 +50,17 @@ export async function POST(req: NextRequest) {
     const sequencial = String((count || 0) + 1).padStart(3, '0');
     const novaReferencia = `CF-${ano}-${sequencial}`;
 
-    // 4. Clonar e Limpar Status e Meta
-    const { id, conteudo, status, criado_em, atualizado_em, imutavel, downloads_count, referencia, ...rest } = original;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id: _id, conteudo: _conteudo, status: _status, criado_em: _c, atualizado_em: _a, imutavel: _i, downloads_count: _d, referencia: _r, ...rest } = original;
 
     const payload = {
       ...rest,
       id: crypto.randomUUID(),
       referencia: novaReferencia,
       status: 'rascunho',
-      conteudo: '',           // o rascunho nasce sem conteúdo formatado final
+      conteudo: '',
       imutavel: false,
-      downloads_count: 0
+      downloads_count: 0,
     };
 
     const { data: novoContrato, error: insertError } = await supabase
@@ -76,20 +70,18 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (insertError) {
-      console.error("[duplicar-contrato] Update error:", insertError.message);
-      return NextResponse.json({ error: "Falha ao criar o rascunho cópia" }, { status: 500 });
+      console.error("[duplicar-contrato]", insertError.message);
+      return err("DB_ERROR", "Falha ao criar rascunho cópia.", 500);
     }
 
-    // 5. Incrementar Cota
     await supabase
       .from('perfis')
       .update({ contratos_usados_mes: perfil.contratos_usados_mes + 1 })
       .eq('user_id', user.id);
 
-    return NextResponse.json({ novoId: novoContrato.id });
-    
-  } catch (error) {
-    console.error("[duplicar-contrato] Catch Interno:", error);
-    return NextResponse.json({ error: "Erro interno no servidor" }, { status: 500 });
+    return ok({ novoId: novoContrato.id }, 201);
+  } catch (error: unknown) {
+    console.error("[duplicar-contrato]", error);
+    return err("INTERNAL_ERROR", "Erro interno no servidor.", 500);
   }
 }

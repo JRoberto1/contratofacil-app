@@ -187,30 +187,49 @@ export default function Formulario({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validações no frontend
-    if (!formData.prestador.cidade || !formData.prestador.estado) {
-      alert("Preencha a cidade e o estado do Prestador.");
-      return;
-    }
-    if (!formData.cliente.cidade || !formData.cliente.estado) {
-      alert("Preencha a cidade e o estado do Cliente.");
-      return;
-    }
+    // Validação client-side: campos obrigatórios (espelhados no schema Zod do servidor)
+    const erros: string[] = [];
+
+    if (!formData.prestador.nomeCompleto || formData.prestador.nomeCompleto.trim().length < 3)
+      erros.push("Nome completo do Prestador é obrigatório.");
+    if (!formData.prestador.cpfCnpj || formData.prestador.cpfCnpj.replace(/\D/g, '').length < 11)
+      erros.push("CPF/CNPJ do Prestador é obrigatório.");
+    if (!formData.prestador.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.prestador.email))
+      erros.push("E-mail do Prestador inválido.");
+    if (!formData.prestador.cidade || !formData.prestador.estado)
+      erros.push("Cidade e estado do Prestador são obrigatórios.");
+
+    if (!formData.cliente.nomeRazaoSocial || formData.cliente.nomeRazaoSocial.trim().length < 3)
+      erros.push("Nome/Razão Social do Cliente é obrigatório.");
+    if (!formData.cliente.cpfCnpj || formData.cliente.cpfCnpj.replace(/\D/g, '').length < 11)
+      erros.push("CPF/CNPJ do Cliente é obrigatório.");
+    if (!formData.cliente.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.cliente.email))
+      erros.push("E-mail do Cliente inválido.");
+    if (!formData.cliente.cidade || !formData.cliente.estado)
+      erros.push("Cidade e estado do Cliente são obrigatórios.");
+
+    if (!formData.servico.descricao || formData.servico.descricao.trim().length < 10)
+      erros.push("Descreva o serviço com pelo menos 10 caracteres.");
+
     const rawValor = formData.servico.valor.replace(/\D/g, "");
-    if (!rawValor || rawValor === "0" || rawValor === "00" || rawValor === "000") {
-      alert("Informe um valor válido para o serviço (maior que zero).");
-      return;
-    }
-    if (!modoAssinatura) {
-      alert("Selecione um modo de assinatura.");
-      return;
-    }
+    if (!rawValor || rawValor === "0" || rawValor === "00" || rawValor === "000")
+      erros.push("Informe um valor válido para o serviço (maior que zero).");
+
+    if (!formData.servico.prazoEntrega)
+      erros.push("Prazo de entrega é obrigatório.");
+
+    if (!modoAssinatura)
+      erros.push("Selecione um modo de assinatura.");
+
     if (formData.servico.multaRescisao) {
       const parsedMul = Number(formData.servico.multaRescisao);
-      if (isNaN(parsedMul) || parsedMul < 1 || parsedMul > 100) {
-        alert("A multa rescisória deve ser um valor entre 1 e 100.");
-        return;
-      }
+      if (isNaN(parsedMul) || parsedMul < 1 || parsedMul > 100)
+        erros.push("A multa rescisória deve ser um valor entre 1 e 100.");
+    }
+
+    if (erros.length > 0) {
+      alert(erros.join("\n"));
+      return;
     }
 
     // Geração textual da forma de pagamento

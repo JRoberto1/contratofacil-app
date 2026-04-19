@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { AtualizarContratoSchema } from "@/lib/schemas";
+import { ok, err, fromZodError } from "@/lib/api-response";
 
 export async function POST(req: NextRequest) {
   try {
@@ -7,14 +9,14 @@ export async function POST(req: NextRequest) {
 
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
-      return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
+      return err("UNAUTHORIZED", "Não autorizado.", 401);
     }
 
-    const { contratoId, conteudo, tipo } = await req.json();
+    const body = await req.json();
+    const parsed = AtualizarContratoSchema.safeParse(body);
+    if (!parsed.success) return fromZodError(parsed.error);
 
-    if (!contratoId) {
-      return NextResponse.json({ error: "ID do contrato é obrigatório." }, { status: 400 });
-    }
+    const { contratoId, conteudo, tipo } = parsed.data;
 
     const { data: atual, error: fetchError } = await supabase
       .from('contratos')
@@ -24,12 +26,10 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (fetchError || !atual) {
-      return NextResponse.json({ error: "Contrato não encontrado." }, { status: 404 });
+      return err("NOT_FOUND", "Contrato não encontrado.", 404);
     }
 
     const novoCount = (atual.downloads_count || 0) + 1;
-
-    // Tenta incrementar downloads E promover status rascunho→gerado
     const payloadCompleto: Record<string, unknown> = { downloads_count: novoCount };
     if (atual.status === 'rascunho') payloadCompleto.status = 'concluido';
     if (conteudo !== undefined) payloadCompleto.conteudo = conteudo;
@@ -41,12 +41,10 @@ export async function POST(req: NextRequest) {
       .eq('id', contratoId)
       .eq('usuario_id', user.id);
 
-    if (!errCompleto) {
-      return NextResponse.json({ ok: true });
-    }
+    if (!errCompleto) return ok({ ok: true });
 
-    // Se falhou (trigger antigo), faz só o downloads_count para não quebrar o download
-    console.warn("[atualizar-contrato] Falha ao atualizar status, tentando só downloads_count:", errCompleto.message);
+    // Fallback: só downloads_count se o update completo falhou
+    console.warn("[atualizar-contrato] Fallback downloads_count:", errCompleto.message);
     const payloadSafe: Record<string, unknown> = { downloads_count: novoCount };
     if (conteudo !== undefined) payloadSafe.conteudo = conteudo;
     if (tipo !== undefined) payloadSafe.tipo = tipo;
@@ -58,13 +56,13 @@ export async function POST(req: NextRequest) {
       .eq('usuario_id', user.id);
 
     if (errSafe) {
-      console.error("[atualizar-contrato] Erro fallback:", errSafe);
-      return NextResponse.json({ error: `Falha ao atualizar contrato: ${errSafe.message}` }, { status: 500 });
+      console.error("[atualizar-contrato] Erro fallback:", errSafe.message);
+      return err("DB_ERROR", `Falha ao atualizar contrato: ${errSafe.message}`, 500);
     }
 
-    return NextResponse.json({ ok: true });
-  } catch (error) {
-    console.error("[atualizar-contrato] Interno:", error);
-    return NextResponse.json({ error: "Erro interno." }, { status: 500 });
+    return ok({ ok: true });
+  } catch (error: unknown) {
+    console.error("[atualizar-contrato]", error);
+    return err("INTERNAL_ERROR", "Erro interno.", 500);
   }
 }

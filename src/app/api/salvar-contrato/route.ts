@@ -1,42 +1,30 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import type { FormularioContrato, TipoContrato } from "@/types/contrato";
+import { SalvarContratoSchema } from "@/lib/schemas";
+import { ok, err, fromZodError } from "@/lib/api-response";
+import { ZodError } from "zod";
 
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    // Validar usuário autenticado
+
     const { data: { user }, error: userError } = await supabase.auth.getUser();
-    
     if (userError || !user) {
-      return NextResponse.json(
-        { error: "Não autorizado." },
-        { status: 401 }
-      );
+      return err("UNAUTHORIZED", "Não autorizado.", 401);
     }
 
     const body = await req.json();
-    const { formulario, tipo, conteudo, status_override } = body as {
-      formulario: FormularioContrato;
-      tipo: TipoContrato;
-      conteudo?: string;
-      status_override?: string;
-    };
+    const parsed = SalvarContratoSchema.safeParse(body);
+    if (!parsed.success) return fromZodError(parsed.error);
 
-    if (!formulario || !tipo) {
-      return NextResponse.json(
-        { error: "Dados incompletos para salvar o contrato." },
-        { status: 400 }
-      );
-    }
+    const { formulario, tipo, conteudo, status_override } = parsed.data;
 
-    // Converte valor formatado BR ("1.500,00") para número decimal
-    const valorNumerico = parseFloat(
+    // Converte valor BR ("1.500,00") → centavos inteiros (150000)
+    const valorDecimal = parseFloat(
       String(formulario.servico.valor).replace(/\./g, '').replace(',', '.')
     );
+    const valorCentavos = isNaN(valorDecimal) ? 0 : Math.round(valorDecimal * 100);
 
-    // Preparar dados para inserção no banco de dados baseado no schema
     const payload = {
       usuario_id: user.id,
       categoria: formulario.categoria,
@@ -46,12 +34,12 @@ export async function POST(req: NextRequest) {
       cliente_nome: formulario.cliente.nomeRazaoSocial,
       cliente_doc: formulario.cliente.cpfCnpj,
       servico_descricao: formulario.servico.descricao,
-      servico_valor: isNaN(valorNumerico) ? 0 : valorNumerico,
+      servico_valor: valorCentavos,
       servico_prazo: formulario.servico.prazoEntrega,
       servico_pagamento: formulario.servico.formaPagamento,
-      tipo: tipo,
+      tipo,
       conteudo: conteudo || '',
-      status: status_override || 'rascunho'
+      status: status_override || 'rascunho',
     };
 
     const { data, error } = await supabase
@@ -60,23 +48,15 @@ export async function POST(req: NextRequest) {
       .select('id')
       .single();
 
-    console.log(">>>>>>>>>> [salvar-contrato] TENTOU INSERIR <<<<<<<<<<");
-    console.log("Payload:", payload);
-
     if (error) {
-      console.error("[salvar-contrato] ERRO no Banco de dados:", error);
-      return NextResponse.json(
-        { error: "Falha ao gravar contrato no banco de dados." },
-        { status: 500 }
-      );
+      console.error("[salvar-contrato]", error.message);
+      return err("DB_ERROR", "Falha ao gravar contrato no banco de dados.", 500);
     }
 
-    return NextResponse.json({ id: data.id });
-  } catch (error) {
-    console.error("[salvar-contrato] Interno:", error);
-    return NextResponse.json(
-      { error: "Ocorreu um erro ao salvar o contrato." },
-      { status: 500 }
-    );
+    return ok({ id: data.id }, 201);
+  } catch (error: unknown) {
+    if (error instanceof ZodError) return fromZodError(error);
+    console.error("[salvar-contrato]", error);
+    return err("INTERNAL_ERROR", "Ocorreu um erro ao salvar o contrato.", 500);
   }
 }

@@ -1,29 +1,30 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { enviarBoasVindas, enviarConfirmacaoPagamento } from "@/lib/email";
+import { EmailSchema } from "@/lib/schemas";
+import { ok, err, fromZodError } from "@/lib/api-response";
 
-// Rota interna chamada por webhooks e server actions
-// Protegida por secret para evitar chamadas externas
 export async function POST(req: NextRequest) {
   const secret = req.headers.get("x-internal-secret");
   if (secret !== process.env.INTERNAL_SECRET) {
-    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+    return err("UNAUTHORIZED", "Não autorizado.", 401);
   }
 
   try {
     const body = await req.json();
-    const { tipo, ...dados } = body;
+    const parsed = EmailSchema.safeParse(body);
+    if (!parsed.success) return fromZodError(parsed.error);
+
+    const { tipo, ...dados } = parsed.data as { tipo: string; [key: string]: unknown };
 
     if (tipo === "boas-vindas") {
-      await enviarBoasVindas(dados);
+      await enviarBoasVindas(dados as Parameters<typeof enviarBoasVindas>[0]);
     } else if (tipo === "confirmacao-pagamento") {
-      await enviarConfirmacaoPagamento(dados);
-    } else {
-      return NextResponse.json({ error: "Tipo inválido" }, { status: 400 });
+      await enviarConfirmacaoPagamento(dados as Parameters<typeof enviarConfirmacaoPagamento>[0]);
     }
 
-    return NextResponse.json({ ok: true });
-  } catch (error) {
+    return ok({ enviado: true });
+  } catch (error: unknown) {
     console.error("[api/email]", error);
-    return NextResponse.json({ error: "Erro ao enviar e-mail" }, { status: 500 });
+    return err("INTERNAL_ERROR", "Erro ao enviar e-mail.", 500);
   }
 }

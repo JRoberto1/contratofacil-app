@@ -205,7 +205,7 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
                     {item.categoria_custom || item.categoria}
                   </td>
                   <td className="p-5 text-sm font-medium text-on-surface">
-                    {item.servico_valor ? `R$ ${item.servico_valor}` : '-'}
+                    {item.servico_valor ? `R$ ${(item.servico_valor / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '-'}
                   </td>
                   <td className="p-5 text-sm text-on-surface-variant">
                     {item.criado_em ? new Date(item.criado_em).toLocaleDateString('pt-BR') : '-'}
@@ -267,7 +267,7 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
               
               <div className="text-sm text-on-surface-variant flex flex-col gap-1 mb-4">
                 <p><span className="font-medium text-on-surface">Categoria:</span> {item.categoria_custom || item.categoria}</p>
-                <p><span className="font-medium text-on-surface">Valor:</span> {item.servico_valor ? `R$ ${item.servico_valor}` : '-'}</p>
+                <p><span className="font-medium text-on-surface">Valor:</span> {item.servico_valor ? `R$ ${(item.servico_valor / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '-'}</p>
               </div>
 
               <div className="flex justify-between items-center border-t border-outline-variant/20 pt-4 mt-2">

@@ -22,9 +22,10 @@ export async function POST(req: NextRequest) {
       throw new Error("Missing stripe signature or endpoint secret.");
     }
     event = stripe.webhooks.constructEvent(payload, signature, endpointSecret);
-  } catch (err: any) {
-    console.error(`⚠️  Webhook signature falhou.`, err.message);
-    return NextResponse.json({ error: err.message }, { status: 400 });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Webhook error';
+    console.error(`⚠️  Webhook signature falhou.`, msg);
+    return NextResponse.json({ error: msg }, { status: 400 });
   }
 
   // Handle successful checkout
@@ -38,8 +39,8 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-      // 1. Registro de Pagamento na tabela `pagamentos`
-      await supabaseAdmin.from('pagamentos').insert([{
+      // 1. Registro de Pagamento — upsert por idempotency_key (session.id) evita duplicação em retries do Stripe
+      await supabaseAdmin.from('pagamentos').upsert([{
         usuario_id: userId,
         contrato_id: contratoId || null,
         plano: plano,
@@ -47,7 +48,8 @@ export async function POST(req: NextRequest) {
         status: 'aprovado',
         metodo: session.payment_method_types[0],
         stripe_session_id: session.id,
-      }]);
+        idempotency_key: session.id,
+      }], { onConflict: 'idempotency_key', ignoreDuplicates: true });
 
       // 2. Atualizar perfil ou liberar contrato
       if (plano === 'avulso' && contratoId) {
