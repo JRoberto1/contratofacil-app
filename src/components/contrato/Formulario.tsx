@@ -113,7 +113,6 @@ export default function Formulario({
     else if (manuais.includes(categoria)) setModoAssinatura("fisica_com_testemunhas");
     else setModoAssinatura("fisica_sem_testemunhas");
 
-    // Load local storage draft if available and no initialData
     if (initialData) {
       setFormData(initialData as any);
       if ((initialData as any).modoAssinatura) {
@@ -125,6 +124,13 @@ export default function Formulario({
         const parsedDraft = JSON.parse(draft);
         setFormData(parsedDraft);
         if (parsedDraft.modoAssinatura) setModoAssinatura(parsedDraft.modoAssinatura);
+      } else {
+        // Pré-preenche apenas os dados do prestador a partir do último contrato gerado
+        const perfil = localStorage.getItem("contratofacil_perfil_prestador");
+        if (perfil) {
+          const prestadorSalvo = JSON.parse(perfil);
+          setFormData(prev => ({ ...prev, prestador: { ...prev.prestador, ...prestadorSalvo } }));
+        }
       }
     }
   }, [initialData, categoria]);
@@ -286,6 +292,9 @@ export default function Formulario({
         formaPagamento: pagtoFinal,
       }
     };
+
+    // Persiste dados do prestador para pré-preencher próximos contratos
+    localStorage.setItem("contratofacil_perfil_prestador", JSON.stringify(normalizedData.prestador));
 
     // Analytics
     if (typeof window !== "undefined" && (window as any).gtag) {
