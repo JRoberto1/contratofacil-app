@@ -69,8 +69,8 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
         body: JSON.stringify({ formulario, tipo, contratoId }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Erro ao gerar");
-      setConteudo((prev) => ({ ...prev, [tipo]: data.conteudo }));
+      if (!res.ok) throw new Error(data.error?.message ?? data.error ?? "Erro ao gerar");
+      setConteudo((prev) => ({ ...prev, [tipo]: data.data?.conteudo ?? data.conteudo }));
     } catch (e: unknown) {
       setErro(e instanceof Error ? e.message : "Não foi possível gerar o contrato.");
     } finally {
@@ -128,7 +128,7 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
             });
             if (!res.ok) {
               const err = await res.json().catch(() => ({}));
-              throw new Error(`Erro ao registrar download: ${err.error || "Desconhecido"}`);
+              throw new Error(`Erro ao registrar download: ${err.error?.message || err.error || "Desconhecido"}`);
             }
           } else {
             // Novo contrato: primeiro download ou conteúdo foi modificado
@@ -139,9 +139,9 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
             });
             const dataSalvar = await resSalvar.json();
             if (!resSalvar.ok) {
-              throw new Error(`Erro ao salvar no seu histórico: ${dataSalvar.error || "Desconhecido"}`);
+              throw new Error(`Erro ao salvar no seu histórico: ${dataSalvar.error?.message || dataSalvar.error || "Desconhecido"}`);
             }
-            dbContratoId = dataSalvar.id;
+            dbContratoId = dataSalvar?.data?.id ?? dataSalvar?.id;
             // Conta o download no contrato recém-criado
             await fetch("/api/atualizar-contrato", {
               method: "POST",
