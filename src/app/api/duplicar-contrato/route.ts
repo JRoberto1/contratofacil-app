@@ -20,12 +20,12 @@ export async function POST(req: NextRequest) {
     const { data: perfil } = await supabase
       .from('perfis')
       .select('contratos_mes, contratos_usados_mes')
-      .eq('user_id', user.id)
+      .eq('id', user.id)
       .single();
 
-    if (!perfil) return err("NOT_FOUND", "Perfil não encontrado.", 404);
-
-    const cotaDisponivel = perfil.contratos_mes - perfil.contratos_usados_mes;
+    const cotaDisponivel = perfil
+      ? (perfil.contratos_mes ?? 2) - (perfil.contratos_usados_mes || 0)
+      : 2;
     if (cotaDisponivel <= 0) {
       return err("QUOTA_EXCEEDED", "Cota de contratos esgotada.", 403);
     }
@@ -76,8 +76,8 @@ export async function POST(req: NextRequest) {
 
     await supabase
       .from('perfis')
-      .update({ contratos_usados_mes: perfil.contratos_usados_mes + 1 })
-      .eq('user_id', user.id);
+      .update({ contratos_usados_mes: (perfil?.contratos_usados_mes || 0) + 1 })
+      .eq('id', user.id);
 
     return ok({ novoId: novoContrato.id }, 201);
   } catch (error: unknown) {

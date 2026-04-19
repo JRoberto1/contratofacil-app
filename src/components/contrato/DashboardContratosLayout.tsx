@@ -118,10 +118,11 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
           router.push(resJson.redirect);
           return;
         }
-        throw new Error(resJson.error || "Erro de fetch");
+        throw new Error(resJson.error?.message || resJson.error || "Erro de fetch");
       }
 
-      router.push(`/gerar?from=${resJson.novoId}`);
+      const novoId = resJson.data?.novoId ?? resJson.novoId;
+      router.push(`/gerar?from=${novoId}`);
     } catch (error: any) {
       alert("Falha ao duplicar: " + error.message);
     } finally {
