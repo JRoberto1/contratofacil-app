@@ -24,6 +24,17 @@
 | 9 | `modoAssinatura: "eletrônica"` (com acento) rejeitado pelo Zod | Typo no mock de EditarContratoClient | `EditarContratoClient.tsx:24` |
 | 10 | Cache `.next` stale referenciando `middleware.ts` deletado | Turbopack não limpa cache automaticamente após delete | Resolvido com `rm -rf .next` + restart |
 
+#### Pós-sessão 1 (continuação)
+
+| # | Sintoma | Causa raiz | Arquivo(s) |
+|---|---------|-----------|------------|
+| 11 | Build Vercel falhava com **TypeScript error** | `nomeCategoria()` aceitava `string \| null` mas `item.categoria_custom` é `string \| undefined` | `DashboardContratosLayout.tsx:11` |
+| 12 | **"Enviar por E-mail" não fazia nada** ao clicar | Guard `if (!contratoId) return` silencioso — sem erro exibido ao usuário | `VisualizadorContrato.tsx:209` |
+| 13 | Modal de e-mail mostrava **"Salve o contrato antes de enviar"** | Contrato vindo do path rascunho não tinha `contratoId` — sem auto-save | `VisualizadorContrato.tsx` — adicionado auto-save antes do envio |
+| 14 | Auto-save falhava com **"contratos_tipo_check"** | CHECK constraint do banco tinha tipos antigos (`resumido-formal`, `completo-dia-a-dia`) incompatíveis com os novos | Migration via API: constraint atualizada |
+| 15 | Rota `/api/enviar-contrato` retornava **HTML** em vez de JSON | Import estático de `pdf-lib`/`resend` crashava a rota antes do `try/catch`; `RESEND_API_KEY` não verificada | `enviar-contrato/route.ts` — imports dinâmicos + verificação antecipada de env |
+| 16 | Frontend exibia **"Unexpected token '<'"** em vez do erro real | `res.json()` chamado antes de verificar `res.ok` — HTML retornado pelo servidor quebrava o parse | `VisualizadorContrato.tsx` — parse defensivo com `res.text()` + try/catch |
+
 ---
 
 ### Migrações aplicadas no banco (Supabase)
@@ -34,6 +45,7 @@
 | `20260419_pagamentos_idempotency.sql` | Adiciona `idempotency_key UNIQUE` em `pagamentos` |
 | `20260418_status_concluido` (via API) | Adiciona `'concluido'` ao CHECK constraint; migra `'gerado'→'concluido'`; corrige trigger `check_imutavel` |
 | `contratos_usados_mes` (via API) | Adiciona coluna `contratos_usados_mes INTEGER DEFAULT 0` em `perfis`; corrige `contratos_mes=0→2` |
+| `contratos_tipo_check` (via API) | Substitui tipos antigos (`resumido-formal`, `completo-dia-a-dia`) pelos novos (`simplificado`, `executivo`, `minimalista`) |
 
 ---
 
@@ -44,3 +56,7 @@
 - **Validação Zod**: todas as rotas API usam schemas Zod com envelope `{success, data}` / `{success, error}`
 - **Webhook idempotente**: Stripe webhook usa `upsert` com `idempotency_key` para evitar pagamentos duplicados
 - **Health check**: `/api/health` verifica conectividade Supabase e variáveis de ambiente
+- **Modal "Enviar por E-mail"**: UI completa com campo de destinatário, loading state, exibição de erros e toast de confirmação
+- **Auto-save no envio**: se o contrato não tiver ID (rascunho), salva automaticamente antes de enviar por e-mail
+- **Categorias em português**: `nomeCategoria()` traduz slugs internos para nomes exibíveis no dashboard
+- **Referência CF-XXXX-NNN**: todos os contratos recebem referência sequencial gerada no momento do save
