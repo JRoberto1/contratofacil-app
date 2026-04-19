@@ -8,7 +8,7 @@ import { Contrato } from "@/types/contrato";
 import { ContratoPreview } from "./ContratoPreview";
 import { categorias } from "@/lib/categorias";
 
-function nomeCategoria(cat: string | null, catCustom: string | null): string {
+function nomeCategoria(cat: string | null | undefined, catCustom: string | null | undefined): string {
   if (catCustom) return catCustom;
   if (!cat) return "—";
   return categorias[cat as keyof typeof categorias]?.title ?? cat;
