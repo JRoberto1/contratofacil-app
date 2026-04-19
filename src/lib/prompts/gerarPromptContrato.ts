@@ -65,10 +65,32 @@ export function prepararPrompt(formulario: FormularioContrato, tipoContrato: Tip
 
   // Diretriz de tipo de contrato
   const diretrizTipo: Record<TipoContrato, string> = {
-    "completo-formal": "TIPO: Completo Formal — Extensão: 3 a 5 páginas. Tom: técnico-jurídico, linguagem formal, citações legais pertinentes. Estrutura: todas as cláusulas numeradas, com parágrafos e incisos. Inclui: definição de termos, casos fortuitos, sucessão, legislação aplicável.",
-    "simplificado": "TIPO: Simplificado — Extensão: 1 a 2 páginas. Tom: linguagem acessível, sem juridiquês desnecessário. Estrutura: apenas cláusulas essenciais, sem subparágrafos excessivos. Inclui: objeto, pagamento, prazo, rescisão, LGPD, foro.",
-    "executivo": "TIPO: Executivo — Extensão: 1,5 a 2,5 páginas. Tom: formal e objetivo, adequado para relações B2B. Estrutura: cláusulas compactas, sem subcláusulas extensas. Inclui: objeto, pagamento, entregáveis, confidencialidade, rescisão, foro.",
-    "minimalista": "TIPO: Minimalista — Extensão: até 1 página. Tom: direto, linguagem do cotidiano sem juridiquês. Estrutura: blocos simples, sem numeração de incisos. Inclui: quem é quem, o que vai fazer, quanto vai receber, o que acontece se não pagar, onde resolver conflito.",
+    "completo-formal": `MODELO: Completo Formal
+EXTENSÃO OBRIGATÓRIA: 600 a 900 palavras.
+TOM: técnico-jurídico, linguagem formal, citações de artigos de lei.
+ESTRUTURA: cláusulas numeradas (CLÁUSULA 1ª, 2ª...) com parágrafos (§1º, §2º) e incisos (I, II, III).
+DEVE INCLUIR: definição de termos, força maior/caso fortuito, sucessão e cessão, vedações explícitas, legislação aplicável.`,
+
+    "simplificado": `MODELO: Simplificado
+EXTENSÃO OBRIGATÓRIA: 250 a 380 palavras. SE ULTRAPASSAR 380 PALAVRAS, CORTE CLÁUSULAS.
+TOM: linguagem clara e acessível. PROIBIDO usar: "doravante", "outrossim", "nos termos do art.", "inciso", "parágrafo único".
+ESTRUTURA: no máximo 6 seções com títulos simples (## DAS PARTES, ## OBJETO, ## PAGAMENTO, ## PRAZO, ## RESCISÃO, ## VALIDADE). Sem subparágrafos.
+DEVE INCLUIR APENAS: quem são as partes, o que será feito, quanto e quando paga, prazo de entrega, o que acontece se cancelar, onde resolver conflito.
+NÃO INCLUIR: definição de termos, força maior, sucessão, referências a artigos de lei, cláusulas de vínculo empregatício com linguagem técnica.`,
+
+    "executivo": `MODELO: Executivo
+EXTENSÃO OBRIGATÓRIA: 380 a 550 palavras.
+TOM: formal, direto e objetivo — adequado para relações B2B e contratos recorrentes.
+ESTRUTURA: cláusulas compactas em parágrafos corridos, sem subincisos. Máximo 8 seções.
+DEVE INCLUIR: objeto com entregáveis específicos, cronograma de pagamento, SLA/prazo, confidencialidade, rescisão com aviso prévio, foro.
+NÃO INCLUIR: definições longas, força maior genérica, sucessão, citações extensas de legislação.`,
+
+    "minimalista": `MODELO: Minimalista
+EXTENSÃO OBRIGATÓRIA: 120 a 200 palavras. SE ULTRAPASSAR 200 PALAVRAS, CORTE SEM EXCEÇÃO.
+TOM: linguagem do dia a dia, como um combinado formal entre pessoas. PROIBIDO qualquer jargão jurídico.
+ESTRUTURA: 4 blocos simples sem numeração: QUEM, O QUÊ, PAGAMENTO, REGRAS BÁSICAS.
+DEVE INCLUIR APENAS: nomes das partes, descrição simples do serviço, valor e data de pagamento, o que acontece se um lado desistir.
+NÃO INCLUIR: LGPD, força maior, vínculo empregatício, cessão, artigos de lei, citações legais, subcláusulas.`,
   };
 
   // Qualificação das partes
