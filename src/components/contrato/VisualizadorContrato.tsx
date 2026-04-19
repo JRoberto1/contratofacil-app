@@ -206,7 +206,9 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
   const textoAtual = editando ? textoEditado : (conteudo[tipoAtivo] ?? "");
 
   const enviarEmail = async () => {
-    if (!emailPara || !textoAtual || !contratoId) return;
+    if (!emailPara.trim()) { setErroEmail("Informe o e-mail do destinatário."); return; }
+    if (!textoAtual) { setErroEmail("Contrato sem conteúdo para enviar."); return; }
+    if (!contratoId) { setErroEmail("Salve o contrato antes de enviar por e-mail."); return; }
     setEnviandoEmail(true);
     setErroEmail(null);
     try {
