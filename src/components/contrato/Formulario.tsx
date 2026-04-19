@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { categorias, CategoriaSlug } from "@/lib/categorias";
+import { categorias, CategoriaSlug, gruposCategorias } from "@/lib/categorias";
 import type { FormularioContrato } from "@/types/contrato";
 
 interface FormularioProps {
@@ -107,11 +107,11 @@ export default function Formulario({
 
   useEffect(() => {
     // Definir assinatura padrão com base na categoria
-    const criativos = ["designer", "uxui", "dev", "data", "photo", "socialmedia", "copywriter", "editor", "consultant", "mentor", "professor", "cerimonial", "dj", "psicologo", "nutricionista", "personaltrainer"];
-    const manuais = ["maintenance", "eletricista", "encanador", "limpeza", "buffet", "cuidador", "esteticista"];
-    if (criativos.includes(categoria)) setModoAssinatura("eletronica");
-    else if (manuais.includes(categoria)) setModoAssinatura("fisica_com_testemunhas");
-    else setModoAssinatura("fisica_sem_testemunhas");
+    const grupoDigital = ["tech", "criacao", "consultoria", "saude"];
+    const isDigital = gruposCategorias.some(g => grupoDigital.includes(g.id) && g.items.includes(categoria as any));
+    
+    if (isDigital) setModoAssinatura("eletronica");
+    else setModoAssinatura("fisica_com_testemunhas");
 
     if (initialData) {
       setFormData(initialData as any);
