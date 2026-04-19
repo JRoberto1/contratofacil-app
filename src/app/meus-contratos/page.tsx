@@ -27,10 +27,13 @@ export default async function MeusContratosPage() {
   const { data: perfil } = await supabase
     .from('perfis')
     .select('contratos_mes, contratos_usados_mes')
-    .eq('user_id', user.id)
+    .eq('id', user.id)
     .single();
 
-  const cotaDisponivel = perfil ? Math.max(0, perfil.contratos_mes - (perfil.contratos_usados_mes || 0)) : 0;
+  // Plano grátis = 2 contratos/mês por padrão quando perfil não existe
+  const cotaDisponivel = perfil
+    ? Math.max(0, (perfil.contratos_mes ?? 2) - (perfil.contratos_usados_mes || 0))
+    : 2;
 
   if (contratosError) {
     return (
