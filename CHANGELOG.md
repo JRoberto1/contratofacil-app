@@ -35,6 +35,7 @@
 | 15 | Rota `/api/enviar-contrato` retornava **HTML** em vez de JSON | Import estático de `pdf-lib`/`resend` crashava a rota antes do `try/catch`; `RESEND_API_KEY` não verificada | `enviar-contrato/route.ts` — imports dinâmicos + verificação antecipada de env |
 | 16 | Frontend exibia **"Unexpected token '<'"** em vez do erro real | `res.json()` chamado antes de verificar `res.ok` — HTML retornado pelo servidor quebrava o parse | `VisualizadorContrato.tsx` — parse defensivo com `res.text()` + try/catch |
 | 17 | Após envio por e-mail, tela **não redirecionava** para Meus Contratos | `enviarEmail()` só fechava o modal sem chamar `router.push` | `VisualizadorContrato.tsx` — adicionado redirect + toast "Contrato enviado por e-mail!" |
+| 18 | Modal "Detalhes do Contrato" exibia **"# Sem Referência"** em contratos antigos | Contratos criados antes da feature de referência não tinham o campo preenchido | `DashboardContratosLayout.tsx` — linha oculta quando null; migration retroativa gerou CF-YYYY-NNN para 23 contratos |
 
 ---
 

@@ -301,10 +301,12 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
             <div className="p-6 border-b border-outline-variant/20 flex justify-between items-start bg-surface">
               <div>
                 <h2 className="text-2xl font-headline font-extrabold text-on-surface">Detalhes do Contrato</h2>
-                <p className="text-on-surface-variant font-medium text-sm mt-1 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[16px]">tag</span>
-                  {modalContrato.referencia || 'Sem Referência'}
-                </p>
+                {modalContrato.referencia && (
+                  <p className="text-on-surface-variant font-medium text-sm mt-1 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[16px]">tag</span>
+                    {modalContrato.referencia}
+                  </p>
+                )}
               </div>
               <button onClick={() => { setModalContrato(null); setShowConfirmDuplicate(false); }} className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container transition-colors">
                 <span className="material-symbols-outlined text-on-surface-variant">close</span>
