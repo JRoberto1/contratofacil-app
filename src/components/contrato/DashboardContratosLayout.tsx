@@ -311,7 +311,13 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
               ) : (
                 <div className="text-center p-10 bg-surface-container-low rounded-2xl">
                   <span className="material-symbols-outlined text-4xl text-on-surface-variant opacity-50 mb-4 block">edit_document</span>
-                  <p className="text-on-surface-variant font-medium">Este contrato ainda não foi finalizado e processado.</p>
+                  <p className="text-on-surface-variant font-medium mb-4">Este contrato ainda não foi gerado pela IA.</p>
+                  <button
+                    onClick={() => { setModalContrato(null); router.push(`/contrato/${modalContrato.id}`); }}
+                    className="signature-gradient text-white px-6 py-2 rounded-full font-bold font-headline text-sm shadow-sm hover:scale-[1.02] transition-all"
+                  >
+                    Gerar contrato
+                  </button>
                 </div>
               )}
             </div>
