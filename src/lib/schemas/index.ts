@@ -6,9 +6,7 @@ const cpfCnpj = z.string().min(11, "CPF/CNPJ obrigatório");
 const uuid = z.string().uuid("ID inválido");
 const tipoContrato = z.enum(["completo-formal", "simplificado", "executivo", "minimalista"]);
 const categoriaContrato = z.enum([
-  "fotografo", "videomaker", "designer-grafico", "desenvolvedor-web",
-  "social-media", "redator", "ilustrador", "motion-designer",
-  "editor-de-video", "consultor", "servicos-gerais", "outros",
+  "designer", "dev", "photo", "consultant", "maintenance", "other",
 ]);
 
 // ── Schemas de entrada por rota ───────────────────────────────────────────────

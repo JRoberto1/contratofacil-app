@@ -21,7 +21,7 @@ export default function EditarContratoClient({ contrato, contratoId }: { contrat
       // Criamos um formulário mock para uso do Visualizador 
       setFormData({
         categoria: contrato.categoria,
-        modoAssinatura: "eletrônica",
+        modoAssinatura: "eletronica",
         cliente: { nomeRazaoSocial: contrato.cliente_nome, cpfCnpj: contrato.cliente_doc, cidade: "", estado: "" },
         prestador: { nomeCompleto: contrato.prestador_nome, cpfCnpj: contrato.prestador_doc, cidade: "", estado: "", logradouro: "", numero: "", profissao: "", civil: "", nacionalidade: "" },
         servico: { descricao: contrato.servico_descricao, valor: contrato.servico_valor ? (contrato.servico_valor / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '', prazoEntrega: contrato.servico_prazo, formaPagamento: contrato.servico_pagamento, formaPagamentoTipo: "outro", formaPagamentoDetalhes: {} }
