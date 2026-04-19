@@ -208,15 +208,30 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
   const enviarEmail = async () => {
     if (!emailPara.trim()) { setErroEmail("Informe o e-mail do destinatário."); return; }
     if (!textoAtual) { setErroEmail("Contrato sem conteúdo para enviar."); return; }
-    if (!contratoId) { setErroEmail("Salve o contrato antes de enviar por e-mail."); return; }
     setEnviandoEmail(true);
     setErroEmail(null);
     try {
+      let idParaEnvio = contratoId ?? null;
+
+      // Se ainda não tem ID, salva o contrato agora
+      if (!idParaEnvio) {
+        const resSalvar = await fetch("/api/salvar-contrato", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ formulario, tipo: tipoAtivo, conteudo: textoAtual }),
+        });
+        const dataSalvar = await resSalvar.json();
+        if (!resSalvar.ok) throw new Error(dataSalvar.error?.message ?? "Erro ao salvar contrato");
+        idParaEnvio = dataSalvar?.data?.id ?? dataSalvar?.id ?? null;
+      }
+
+      if (!idParaEnvio) throw new Error("Não foi possível identificar o contrato.");
+
       const res = await fetch("/api/enviar-contrato", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contratoId,
+          contratoId: idParaEnvio,
           conteudo: textoAtual,
           para: emailPara,
           nomeDestinatario: formulario?.cliente?.nomeRazaoSocial ?? "",
