@@ -43,6 +43,7 @@
 |---|---------|-----------|------------|
 | 19 | Dificuldade em adicionar > 20 profissões sem quebrar restrição de backend | O Zod schema barrava a inclusão de novas profissões no `categoriaContrato` via `z.enum` fixo | `lib/schemas/index.ts` — relaxado para `z.string()` |
 | 20 | Interface confusa pela falta de clareza com várias categorias de nível único | O array de exibição era um grid direto e rígido sem capacidade de agrupar subcategorias | `SeletorCategoria.tsx` — componente reescrito com grupos hierárquicos, mantendo estado de `ActiveGroup` |
+| 21 | Interface não atualizava visualmente mesmo após criar novo módulo `SeletorCategoria.tsx` | A página `/gerar/page.tsx` não importava e não usava o componente, possivelmente abandonado no mock inline original | `gerar/page.tsx` — limpa lógica hardcoded e implementado wrapper sobre o componente oficial `<SeletorCategoria/>` |
 
 ---
 
