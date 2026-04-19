@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       id: crypto.randomUUID(),
       referencia: novaReferencia,
       status: 'rascunho',
-      conteudo: '',
+      conteudo: original.conteudo || '',
       imutavel: false,
       downloads_count: 0,
     };

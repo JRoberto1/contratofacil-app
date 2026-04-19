@@ -122,7 +122,7 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
       }
 
       const novoId = resJson.data?.novoId ?? resJson.novoId;
-      router.push(`/gerar?from=${novoId}`);
+      router.push(`/contrato/${novoId}`);
     } catch (error: any) {
       alert("Falha ao duplicar: " + error.message);
     } finally {
