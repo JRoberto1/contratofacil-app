@@ -91,8 +91,18 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
     await gerarTipo(tipo);
   }
 
+  function markdownParaTexto(md: string): string {
+    return md
+      .replace(/^#{1,3}\s+/gm, "")        // remove ## títulos
+      .replace(/\*\*(.+?)\*\*/g, "$1")     // remove **negrito**
+      .replace(/\*(.+?)\*/g, "$1")         // remove *itálico*
+      .replace(/^[-*]\s+/gm, "• ")         // bullet points legíveis
+      .replace(/\n{3,}/g, "\n\n")          // máximo 2 quebras de linha
+      .trim();
+  }
+
   function iniciarEdicao() {
-    setTextoEditado(conteudo[tipoAtivo] ?? "");
+    setTextoEditado(markdownParaTexto(conteudo[tipoAtivo] ?? ""));
     setEditando(true);
   }
 

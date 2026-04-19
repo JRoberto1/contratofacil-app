@@ -18,16 +18,16 @@ export const SalvarContratoSchema = z.object({
     prestador: z.object({
       nomeCompleto: z.string().min(3, "Nome do prestador obrigatório"),
       cpfCnpj,
-      cidade: z.string().min(2, "Cidade obrigatória"),
-      estado: z.string().min(2, "Estado obrigatório"),
-      email: z.string().email("E-mail do prestador inválido"),
+      cidade: z.string().optional(),
+      estado: z.string().optional(),
+      email: z.string().email("E-mail do prestador inválido").optional().or(z.literal("")),
     }).passthrough(),
     cliente: z.object({
       nomeRazaoSocial: z.string().min(3, "Nome do cliente obrigatório"),
       cpfCnpj,
-      cidade: z.string().min(2, "Cidade obrigatória"),
-      estado: z.string().min(2, "Estado obrigatório"),
-      email: z.string().email("E-mail do cliente inválido"),
+      cidade: z.string().optional(),
+      estado: z.string().optional(),
+      email: z.string().email("E-mail do cliente inválido").optional().or(z.literal("")),
     }).passthrough(),
     servico: z.object({
       descricao: z.string().min(10, "Descrição do serviço obrigatória"),
