@@ -59,8 +59,8 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error) {
-      console.error("[salvar-contrato]", error.message);
-      return err("DB_ERROR", "Falha ao gravar contrato no banco de dados.", 500);
+      console.error("[salvar-contrato]", error.message, error.code, error.details);
+      return err("DB_ERROR", `Falha ao gravar: ${error.message}`, 500);
     }
 
     return ok({ id: data.id }, 201);
