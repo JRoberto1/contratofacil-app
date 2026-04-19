@@ -136,10 +136,16 @@ export default function Formulario({
   }, [initialData, categoria]);
 
   const handleChange = (section: "prestador" | "cliente" | "servico", field: string, value: any) => {
-    setFormData((prev) => ({
-      ...prev,
-      [section]: { ...prev[section], [field]: value },
-    }));
+    setFormData((prev) => {
+      const updated = { ...prev, [section]: { ...prev[section], [field]: value } };
+      // Auto-seleciona PF/PJ com base nos dígitos do CPF/CNPJ
+      if (field === "cpfCnpj" && (section === "prestador" || section === "cliente")) {
+        const digits = value.replace(/\D/g, "");
+        const tipo = digits.length > 11 ? "PJ" : "PF";
+        (updated[section] as any).tipoPessoa = tipo;
+      }
+      return updated;
+    });
     setSaved(false);
   };
 

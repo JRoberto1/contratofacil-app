@@ -158,6 +158,25 @@ FORMATO DE SAÍDA
 - Nunca use markdown decorativo
 - O texto deve ler como documento jurídico real
 - Responda APENAS com o texto do contrato. Não adicione introduções ou assine como IA.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BLOCO DE ASSINATURAS — REGRA ABSOLUTA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Modo selecionado: ${formulario.modoAssinatura}
+
+${formulario.modoAssinatura === "fisica_com_testemunhas"
+  ? `Incluir EXATAMENTE este bloco ao final:
+CONTRATANTE: ________________________________
+CONTRATADO: _________________________________
+TESTEMUNHA 1: _______________________________
+TESTEMUNHA 2: _______________________________`
+  : formulario.modoAssinatura === "fisica_sem_testemunhas"
+  ? `Incluir EXATAMENTE este bloco ao final — SEM testemunhas:
+CONTRATANTE: ________________________________
+CONTRATADO: _________________________________`
+  : `Incluir EXATAMENTE este bloco ao final — sem linhas de assinatura física:
+Aceite eletrônico registrado por link com validade jurídica (MP 2.200-2/2001 e CPC art. 784).`
+}
 `;
 
   // User prompt
