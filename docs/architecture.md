@@ -181,6 +181,25 @@ contratofacil-app/
 
 ---
 
+### ADR-006: Sem versionamento de rotas API (/api/v1/)
+**Data:** 2026-04-19 | **Status:** Aceita
+
+**Contexto:** O domínio API recomenda `/api/v1/`. O harness flagou ausência de versioning.
+
+**Decisão:** Não adotar prefixo `/api/v1/` neste momento.
+
+**Justificativa:**
+- API é exclusivamente interna — todos os clientes são o próprio frontend Next.js
+- Não existe contrato externo publicado; não há terceiros consumindo as rotas
+- Versioning com prefixo de URL introduz overhead de manutenção sem benefício real para APIs privadas de SaaS MVP
+- Estratégia de migração futura: se a API for exposta externamente, adotar versioning via header `Accept: application/vnd.contratofacil.v2+json` (menos disruptivo que prefixo de URL)
+
+**Consequências:**
+- ✅ Menos fricção de desenvolvimento no MVP
+- ⚠️ Se a API for exposta externamente no futuro, precisará de estratégia de versionamento — revisar este ADR
+
+---
+
 ### ADR-005: Downloads via URL Assinada (não URL pública)
 **Data:** 2026-04-17 | **Status:** Aceita
 
