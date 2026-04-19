@@ -107,8 +107,8 @@ export default function Formulario({
 
   useEffect(() => {
     // Definir assinatura padrão com base na categoria
-    const criativos = ["designer-grafico", "desenvolvedor-web", "fotografo", "videomaker", "social-media", "redator", "consultor", "ilustrador", "motion-designer", "editor-de-video", "professor"];
-    const manuais = ["servicos-gerais", "eletricista", "encanador", "pedreiro", "pintor", "marceneiro"];
+    const criativos = ["designer", "uxui", "dev", "data", "photo", "socialmedia", "copywriter", "editor", "consultant", "mentor", "professor", "cerimonial", "dj", "psicologo", "nutricionista", "personaltrainer"];
+    const manuais = ["maintenance", "eletricista", "encanador", "limpeza", "buffet", "cuidador", "esteticista"];
     if (criativos.includes(categoria)) setModoAssinatura("eletronica");
     else if (manuais.includes(categoria)) setModoAssinatura("fisica_com_testemunhas");
     else setModoAssinatura("fisica_sem_testemunhas");

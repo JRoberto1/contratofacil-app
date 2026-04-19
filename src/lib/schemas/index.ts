@@ -5,9 +5,7 @@ import { z } from "zod";
 const cpfCnpj = z.string().min(11, "CPF/CNPJ obrigatório");
 const uuid = z.string().uuid("ID inválido");
 const tipoContrato = z.enum(["completo-formal", "simplificado", "executivo", "minimalista"]);
-const categoriaContrato = z.enum([
-  "designer", "dev", "photo", "consultant", "maintenance", "other",
-]);
+const categoriaContrato = z.string().min(1, "Categoria obrigatória");
 
 // ── Schemas de entrada por rota ───────────────────────────────────────────────
 

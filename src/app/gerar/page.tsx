@@ -35,7 +35,8 @@ export default function GerarPage() {
 
       if (!res.ok) throw new Error("Falha ao preparar geração");
 
-      const { id } = await res.json();
+      const json = await res.json();
+      const id = json?.data?.id ?? json?.id;
       router.push(`/contrato/${id}`);
     } catch (e) {
       console.error(e);

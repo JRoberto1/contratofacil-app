@@ -1,4 +1,4 @@
-export type CategoriaSlug = 'designer' | 'dev' | 'photo' | 'consultant' | 'maintenance' | 'other';
+export type CategoriaSlug = string;
 
 export interface CategoriaContrato {
   id: CategoriaSlug;
@@ -16,109 +16,137 @@ export interface CategoriaContrato {
   }[];
 }
 
+export interface GrupoCategoria {
+  id: string;
+  label: string;
+  icon: string;
+  items: CategoriaSlug[];
+}
+
+export const gruposCategorias: GrupoCategoria[] = [
+  { id: 'tech', label: 'Tecnologia & Dados', icon: 'code', items: ['dev', 'uxui', 'data'] },
+  { id: 'criacao', label: 'Design & Criatividade', icon: 'palette', items: ['designer', 'photo', 'socialmedia', 'copywriter', 'editor'] },
+  { id: 'consultoria', label: 'Consultoria & Aulas', icon: 'school', items: ['consultant', 'mentor', 'professor'] },
+  { id: 'servicos', label: 'Serviços & Manutenção', icon: 'construction', items: ['maintenance', 'eletricista', 'encanador', 'limpeza'] },
+  { id: 'saude', label: 'Saúde & Bem-estar', icon: 'favorite', items: ['nutricionista', 'psicologo', 'personaltrainer', 'cuidador', 'esteticista'] },
+  { id: 'eventos', label: 'Eventos & Mídia', icon: 'celebration', items: ['cerimonial', 'dj', 'buffet'] },
+  { id: 'outros', label: 'Outros Serviços', icon: 'more_horiz', items: ['other'] }
+];
+
 export const categorias: Record<CategoriaSlug, CategoriaContrato> = {
   designer: {
-    id: 'designer',
-    icon: 'palette',
-    title: 'Designer / Freelancer Digital',
-    desc: 'Logos, UI/UX, Social Media',
+    id: 'designer', icon: 'palette', title: 'Designer Gráfico', desc: 'Logos, Identidade Visual, Materiais',
     sugestaoObjeto: 'Ex: Criação de Identidade Visual contendo Logo, Tipografia, Paleta de Cores e Manual da Marca.',
     clausulasBase: [
       'Cessão de direitos de propriedade intelectual condicionada ao pagamento integral (art. 49 da Lei 9.610/98)',
       'Direito de portfólio: o prestador pode exibir o trabalho após entrega e quitação',
-      'Limite de revisões: se informado, incluir número; se não informado, omitir — não inventar número',
       'Entrega dos arquivos finais somente após quitação total do valor contratado',
     ],
     camposExtras: [
       { id: 'limiteAprovacao', label: 'Prazo limite para o cliente aprovar/revisar (dias)?', type: 'number', placeholder: 'Ex: 5' },
-      { id: 'numeroRevisoes', label: 'Número máximo de rodadas de revisão/alterações?', type: 'number', placeholder: 'Ex: 3' },
-      { id: 'formatosEntrega', label: 'Formatos de arquivo entregues finais?', type: 'text', placeholder: 'Ex: PDF, PNG, Figma' },
+      { id: 'numeroRevisoes', label: 'Número máximo de rodadas de revisão?', type: 'number', placeholder: 'Ex: 3' },
     ],
+  },
+  uxui: {
+    id: 'uxui', icon: 'web_asset', title: 'UX/UI Designer', desc: 'Design de Interfaces e Experiência',
+    sugestaoObjeto: 'Ex: Design de UI para App Mobile, contendo 15 telas feitas no Figma.',
+    clausulasBase: ['Os arquivos fonte (Figma) serão entregues ao cliente após quitação total.'],
+    camposExtras: [],
   },
   dev: {
-    id: 'dev',
-    icon: 'code',
-    title: 'Desenvolvedor de Software',
-    desc: 'Sites, Apps, Sistemas',
-    sugestaoObjeto: 'Ex: Desenvolvimento de Landing Page institucional em React/Next.js com 5 seções.',
+    id: 'dev', icon: 'code', title: 'Desenvolvedor de Software', desc: 'Sites, Apps, Sistemas',
+    sugestaoObjeto: 'Ex: Desenvolvimento de Landing Page institucional em React com 5 seções.',
     clausulasBase: [
-      'Propriedade do código-fonte transferida somente após pagamento integral do valor contratado',
-      'Isenção de responsabilidade por falhas em servidores, APIs ou integrações de terceiros',
-      'Garantia contra bugs críticos: incluir prazo somente se informado pelo usuário; caso contrário, omitir',
-      'Entrega inclui código-fonte e documentação básica de uso conforme acordado',
+      'Propriedade do código-fonte transferida somente após pagamento integral',
+      'Isenção de responsabilidade por falhas em servidores/hospedagem de terceiros',
     ],
     camposExtras: [
-      { id: 'tecnologias', label: 'Principais tecnologias utilizadas?', type: 'text', placeholder: 'Ex: React, Node.js, AWS' },
-      { id: 'hospedagem', label: 'Quem paga pela infraestrutura/hospedagem mensal?', type: 'enum', options: ['O Cliente', 'O Prestador', 'Público/Gratuito'] },
-      { id: 'codigoAberto', label: 'O código-fonte será entregue ao cliente?', type: 'boolean' },
+      { id: 'tecnologias', label: 'Principais tecnologias?', type: 'text', placeholder: 'Ex: React, Node.js' },
+      { id: 'hospedagem', label: 'Quem paga pela infraestrutura/hospedagem?', type: 'enum', options: ['O Cliente', 'O Prestador'] },
     ],
+  },
+  data: {
+    id: 'data', icon: 'bar_chart', title: 'Analista de Dados', desc: 'Dashboards, BI, Análises',
+    sugestaoObjeto: 'Ex: Criação de Dashboards no PowerBI integrados com o sistema do cliente.',
+    clausulasBase: ['Sigilo absoluto de dados baseados na LGPD.'],
+    camposExtras: [],
   },
   photo: {
-    id: 'photo',
-    icon: 'photo_camera',
-    title: 'Fotógrafo / Videomaker',
-    desc: 'Eventos, Ensaios, Edição',
+    id: 'photo', icon: 'photo_camera', title: 'Fotógrafo(a)', desc: 'Ensaios, Eventos, Corporativo',
     sugestaoObjeto: 'Ex: Cobertura fotográfica de evento corporativo com duração de 4 horas.',
     clausulasBase: [
-      'Autorização de uso de imagem do evento ou sessão concedida pelo CONTRATANTE',
+      'Autorização de uso de imagem concedida pelo CONTRATANTE',
       'Direito de uso do material para portfólio profissional do prestador',
-      'Política de reagendamento: imprevistos climáticos ou emergências documentadas permitem reagendamento sem multa',
-      'Arquivos RAW: incluir cláusula de retenção somente se o usuário não informou entrega dos RAW',
-      'Prazo de entrega conta a partir da data do evento ou sessão, não da assinatura do contrato',
     ],
     camposExtras: [
-      { id: 'localEvento', label: 'Local de realização da sessão/evento?', type: 'text', placeholder: 'Endereço completo' },
-      { id: 'dataHoraEvento', label: 'Data e Hora (Início e Fim)?', type: 'text', placeholder: 'Ex: 25/11 das 14h às 18h' },
-      { id: 'quantidadeFotos', label: 'Quantidade exata de fotos editadas a serem entregues?', type: 'number', placeholder: 'Ex: 40' },
+      { id: 'localEvento', label: 'Local?', type: 'text', placeholder: 'Endereço completo' },
+      { id: 'quantidadeFotos', label: 'Quantidade de fotos editadas a entregar?', type: 'number', placeholder: 'Ex: 40' },
     ],
+  },
+  socialmedia: {
+    id: 'socialmedia', icon: 'campaign', title: 'Gestor de Redes Sociais', desc: 'Posts, Reels, Tráfego Pago',
+    sugestaoObjeto: 'Ex: Gestão de Instagram com 3 posts semanais por 3 meses.',
+    clausulasBase: ['Obrigação de meio: não há garantia fechada de conversões/vendas.'],
+    camposExtras: [
+      { id: 'verbaAnuncios', label: 'Verba de anúncios (quem paga?)', type: 'enum', options: ['O Cliente', 'O Prestador', 'Não há tráfego pago'] }
+    ],
+  },
+  copywriter: {
+    id: 'copywriter', icon: 'edit_document', title: 'Copywriter / Redator', desc: 'Textos, Blogs, Roteiros',
+    sugestaoObjeto: 'Ex: Redação de 4 artigos de blog otimizados para SEO por mês.',
+    clausulasBase: ['Os textos devem ser originais, garantindo ausência de plágio.'],
+    camposExtras: [],
+  },
+  editor: {
+    id: 'editor', icon: 'movie', title: 'Editor de Vídeo', desc: 'Montagem, Cortes, Animações',
+    sugestaoObjeto: 'Ex: Edição de 10 vídeos "Nuggets/Reels" para Instagram e TikTok.',
+    clausulasBase: ['Arquivos brutos devem ser enviados pelo cliente com antecedência de X dias.'],
+    camposExtras: [],
   },
   consultant: {
-    id: 'consultant',
-    icon: 'school',
-    title: 'Consultor / Professor / Coach',
-    desc: 'Aulas, Mentorias, Estratégia',
-    sugestaoObjeto: 'Ex: Mentoria online de gestão de tempo, 4 sessões de 1 hora.',
+    id: 'consultant', icon: 'school', title: 'Consultor / Assessor', desc: 'Consultoria empresarial ou técnica',
+    sugestaoObjeto: 'Ex: Consultoria de gestão de tempo, 4 sessões de 1 hora online.',
     clausulasBase: [
-      'Obrigação de meio, não de resultado: o prestador não garante resultados específicos, apenas a qualidade técnica do serviço',
-      'NDA: sigilo reforçado sobre estratégias, dados e informações de negócio do cliente',
-      'Tolerância de 15 minutos para início das sessões; após esse período, a sessão poderá ser reagendada',
-      'Política de cancelamento: aviso com antecedência mínima de 24 horas antes da sessão',
+      'Obrigação de meio, não garantindo resultados atrelados a agentes externos',
+      'NDA (Acordo de Confidencialidade) incluso por padrão sobre processos internos'
     ],
     camposExtras: [
-      { id: 'formatoAulas', label: 'Formato (Online ou Presencial)?', type: 'enum', options: ['Online (Zoom/Meet)', 'Presencial', 'Híbrido'] },
-      { id: 'quantidadeSessoes', label: 'Quantas sessões/horas totais no pacote?', type: 'number', placeholder: 'Ex: 10 horas' },
-      { id: 'gravacaoAutorizada', label: 'As sessões poderão ser gravadas?', type: 'boolean' },
+      { id: 'formatoLocal', label: 'Remoto ou Presencial?', type: 'enum', options: ['Remoto', 'Presencial'] }
     ],
   },
+  mentor: { id: 'mentor', icon: 'lightbulb', title: 'Mentor', desc: 'Direcionamento 1-a-1', sugestaoObjeto: 'Ex: Mentoria online.', clausulasBase: [], camposExtras: [] },
+  professor: { id: 'professor', icon: 'menu_book', title: 'Professor Particular', desc: 'Aulas e Cursos', sugestaoObjeto: 'Aulas de idiomas online. Pacote de 10 aulas', clausulasBase: [], camposExtras: [] },
   maintenance: {
-    id: 'maintenance',
-    icon: 'construction',
-    title: 'Eletricista / Encanador / Construção',
-    desc: 'Reparos, Manutenção e Obras',
-    sugestaoObjeto: 'Ex: Troca de fiação no apartamento e instalação de 5 tomadas novas.',
+    id: 'maintenance', icon: 'construction', title: 'Reformas e Serviços Gerais', desc: 'Reparos, Pedreiro, Marcenaria',
+    sugestaoObjeto: 'Ex: Reforma de banheiro com demolição, revestimento e pintura.',
     clausulasBase: [
-      'Definição clara de responsabilidade pelo fornecimento de materiais: usar o que foi informado pelo usuário; se não informado, deixar como "a definir entre as partes"',
-      'Responsabilidade civil restrita ao escopo dos serviços contratados, não cobrindo vícios ocultos da estrutura geral do imóvel',
-      'Garantia de mão de obra: incluir prazo somente se informado pelo usuário; caso contrário, omitir',
-      'Vistoria prévia: o prestador atesta as condições do local antes do início dos serviços',
+      'Material incluído na responsabilidade de quem for acordado. Vícios estruturais pré-existentes não são cobertos.'
     ],
     camposExtras: [
-      { id: 'fornecimentoMateriais', label: 'Quem comprará os materiais/peças?', type: 'enum', options: ['O Cliente', 'O Prestador', 'A Combinar'] },
-      { id: 'descartes', label: 'Quem será responsável pela remoção de entulho/descarte?', type: 'enum', options: ['O Cliente', 'O Prestador'] },
-      { id: 'horarioPermitido', label: 'Horário permitido para barulho/obras no local?', type: 'text', placeholder: 'Ex: 08h às 17h' },
+      { id: 'materiais', label: 'Materiais na responsabilidade de:', type: 'enum', options: ['Cliente', 'Prestador', 'Cada um fornecerá uma parte'] }
     ],
   },
+  eletricista: { id: 'eletricista', icon: 'electric_bolt', title: 'Eletricista', desc: 'Fiação, Tomadas, Rede', sugestaoObjeto: 'Instalação de rede elétrica completa', clausulasBase: [], camposExtras: [] },
+  encanador: { id: 'encanador', icon: 'water_drop', title: 'Encanador', desc: 'Hidráulica e Reparos', sugestaoObjeto: 'Detecção e conserto de vazamentos', clausulasBase: [], camposExtras: [] },
+  limpeza: { id: 'limpeza', icon: 'cleaning_services', title: 'Faxina / Limpeza', desc: 'Pós-obra, Limpeza profunda', sugestaoObjeto: 'Limpeza pós obra para 50m2', clausulasBase: [], camposExtras: [] },
+  nutricionista: {
+    id: 'nutricionista', icon: 'restaurant', title: 'Nutricionista', desc: 'Planos Alimentares, Assessoria',
+    sugestaoObjeto: 'Acompanhamento nutricional mensal com dieta e bioimpedância.',
+    clausulasBase: ['Os resultados dependem integralmente da disciplina e perfil fisiológico do cliente.'],
+    camposExtras: [],
+  },
+  psicologo: { id: 'psicologo', icon: 'psychology', title: 'Psicólogo(a) / Terapeuta', desc: 'Acompanhamento focado', sugestaoObjeto: 'Sessão semanal de acompanhamento psicoterapêutico', clausulasBase: ['Manutenção de sigilo absoluto (código de ética).'], camposExtras: [] },
+  personaltrainer: { id: 'personaltrainer', icon: 'fitness_center', title: 'Personal Trainer', desc: 'Condicionamento Físico', sugestaoObjeto: 'Aulas 3 vezes na semana', clausulasBase: ['O cliente atesta aptidão física para realizar exercícios.'], camposExtras: [] },
+  cuidador: { id: 'cuidador', icon: 'elderly', title: 'Cuidador(a)', desc: 'Idosos, Crianças (Babá)', sugestaoObjeto: 'Acompanhamento diurno das 08h às 18h', clausulasBase: [], camposExtras: [] },
+  esteticista: { id: 'esteticista', icon: 'spa', title: 'Beleza & Estética', desc: 'Maquiagem, Sobrancelha, Massagem', sugestaoObjeto: 'Procedimentos estéticos no rosto do cliente', clausulasBase: [], camposExtras: [] },
+  cerimonial: { id: 'cerimonial', icon: 'celebration', title: 'Cerimonialista / Produtor', desc: 'Casamentos e Festas', sugestaoObjeto: 'Assessoria de casamento', clausulasBase: ['Limitação de responsabilidade sobre fornecedores terceiros que falharem.'], camposExtras: [] },
+  dj: { id: 'dj', icon: 'headphones', title: 'DJ / Músico', desc: 'Apresentações, Som e Iluminação', sugestaoObjeto: 'Evento de 5 horas com pista de som', clausulasBase: [], camposExtras: [] },
+  buffet: { id: 'buffet', icon: 'restaurant_menu', title: 'Buffet', desc: 'Comidas e Bebidas', sugestaoObjeto: 'Menu para 100 pessoas', clausulasBase: [], camposExtras: [] },
   other: {
-    id: 'other',
-    icon: 'more_horiz',
-    title: 'Outros Serviços',
-    desc: 'Personalizado',
-    sugestaoObjeto: 'Descreva em detalhes o que você irá entregar ao cliente.',
+    id: 'other', icon: 'more_horiz', title: 'Outros Profissionais', desc: 'Personalizado',
+    sugestaoObjeto: 'Descreva detalhadamente o que você vai reparar ou entregar.',
     clausulasBase: [
-      'Analisar o tipo de serviço e aplicar: SE presencial → cláusula de local e imprevistos; SE remoto/digital → entrega digital e ferramentas; SE criativo → cessão de propriedade intelectual; SE técnico → garantia e limite de responsabilidade; SE saúde/bem-estar → isenção de resultado terapêutico; SE educacional → obrigação de meio, não de resultado',
-      'Cláusula de rescisão com aviso prévio mínimo de 30 dias para contratos de prestação contínua',
-      'Sigilo padrão sobre informações e dados do contratante',
-      'Foro de eleição com base na comarca do prestador',
+      'Cláusula padrão de sigilo aplicável.', 'Prazo de rescisão padrão de 30 dias.'
     ],
     camposExtras: [],
   },

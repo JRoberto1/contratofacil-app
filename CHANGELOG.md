@@ -37,6 +37,13 @@
 | 17 | Após envio por e-mail, tela **não redirecionava** para Meus Contratos | `enviarEmail()` só fechava o modal sem chamar `router.push` | `VisualizadorContrato.tsx` — adicionado redirect + toast "Contrato enviado por e-mail!" |
 | 18 | Modal "Detalhes do Contrato" exibia **"# Sem Referência"** em contratos antigos | Contratos criados antes da feature de referência não tinham o campo preenchido | `DashboardContratosLayout.tsx` — linha oculta quando null; migration retroativa gerou CF-YYYY-NNN para 23 contratos |
 
+#### Pós-sessão 2 (Refatoração de Categorias e UI)
+
+| # | Sintoma | Causa raiz | Arquivo(s) |
+|---|---------|-----------|------------|
+| 19 | Dificuldade em adicionar > 20 profissões sem quebrar restrição de backend | O Zod schema barrava a inclusão de novas profissões no `categoriaContrato` via `z.enum` fixo | `lib/schemas/index.ts` — relaxado para `z.string()` |
+| 20 | Interface confusa pela falta de clareza com várias categorias de nível único | O array de exibição era um grid direto e rígido sem capacidade de agrupar subcategorias | `SeletorCategoria.tsx` — componente reescrito com grupos hierárquicos, mantendo estado de `ActiveGroup` |
+
 ---
 
 ### Migrações aplicadas no banco (Supabase)
@@ -62,3 +69,4 @@
 - **Auto-save no envio**: se o contrato não tiver ID (rascunho), salva automaticamente antes de enviar por e-mail
 - **Categorias em português**: `nomeCategoria()` traduz slugs internos para nomes exibíveis no dashboard
 - **Referência CF-XXXX-NNN**: todos os contratos recebem referência sequencial gerada no momento do save
+- **Sistema Hierárquico de Múltiplos Serviços**: Suporte nativo para dezenas de categorias agrupadas em grandes áreas sem poluição visual.
