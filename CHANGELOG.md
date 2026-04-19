@@ -34,6 +34,7 @@
 | 14 | Auto-save falhava com **"contratos_tipo_check"** | CHECK constraint do banco tinha tipos antigos (`resumido-formal`, `completo-dia-a-dia`) incompatíveis com os novos | Migration via API: constraint atualizada |
 | 15 | Rota `/api/enviar-contrato` retornava **HTML** em vez de JSON | Import estático de `pdf-lib`/`resend` crashava a rota antes do `try/catch`; `RESEND_API_KEY` não verificada | `enviar-contrato/route.ts` — imports dinâmicos + verificação antecipada de env |
 | 16 | Frontend exibia **"Unexpected token '<'"** em vez do erro real | `res.json()` chamado antes de verificar `res.ok` — HTML retornado pelo servidor quebrava o parse | `VisualizadorContrato.tsx` — parse defensivo com `res.text()` + try/catch |
+| 17 | Após envio por e-mail, tela **não redirecionava** para Meus Contratos | `enviarEmail()` só fechava o modal sem chamar `router.push` | `VisualizadorContrato.tsx` — adicionado redirect + toast "Contrato enviado por e-mail!" |
 
 ---
 

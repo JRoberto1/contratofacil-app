@@ -34,6 +34,7 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [mostrarToast, setMostrarToast] = useState(false);
+  const [toastEmail, setToastEmail] = useState(false);
   const [editando, setEditando] = useState(false);
   const [textoEditado, setTextoEditado] = useState("");
   const [user, setUser] = useState<User | null>(null);
@@ -243,8 +244,8 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
       if (!res.ok) throw new Error(json.error?.message ?? `Erro ao enviar (${res.status})`);
       setModalEmail(false);
       setEmailPara("");
-      setMostrarToast(true);
-      setTimeout(() => setMostrarToast(false), 3000);
+      setToastEmail(true);
+      setTimeout(() => { setToastEmail(false); router.push("/meus-contratos"); }, 2500);
     } catch (e: any) {
       setErroEmail(e.message);
     } finally {
@@ -254,10 +255,15 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
 
   return (
     <div className="w-full pb-12 animate-in fade-in duration-500 relative">
-      {/* Toast Notification */}
+      {/* Toast — download */}
       <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-[#e6f4ea] text-[#137333] px-6 py-4 rounded-xl shadow-[0_10px_40px_rgba(19,115,51,0.2)] transition-all duration-300 border border-[#137333]/20 ${mostrarToast ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
         <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
         <span className="font-bold font-body text-sm">Contrato baixado com sucesso!</span>
+      </div>
+      {/* Toast — e-mail enviado */}
+      <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-[#e6f4ea] text-[#137333] px-6 py-4 rounded-xl shadow-[0_10px_40px_rgba(19,115,51,0.2)] transition-all duration-300 border border-[#137333]/20 ${toastEmail ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
+        <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>mark_email_read</span>
+        <span className="font-bold font-body text-sm">Contrato enviado por e-mail!</span>
       </div>
 
       <header className="mb-12">
