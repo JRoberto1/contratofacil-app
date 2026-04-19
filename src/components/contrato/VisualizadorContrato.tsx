@@ -251,7 +251,7 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
                   {formulario?.modoAssinatura === "eletronica" ? "ACEITE ELETRÔNICO" : "ASSINATURA FÍSICA"}
                 </p>
                 <p className="text-[12px] font-bold text-primary leading-none font-body">
-                  {formulario?.modoAssinatura === "eletronica" ? "Link enviado p/ e-mail" : "Documento Impresso"}
+                  {formulario?.modoAssinatura === "eletronica" ? "Aceite por link eletrônico" : "Documento Impresso"}
                 </p>
               </div>
               

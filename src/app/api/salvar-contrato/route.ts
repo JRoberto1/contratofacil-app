@@ -25,6 +25,15 @@ export async function POST(req: NextRequest) {
     );
     const valorCentavos = isNaN(valorDecimal) ? 0 : Math.round(valorDecimal * 100);
 
+    // Gera referência única CF-{ano}-{seq}
+    const { count } = await supabase
+      .from('contratos')
+      .select('*', { count: 'exact', head: true })
+      .eq('usuario_id', user.id);
+    const ano = new Date().getFullYear();
+    const sequencial = String((count || 0) + 1).padStart(3, '0');
+    const referencia = `CF-${ano}-${sequencial}`;
+
     const payload = {
       usuario_id: user.id,
       categoria: formulario.categoria,
@@ -40,6 +49,7 @@ export async function POST(req: NextRequest) {
       tipo,
       conteudo: conteudo || '',
       status: status_override || 'rascunho',
+      referencia,
     };
 
     const { data, error } = await supabase
