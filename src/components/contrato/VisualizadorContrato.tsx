@@ -38,8 +38,11 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
   const [textoEditado, setTextoEditado] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [processandoDownload, setProcessandoDownload] = useState(false);
-  // true quando o usuário editou o texto ou trocou de tipo — gera novo contrato no download
   const [fezModificacoes, setFezModificacoes] = useState(false);
+  const [modalEmail, setModalEmail] = useState(false);
+  const [emailPara, setEmailPara] = useState("");
+  const [enviandoEmail, setEnviandoEmail] = useState(false);
+  const [erroEmail, setErroEmail] = useState<string | null>(null);
   const supabase = createClient();
 
   useEffect(() => {
@@ -202,6 +205,34 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
 
   const textoAtual = editando ? textoEditado : (conteudo[tipoAtivo] ?? "");
 
+  const enviarEmail = async () => {
+    if (!emailPara || !textoAtual || !contratoId) return;
+    setEnviandoEmail(true);
+    setErroEmail(null);
+    try {
+      const res = await fetch("/api/enviar-contrato", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contratoId,
+          conteudo: textoAtual,
+          para: emailPara,
+          nomeDestinatario: formulario?.cliente?.nomeRazaoSocial ?? "",
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error?.message ?? "Erro ao enviar");
+      setModalEmail(false);
+      setEmailPara("");
+      setMostrarToast(true);
+      setTimeout(() => setMostrarToast(false), 3000);
+    } catch (e: any) {
+      setErroEmail(e.message);
+    } finally {
+      setEnviandoEmail(false);
+    }
+  };
+
   return (
     <div className="w-full pb-12 animate-in fade-in duration-500 relative">
       {/* Toast Notification */}
@@ -328,7 +359,8 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
                 </span>
                 {processandoDownload ? 'Processando...' : 'Baixar em PDF'}
               </button>
-              <button 
+              <button
+                onClick={() => { setModalEmail(true); setErroEmail(null); }}
                 disabled={carregando || !textoAtual}
                 className="w-full bg-surface-container text-primary py-4 rounded-full font-bold flex items-center justify-center gap-3 hover:bg-surface-container-high transition-colors font-body disabled:opacity-50"
               >
@@ -366,6 +398,65 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
           </div>
         </aside>
       </div>
+
+      {modalEmail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-surface-container-low rounded-2xl shadow-xl w-full max-w-md p-8 relative">
+            <button
+              onClick={() => { setModalEmail(false); setErroEmail(null); }}
+              className="absolute top-4 right-4 text-outline hover:text-on-surface transition-colors"
+              aria-label="Fechar"
+            >
+              <span className="material-symbols-outlined">close</span>
+            </button>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>send</span>
+              </div>
+              <h3 className="text-lg font-bold text-on-surface font-headline">Enviar por E-mail</h3>
+            </div>
+            <p className="text-sm text-outline mb-4 font-body">O contrato será gerado em PDF e enviado para o endereço abaixo.</p>
+            <label className="block text-sm font-medium text-on-surface-variant mb-1 font-label">E-mail do destinatário</label>
+            <input
+              type="email"
+              value={emailPara}
+              onChange={e => setEmailPara(e.target.value)}
+              placeholder="exemplo@email.com"
+              className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface text-on-surface text-sm font-body focus:outline-none focus:ring-2 focus:ring-primary mb-4"
+              disabled={enviandoEmail}
+            />
+            {erroEmail && (
+              <p className="text-sm text-error mb-4 font-body">{erroEmail}</p>
+            )}
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setModalEmail(false); setErroEmail(null); }}
+                className="flex-1 py-3 rounded-xl border border-outline-variant text-on-surface-variant text-sm font-medium font-label hover:bg-surface-container transition-colors"
+                disabled={enviandoEmail}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={enviarEmail}
+                disabled={enviandoEmail || !emailPara.trim()}
+                className="flex-1 py-3 rounded-xl bg-primary text-on-primary text-sm font-bold font-label hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+              >
+                {enviandoEmail ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-on-primary/30 border-t-on-primary rounded-full animate-spin"></span>
+                    Enviando…
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>send</span>
+                    Enviar
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
