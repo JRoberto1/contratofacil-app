@@ -446,7 +446,7 @@ export function prepararPrompt(formulario: FormularioContrato, tipoContrato: Tip
       descricao:        formulario.servico.descricao,
       valorTotal,
       prazoEntrega:     formulario.servico.prazoEntrega,
-      formaPagamento:   formulario.servico.formaPagamento || formulario.servico.formaPagamentoTipo,
+      formaPagamento:   (formulario.servico.formaPagamento || formulario.servico.formaPagamentoTipo) ?? '',
       percentualEntrada,
       numeroParcelas,
       multaRescisao,
