@@ -41,7 +41,6 @@ export default function LoginPage() {
 
     setCarregando(true);
     setErro(null);
-    setSucesso(null);
 
     if (modo === "cadastro") {
       if (password !== confirmarSenha) {
