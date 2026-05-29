@@ -1,10 +1,30 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
 /**
- * Gera um PDF a partir de um texto, retornando os bytes em Uint8Array.
+ * Remove símbolos de markdown do texto, deixando conteúdo legível para o PDF.
+ */
+function markdownParaTexto(md: string): string {
+  return md
+    .replace(/^#{1,6}\s+/gm, "")           // remove ## títulos
+    .replace(/\*\*(.+?)\*\*/g, "$1")        // remove **negrito**
+    .replace(/\*(.+?)\*/g, "$1")            // remove *itálico*
+    .replace(/^[-*]\s+/gm, "• ")            // bullet points legíveis
+    .replace(/^>\s+/gm, "")                 // remove blockquotes
+    .replace(/`{1,3}([^`]*)`{1,3}/g, "$1") // remove `código`
+    .replace(/\[(.+?)\]\(.+?\)/g, "$1")     // remove [links](url)
+    .replace(/_{2}(.+?)_{2}/g, "$1")        // remove __negrito__
+    .replace(/_(.+?)_/g, "$1")              // remove _itálico_
+    .replace(/\n{3,}/g, "\n\n")             // máximo 2 quebras de linha
+    .trim();
+}
+
+/**
+ * Gera um PDF a partir de um texto (markdown ou texto puro),
+ * retornando os bytes em Uint8Array.
  * Inclui paginação automática e quebra nativa de linha garantida para o texto.
  */
 export async function gerarPDFBuffer(texto: string): Promise<Uint8Array> {
+  texto = markdownParaTexto(texto);
   const pdfDoc = await PDFDocument.create();
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
