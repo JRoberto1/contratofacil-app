@@ -81,6 +81,33 @@ export interface DadosServico {
   formaEntrega?: string;
   clausulasEspeciais?: string;
   camposExtrasCategoria?: Record<string, string | boolean | number>;
+  // ── Campos novos ────────────────────────────────────────────────────────────
+  formaRecebimento?: string;
+  // Criativos & Dev
+  revisoes?: string;
+  transferePI?: boolean;
+  permitePortfolio?: boolean;
+  proibeSubcontratacao?: boolean;
+  // Dev extra
+  diasGarantia?: string;
+  quemPagaHospedagem?: string;
+  manutencaoMensal?: boolean;
+  valorManutencao?: string;
+  escopoManutencao?: string;
+  // Foto / Video
+  entregaRaw?: boolean;
+  revisoesFotos?: string;
+  // Construção
+  quemForneceMateriais?: string;
+  garantiaMaoDeObra?: string;
+  // Beleza & Saúde
+  politicaCancelamento?: string;
+  // Consultoria
+  sessoesGravadas?: boolean;
+  // Avançado
+  avisoPrevio?: string;
+  prazoAprovacao?: string;
+  prazoMateriais?: string;
 }
 
 export interface FormularioContrato {

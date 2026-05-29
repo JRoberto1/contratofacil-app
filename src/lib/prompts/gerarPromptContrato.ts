@@ -276,6 +276,7 @@ export function gerarUserPrompt(dados: {
     valorTotal: number
     prazoEntrega: string
     formaPagamento: string
+    formaRecebimento?: string
     percentualEntrada?: number
     numeroParcelas?: number
     multaRescisao?: number
@@ -290,6 +291,16 @@ export function gerarUserPrompt(dados: {
     transferePI?: boolean
     permitePortfolio?: boolean
     proibeSubcontratacao?: boolean
+    entregaRaw?: boolean
+    revisoesFotos?: number
+    quemForneceMateriais?: string
+    garantiaMaoDeObra?: number
+    quemPagaHospedagem?: string
+    politicaCancelamento?: string
+    sessoesGravadas?: boolean
+    avisoPrevio?: number
+    prazoAprovacao?: number
+    prazoMateriais?: number
     clausulasEspeciais?: string
   }
   modoAssinatura: 'fisica-testemunhas' | 'fisica-simples' | 'aceite-eletronico'
@@ -346,11 +357,22 @@ ${servico.clausulasEspeciais || 'Nenhuma'}
 
 INFORMAÇÕES ESPECÍFICAS DA CATEGORIA:
 ${servico.revisoes ? `- Revisões inclusas: ${servico.revisoes}` : '- Revisões: não informadas — NÃO incluir número'}
-${servico.garantiaDias ? `- Garantia após entrega: ${servico.garantiaDias} dias` : '- Garantia: não informada — NÃO incluir'}
+${servico.garantiaDias ? `- Garantia após entrega: ${servico.garantiaDias} dias` : '- Garantia de bugs: não informada — NÃO incluir'}
 ${servico.manutencaoMensal ? `- Manutenção mensal: sim — valor R$ ${servico.valorManutencao?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} — escopo: ${servico.escopoManutencao}` : ''}
 ${servico.transferePI !== undefined ? `- Transferência de PI após pagamento: ${servico.transferePI ? 'sim' : 'não'}` : ''}
 ${servico.permitePortfolio !== undefined ? `- Permite uso em portfólio: ${servico.permitePortfolio ? 'sim' : 'não'}` : ''}
-${servico.proibeSubcontratacao !== undefined ? `- Proíbe subcontratação: ${servico.proibeSubcontratacao ? 'sim' : 'não'}` : ''}
+${servico.proibeSubcontratacao !== undefined ? `- Proíbe subcontratação pelo cliente: ${servico.proibeSubcontratacao ? 'sim' : 'não'}` : ''}
+${servico.entregaRaw !== undefined ? `- Entrega arquivos RAW: ${servico.entregaRaw ? 'sim' : 'não'}` : ''}
+${servico.revisoesFotos ? `- Rodadas de seleção de fotos: ${servico.revisoesFotos}` : ''}
+${servico.quemForneceMateriais ? `- Quem fornece os materiais: ${servico.quemForneceMateriais}` : ''}
+${servico.garantiaMaoDeObra ? `- Garantia de mão de obra: ${servico.garantiaMaoDeObra} dias` : '- Garantia de mão de obra: não informada — NÃO incluir'}
+${servico.quemPagaHospedagem ? `- Quem paga hospedagem/cloud: ${servico.quemPagaHospedagem}` : ''}
+${servico.politicaCancelamento ? `- Cancelamento sem aviso: ${servico.politicaCancelamento === 'cobrar' ? 'cobrar o valor da sessão integralmente' : 'não cobrar'}` : ''}
+${servico.sessoesGravadas !== undefined ? `- Sessões podem ser gravadas: ${servico.sessoesGravadas ? 'sim — uso exclusivo do contratante' : 'não'}` : ''}
+${servico.formaRecebimento ? `- Forma de recebimento do pagamento: ${servico.formaRecebimento}` : ''}
+${servico.avisoPrevio ? `- Aviso prévio para rescisão: ${servico.avisoPrevio} dias úteis` : ''}
+${servico.prazoAprovacao ? `- Prazo para o cliente aprovar entregáveis: ${servico.prazoAprovacao} dias úteis (silêncio = aprovado)` : ''}
+${servico.prazoMateriais ? `- Prazo para o cliente enviar materiais: ${servico.prazoMateriais} dias úteis (prazo de entrega suspenso enquanto aguarda)` : ''}
 ${camposCategoria ? Object.entries(camposCategoria).map(([k, v]) => `- ${k}: ${v}`).join('\n') : ''}`
 }
 
@@ -441,19 +463,47 @@ export function prepararPrompt(formulario: FormularioContrato, tipoContrato: Tip
       email:         formulario.prestador.email,
     },
     servico: {
-      categoria:        categoriaDisplay,
-      numeroPedido:     formulario.servico.numeroPedido,
-      descricao:        formulario.servico.descricao,
+      categoria:           categoriaDisplay,
+      numeroPedido:        formulario.servico.numeroPedido,
+      descricao:           formulario.servico.descricao,
       valorTotal,
-      prazoEntrega:     formulario.servico.prazoEntrega,
-      formaPagamento:   (formulario.servico.formaPagamento || formulario.servico.formaPagamentoTipo) ?? '',
+      prazoEntrega:        formulario.servico.prazoEntrega,
+      formaPagamento:      (formulario.servico.formaPagamento || formulario.servico.formaPagamentoTipo) ?? '',
+      formaRecebimento:    formulario.servico.formaRecebimento,
       percentualEntrada,
       numeroParcelas,
       multaRescisao,
       jurosMora,
-      localPrestacao:   formulario.servico.localPrestacao,
-      formaEntrega:     formulario.servico.formaEntrega,
-      clausulasEspeciais: formulario.servico.clausulasEspeciais,
+      localPrestacao:      formulario.servico.localPrestacao,
+      formaEntrega:        formulario.servico.formaEntrega,
+      clausulasEspeciais:  formulario.servico.clausulasEspeciais,
+      // Criativos & Dev
+      revisoes:            formulario.servico.revisoes ? parseInt(formulario.servico.revisoes) || undefined : undefined,
+      transferePI:         formulario.servico.transferePI,
+      permitePortfolio:    formulario.servico.permitePortfolio,
+      proibeSubcontratacao: formulario.servico.proibeSubcontratacao,
+      // Dev extra
+      garantiaDias:        formulario.servico.diasGarantia ? parseInt(formulario.servico.diasGarantia) || undefined : undefined,
+      quemPagaHospedagem:  formulario.servico.quemPagaHospedagem,
+      manutencaoMensal:    formulario.servico.manutencaoMensal,
+      valorManutencao:     formulario.servico.valorManutencao
+        ? parseFloat((formulario.servico.valorManutencao).replace(/\./g, '').replace(',', '.')) || undefined
+        : undefined,
+      escopoManutencao:    formulario.servico.escopoManutencao,
+      // Foto/Video
+      entregaRaw:          formulario.servico.entregaRaw,
+      revisoesFotos:       formulario.servico.revisoesFotos ? parseInt(formulario.servico.revisoesFotos) || undefined : undefined,
+      // Construção
+      quemForneceMateriais: formulario.servico.quemForneceMateriais,
+      garantiaMaoDeObra:   formulario.servico.garantiaMaoDeObra ? parseInt(formulario.servico.garantiaMaoDeObra) || undefined : undefined,
+      // Beleza & Saúde
+      politicaCancelamento: formulario.servico.politicaCancelamento,
+      // Consultoria
+      sessoesGravadas:     formulario.servico.sessoesGravadas,
+      // Avançado
+      avisoPrevio:         formulario.servico.avisoPrevio ? parseInt(formulario.servico.avisoPrevio) || undefined : undefined,
+      prazoAprovacao:      formulario.servico.prazoAprovacao ? parseInt(formulario.servico.prazoAprovacao) || undefined : undefined,
+      prazoMateriais:      formulario.servico.prazoMateriais ? parseInt(formulario.servico.prazoMateriais) || undefined : undefined,
     },
     modoAssinatura,
     camposCategoria: Object.keys(camposCategoria).length > 0 ? camposCategoria : undefined,
