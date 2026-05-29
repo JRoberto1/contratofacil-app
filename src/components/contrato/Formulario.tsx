@@ -973,29 +973,6 @@ export default function Formulario({ categoria, categoriaCustom, initialData, on
                         <option value="a-combinar">A combinar</option>
                       </select>
                     </div>
-                    <div>
-                      <label className={labelCls}>Inclui manutenção mensal após a entrega?</label>
-                      <ToggleField value={!!formData.servico.manutencaoMensal} onChange={v => handleChange("servico", "manutencaoMensal", v)} />
-                    </div>
-                    {formData.servico.manutencaoMensal && (
-                      <div className="bg-surface-container-low p-4 rounded-xl border border-outline-variant/20 space-y-4">
-                        <div>
-                          <label className={labelCls}>Valor mensal da manutenção (R$) *</label>
-                          <input type="text" placeholder="0,00"
-                            value={formData.servico.valorManutencao || ""}
-                            onChange={handleChangeCurrency("valorManutencao")}
-                            className={inputCls} />
-                        </div>
-                        <div>
-                          <label className={labelCls}>O que está incluso na manutenção? *</label>
-                          <textarea placeholder="Ex: até 5 horas de ajustes, atualizações de segurança, backups semanais..."
-                            rows={3}
-                            value={formData.servico.escopoManutencao || ""}
-                            onChange={e => handleChange("servico", "escopoManutencao", e.target.value)}
-                            className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all resize-none" />
-                        </div>
-                      </div>
-                    )}
                   </div>
                 )}
 
@@ -1086,7 +1063,7 @@ export default function Formulario({ categoria, categoriaCustom, initialData, on
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {catExtra.camposExtras.map(campo => (
-                    <div key={campo.id}>
+                    <div key={campo.id} className={campo.id === 'manutencaoMensal' ? 'md:col-span-2' : ''}>
                       <label className={labelCls}>{campo.label}</label>
                       {campo.type === 'enum' && campo.options ? (
                         <select className={inputCls}
@@ -1094,7 +1071,11 @@ export default function Formulario({ categoria, categoriaCustom, initialData, on
                           onChange={e => setFormData(prev => ({
                             ...prev, servico: {
                               ...prev.servico,
-                              camposExtrasCategoria: { ...(prev.servico.camposExtrasCategoria || {}), [campo.id]: e.target.value }
+                              camposExtrasCategoria: { ...(prev.servico.camposExtrasCategoria || {}), [campo.id]: e.target.value },
+                              ...(campo.id === 'manutencaoMensal' ? {
+                                manutencaoMensal: e.target.value === 'Sim, incluir no contrato',
+                                ...(e.target.value !== 'Sim, incluir no contrato' ? { valorManutencao: '', escopoManutencao: '' } : {}),
+                              } : {}),
                             }
                           }))}>
                           <option value="">Selecione...</option>
@@ -1112,6 +1093,28 @@ export default function Formulario({ categoria, categoriaCustom, initialData, on
                               camposExtrasCategoria: { ...(prev.servico.camposExtrasCategoria || {}), [campo.id]: e.target.value }
                             }
                           }))} />
+                      )}
+                      {/* Campos condicionais de manutenção mensal */}
+                      {campo.id === 'manutencaoMensal' &&
+                        formData.servico.camposExtrasCategoria?.['manutencaoMensal'] === 'Sim, incluir no contrato' && (
+                        <div className="mt-4 space-y-4">
+                          <div>
+                            <label className={labelCls}>Valor da manutenção mensal (R$) *</label>
+                            <input type="text" placeholder="0,00"
+                              value={formData.servico.valorManutencao || ""}
+                              onChange={handleChangeCurrency("valorManutencao")}
+                              className={inputCls} />
+                          </div>
+                          <div>
+                            <label className={labelCls}>O que está incluso na manutenção?</label>
+                            <textarea
+                              placeholder="Ex: até 5 horas de ajustes mensais, atualizações de segurança, backups semanais..."
+                              rows={3}
+                              value={formData.servico.escopoManutencao || ""}
+                              onChange={e => handleChange("servico", "escopoManutencao", e.target.value)}
+                              className="w-full bg-surface-container-highest rounded-xl py-[14px] px-5 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all resize-none" />
+                          </div>
+                        </div>
                       )}
                     </div>
                   ))}
