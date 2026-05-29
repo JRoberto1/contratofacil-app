@@ -170,30 +170,17 @@ export default function Formulario({
   };
 
   const handleChangeValor = (e: React.ChangeEvent<HTMLInputElement>) => {
-    handleChange("servico", "valor", e.target.value);
-  };
-
-  const handleBlurValor = (e: React.FocusEvent<HTMLInputElement>) => {
-    const raw = e.target.value.trim();
-    if (!raw) return;
-
-    let numero: number;
-    if (raw.includes(',')) {
-      // Formato BR: "1.500,00" ou "1500,00" → remove pontos e troca vírgula por ponto
-      numero = parseFloat(raw.replace(/\./g, '').replace(',', '.'));
-    } else {
-      // Apenas dígitos (ou ponto como separador de milhar): "15000" ou "1.500"
-      // Trata tudo como reais inteiros — "15000" = R$ 15.000,00
-      numero = parseFloat(raw.replace(/\./g, ''));
-    }
-
-    if (!numero || isNaN(numero)) return;
-
-    const formatado = numero.toLocaleString('pt-BR', {
+    const digitos = e.target.value.replace(/\D/g, '');
+    const centavos = parseInt(digitos || '0', 10);
+    const formatado = (centavos / 100).toLocaleString('pt-BR', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
     handleChange("servico", "valor", formatado);
+  };
+
+  const handleBlurValor = (_e: React.FocusEvent<HTMLInputElement>) => {
+    // onChange já garante formato correto — blur é no-op
   };
 
   const handleSubmit = (e: React.FormEvent) => {

@@ -119,6 +119,17 @@ h1, h2, h3, h4, h5, h6 {
   padding: 48px 56px;
   background: #ffffff;
   border-radius: 12px;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.contrato-preview p,
+.contrato-preview li,
+.contrato-preview td {
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* Título principal do contrato */
