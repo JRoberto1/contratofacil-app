@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 type Modo = "login" | "cadastro";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
 
   const [modo, setModo] = useState<Modo>("login");
@@ -18,12 +19,10 @@ export default function LoginPage() {
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
-  const [sucesso, setSucesso] = useState<string | null>(null);
 
   function alternarModo(novoModo: Modo) {
     setModo(novoModo);
     setErro(null);
-    setSucesso(null);
     setPassword("");
     setConfirmarSenha("");
   }
@@ -62,10 +61,11 @@ export default function LoginPage() {
           ? "Este e-mail já tem uma conta. Faça login."
           : error.message;
         setErro(msg);
-      } else {
-        setSucesso("Conta criada! Verifique seu e-mail para confirmar o cadastro.");
+        setCarregando(false);
+        return;
       }
-      setCarregando(false);
+      const destino = searchParams.get("redirectTo") || "/meus-contratos";
+      router.push(destino);
       return;
     }
 
@@ -130,11 +130,6 @@ export default function LoginPage() {
             {erro && (
               <div className="mb-4 px-4 py-3 bg-error-container/30 border border-error/20 rounded-xl text-sm text-error font-body">
                 {erro}
-              </div>
-            )}
-            {sucesso && (
-              <div className="mb-4 px-4 py-3 bg-[#e6f4ea] border border-[#137333]/20 rounded-xl text-sm text-[#137333] font-body">
-                {sucesso}
               </div>
             )}
 
