@@ -2,10 +2,45 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const supabase = createClient();
+
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [carregando, setCarregando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
+
+  async function loginGoogle() {
+    setErro(null);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    if (error) setErro(error.message);
+  }
+
+  async function loginEmail(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email || !password) { setErro("Preencha e-mail e senha."); return; }
+    setCarregando(true);
+    setErro(null);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setErro(error.message === "Invalid login credentials"
+        ? "E-mail ou senha incorretos."
+        : error.message);
+      setCarregando(false);
+    } else {
+      router.push("/meus-contratos");
+    }
+  }
 
   return (
     <div className="min-h-screen w-full bg-surface flex flex-col items-center py-10 px-4">
@@ -18,7 +53,7 @@ export default function LoginPage() {
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center w-full max-w-[400px]">
-        
+
         <div className="text-center mb-8">
           <h1 className="text-2xl md:text-3xl font-extrabold font-headline text-on-surface mb-2">Quase lá — seu contrato está pronto</h1>
           <p className="text-sm font-body text-on-surface-variant">Finalize sua autenticação para acessar o documento com segurança.</p>
@@ -28,9 +63,12 @@ export default function LoginPage() {
         <div className="w-full bg-surface-container-low p-2 rounded-[2.5rem] shadow-sm">
           {/* Container Interno */}
           <div className="w-full bg-surface-container-lowest rounded-[2.25rem] px-8 py-10">
-            
+
             {/* Botão Google */}
-            <button className="w-full bg-white border border-outline-variant/30 rounded-2xl py-4 flex items-center justify-center gap-3 hover:bg-surface-container-lowest transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-primary mb-8">
+            <button
+              onClick={loginGoogle}
+              className="w-full bg-white border border-outline-variant/30 rounded-2xl py-4 flex items-center justify-center gap-3 hover:bg-surface-container-lowest transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-primary mb-8"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48">
                 <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
                 <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
@@ -47,14 +85,24 @@ export default function LoginPage() {
               <div className="flex-grow h-px bg-outline-variant/30"></div>
             </div>
 
+            {/* Mensagem de erro */}
+            {erro && (
+              <div className="mb-4 px-4 py-3 bg-error-container/30 border border-error/20 rounded-xl text-sm text-error font-body">
+                {erro}
+              </div>
+            )}
+
             {/* Formulário */}
-            <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+            <form className="space-y-5" onSubmit={loginEmail}>
               <div>
                 <label className="block text-sm font-bold font-headline text-on-surface mb-2">Seu e-mail</label>
-                <input 
-                  type="email" 
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
                   placeholder="nome@exemplo.com"
                   className="w-full bg-surface-container-high rounded-xl py-4 px-4 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                  disabled={carregando}
                 />
               </div>
 
@@ -64,26 +112,30 @@ export default function LoginPage() {
                   <a href="#" className="font-body text-[11px] font-bold text-primary uppercase tracking-wider hover:underline">Esqueci</a>
                 </div>
                 <div className="relative">
-                  <input 
-                    type={showPassword ? "text" : "password"} 
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
                     placeholder="••••••••"
                     className="w-full bg-surface-container-high rounded-xl py-4 pl-4 pr-12 border-none outline-none focus:ring-2 focus:ring-primary text-on-surface font-body transition-all"
+                    disabled={carregando}
                   />
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface focus:outline-none"
                   >
-                    <span className="material-symbols-outlined text-xl">{showPassword ? 'visibility_off' : 'visibility'}</span>
+                    <span className="material-symbols-outlined text-xl">{showPassword ? "visibility_off" : "visibility"}</span>
                   </button>
                 </div>
               </div>
 
-              <button 
+              <button
                 type="submit"
-                className="w-full signature-gradient text-white py-4 rounded-full font-bold shadow-md hover:shadow-lg transition-all active:scale-95 mt-4"
+                disabled={carregando}
+                className="w-full signature-gradient text-white py-4 rounded-full font-bold shadow-md hover:shadow-lg transition-all active:scale-95 mt-4 disabled:opacity-60"
               >
-                Continuar
+                {carregando ? "Entrando…" : "Continuar"}
               </button>
             </form>
 
