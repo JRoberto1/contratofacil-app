@@ -7,11 +7,11 @@ import type { User } from "@supabase/supabase-js";
 import type { FormularioContrato, TipoContrato } from "@/types/contrato";
 import { ContratoPreview } from "./ContratoPreview";
 
-const tipos: { id: TipoContrato; label: string }[] = [
-  { id: "completo-formal", label: "Completo Formal" },
-  { id: "simplificado", label: "Simplificado" },
-  { id: "executivo", label: "Executivo" },
-  { id: "minimalista", label: "Minimalista" },
+const tipos: { id: TipoContrato; label: string; descricao: string }[] = [
+  { id: "completo-formal", label: "Completo Formal",  descricao: "Máxima proteção — ideal para clientes empresa ou serviços acima de R$ 5.000" },
+  { id: "simplificado",    label: "Simplificado",     descricao: "Simples e claro — para a maioria dos serviços do dia a dia" },
+  { id: "executivo",       label: "Executivo",        descricao: "Profissional e direto — para serviços recorrentes ou clientes exigentes" },
+  { id: "minimalista",     label: "Minimalista",      descricao: "Rápido e objetivo — para serviços pequenos ou clientes de confiança" },
 ];
 
 interface VisualizadorContratoProps {
@@ -277,17 +277,21 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
 
       <section className="mb-12">
         <div className="bg-surface-container-high p-1.5 rounded-full inline-flex flex-wrap gap-1 md:gap-2">
-          {tipos.map(({ id, label }) => (
+          {tipos.map(({ id, label, descricao }) => (
             <button
               key={id}
               onClick={() => trocarTipo(id)}
+              title={descricao}
               className={`px-6 py-2.5 rounded-full text-sm transition-all font-body ${
                 tipoAtivo === id
                   ? "bg-surface-container-lowest text-primary font-bold shadow-sm"
                   : "text-slate-600 font-medium hover:bg-surface-container"
               }`}
             >
-              {label}
+              <span className="block">{label}</span>
+              {tipoAtivo === id && (
+                <span className="block text-[10px] font-normal text-on-surface-variant mt-0.5 max-w-[160px] leading-tight">{descricao}</span>
+              )}
             </button>
           ))}
         </div>
