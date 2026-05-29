@@ -1,14 +1,20 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const supabase = createClient();
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    router.push('/');
+  }
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -51,7 +57,7 @@ export default function Header() {
                 Meus contratos
               </Link>
               <button 
-                onClick={() => supabase.auth.signOut()}
+                onClick={handleSignOut}
                 className="hidden md:block text-sm font-medium text-outline hover:text-error transition-colors"
               >
                 Sair
