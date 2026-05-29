@@ -1,0 +1,40 @@
+{
+  "$schema": "https://bifrost.harness/session-schema/v1",
+  "session_id": "2026-05-29-session",
+  "timestamp": "2026-05-29",
+  "runtime": "claude-code",
+  "harness_version": "1.5.0",
+  "task_summary": "Expansão do formulário, novo sistema de prompts, correções de bugs e hooks Bifrost",
+  "context_level_at_close": "L2",
+  "open_items": [
+    "Verificar RESEND_API_KEY e EMAIL_FROM na Vercel (envio de e-mail não confirmado em produção)",
+    "Confirmar constraint contratos_status_check inclui status 'enviado' no Supabase",
+    "Integração AbacatePay (Pix) — variável existe, código não feito",
+    "Limpeza de contratos antigos (30 dias) — sem cron job implementado",
+    "console.error em meus-contratos/page.tsx:24 — viola quality gate",
+    "Rota /api/dev/liberar-perfil exposta — verificar guard NODE_ENV",
+    "Testes automatizados — zero no projeto"
+  ],
+  "decisions_made": [
+    "marked v18: usar marked.parse(text, options) em vez de marked.setOptions() + marked()",
+    "Login: usar window.location.href='/' no logout em vez de router.push() para forçar hard navigation",
+    "PDF: strippar markdown antes de gerarPDFBuffer via markdownParaTexto()",
+    "Prompt v2: gerarSystemPrompt + gerarUserPrompt + prepararPrompt adapter para compatibilidade com route.ts",
+    "Formulário: campos condicionais por categoria renderizados inline no Formulario.tsx (não em categorias.ts)",
+    "Modelo do contrato movido para antes dos dados das partes (logo após seleção de categoria)"
+  ],
+  "files_modified": [
+    "src/components/contrato/ContratoPreview.tsx",
+    "src/components/contrato/Formulario.tsx",
+    "src/components/contrato/VisualizadorContrato.tsx",
+    "src/components/layout/Header.tsx",
+    "src/app/login/page.tsx",
+    "src/lib/pdf.ts",
+    "src/lib/prompts/gerarPromptContrato.ts",
+    "src/types/contrato.ts",
+    ".harness/memory/last-session.json",
+    ".git/hooks/post-commit"
+  ],
+  "next_action": "Confirmar RESEND_API_KEY na Vercel e testar envio de e-mail end-to-end",
+  "hashimoto_events": []
+}
