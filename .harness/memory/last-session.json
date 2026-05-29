@@ -1,14 +1,48 @@
 {
   "$schema": "https://bifrost.harness/session-schema/v1",
-  "session_id": "2026-05-29T19:47:58Z",
-  "timestamp": "2026-05-29T19:47:58Z",
+  "session_id": "2026-05-29-formulario-expansao",
+  "timestamp": "2026-05-29",
   "runtime": "claude-code",
-  "harness_version": "unknown",
-  "task_summary": "test: verificar hook global do Bifrost",
+  "harness_version": "2.9.0",
+  "task_summary": "Sessão completa: bugfixes críticos (marked v18, login, logout, PDF, máscara de moeda, overflow), novo sistema de prompts v2, expansão massiva do formulário com campos condicionais por categoria, reordenação UX do modelo, hook Bifrost global instalado.",
   "context_level_at_close": "L2",
-  "open_items": [],
-  "decisions_made": [],
-  "files_modified": [""],
-  "next_action": "Continuar desenvolvimento — ver último commit para contexto",
-  "hashimoto_events": []
+  "open_items": [
+    "Verificar RESEND_API_KEY e EMAIL_FROM na Vercel — envio de e-mail não confirmado em produção",
+    "Confirmar constraint contratos_status_check inclui status 'enviado' no Supabase",
+    "Integração AbacatePay (Pix) — variável ABACATEPAY_API_KEY existe, código não implementado",
+    "Limpeza de contratos antigos (30 dias) — sem cron job implementado",
+    "console.error em meus-contratos/page.tsx:24 — viola quality gate block_console_log",
+    "Rota /api/dev/liberar-perfil exposta — verificar guard NODE_ENV",
+    "Testes automatizados — zero no projeto",
+    "Hook local .git/hooks/post-commit é redundante agora que global está ativo — pode remover"
+  ],
+  "decisions_made": [
+    "marked v18 API quebrou: marked.setOptions() removido — usar marked.parse(text, { breaks: true, gfm: true })",
+    "Login pós-cadastro: Confirm Email OFF no Supabase → signUp() já autentica → router.push('/meus-contratos') imediato",
+    "Logout: router.push('/') não desautentica view no App Router → window.location.href='/' obrigatório",
+    "PDF: todos os modos passam por markdownParaTexto() antes de gerarPDFBuffer()",
+    "Prompt v2: gerarSystemPrompt(categoria, modelo) + gerarUserPrompt(dados) + prepararPrompt() adapter backward-compatible",
+    "Formulário: campos condicionais por categoria em CAT_CRIATIVOS/CAT_DEV/CAT_FOTO_VIDEO/CAT_CONSTRUCAO/CAT_BELEZA/CAT_CONSULTORIA/CAT_SAUDE inline no Formulario.tsx",
+    "UX: Modelo do contrato movido para 2ª posição (logo após categoria, antes dos dados das partes)",
+    "Hook Bifrost global via core.hooksPath — guard .harness/VERSION para repos sem Bifrost"
+  ],
+  "files_modified": [
+    "src/components/contrato/ContratoPreview.tsx",
+    "src/components/contrato/Formulario.tsx",
+    "src/components/contrato/VisualizadorContrato.tsx",
+    "src/components/layout/Header.tsx",
+    "src/app/login/page.tsx",
+    "src/lib/pdf.ts",
+    "src/lib/prompts/gerarPromptContrato.ts",
+    "src/types/contrato.ts",
+    ".harness/memory/last-session.json",
+    ".git/hooks/post-commit",
+    "C:/Users/leegr/.config/git/hooks/post-commit"
+  ],
+  "next_action": "Confirmar RESEND_API_KEY e EMAIL_FROM na Vercel (Settings → Environment Variables) e testar envio de e-mail end-to-end no fluxo de contratos",
+  "hashimoto_events": [
+    "useSearchParams() no Next.js App Router exige Suspense boundary — remover o hook resolve o build sem wrapper",
+    "window.location.href vs router.push(): após supabase.auth.signOut() o App Router não desautentica a view atual — hard navigation é mandatória",
+    "core.hooksPath global substitui .git/hooks local completamente — não empilhar os dois ou o local é ignorado"
+  ]
 }
