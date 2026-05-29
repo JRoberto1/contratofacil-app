@@ -1,19 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
 export default function Header() {
   const pathname = usePathname();
-  const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const supabase = createClient();
 
   async function handleSignOut() {
     await supabase.auth.signOut();
-    router.push('/');
+    window.location.href = '/';
   }
 
   useEffect(() => {
