@@ -1,124 +1,158 @@
-import { categorias, CategoriaSlug } from "@/lib/categorias";
-import type { FormularioContrato, TipoContrato } from "@/types/contrato";
+// src/lib/prompts/gerarPromptContrato.ts
+// Modelo IA: Groq llama-3.3-70b-versatile | Temperatura: 0.2 | Max tokens: 4096
 
-const TIPO_LABEL: Record<TipoContrato, string> = {
-  "completo-formal": "Completo Formal",
-  "simplificado": "Simplificado",
-  "executivo": "Executivo",
-  "minimalista": "Minimalista",
-};
+export function gerarSystemPrompt(categoria: string, modelo: string): string {
+  const instrucaoModelo: Record<string, string> = {
+    'completo-formal': `
+[MODELO: COMPLETO FORMAL]
+- Extensão: 4 a 5 páginas
+- Tom: técnico-jurídico, linguagem formal, citações legais pertinentes
+- Estrutura: todas as cláusulas numeradas com parágrafos (§) e incisos
+- Inclui: TODAS as cláusulas obrigatórias + cláusulas avançadas abaixo:
+  * Correção monetária pelo IGPM/FGV em caso de atraso
+  * Suspensão de acesso/serviço por inadimplência superior a 15 dias
+  * Prazo de aprovação pelo cliente (5 dias úteis — silêncio = aprovado)
+  * Limitação de danos ao valor total pago pelo contratante
+  * Vedação à cessão e subcontratação sem anuência prévia
+  * Força maior com prazo de comunicação de 3 dias úteis (art. 393 CC)
+  * Confidencialidade por 2 anos após encerramento
+  * Tentativa de resolução amigável antes do judiciário
+  * Registro de IP, data e hora no aceite eletrônico (quando aplicável)`,
 
-const MODO_ASSINATURA_LABEL: Record<string, string> = {
-  "eletronica": "Aceite Eletrônico",
-  "fisica_sem_testemunhas": "Física Simples",
-  "fisica_com_testemunhas": "Física + Testemunhas",
-};
+    'simplificado': `
+[MODELO: SIMPLIFICADO]
+- Extensão: 1 a 2 páginas
+- Tom: linguagem acessível, sem juridiquês, frases curtas
+- Estrutura: cláusulas essenciais sem subdivisões excessivas
+- Inclui: cláusulas obrigatórias básicas
+- Evitar: referências legais explícitas, parágrafos numerados, termos técnicos
+- Linguagem: "O cliente pagará..." em vez de "O CONTRATANTE quitará..."`,
 
-function qualificarParte(tipo: "PF" | "PJ" | undefined, dados: {
-  nacionalidade?: string;
-  estadoCivil?: string;
-  profissao?: string;
-  representanteLegal?: string;
-  cargoRepresentante?: string;
-}): string {
-  if (tipo === "PJ") {
-    const rep = dados.representanteLegal ? `, representada por ${dados.representanteLegal}${dados.cargoRepresentante ? `, ${dados.cargoRepresentante}` : ""}` : "";
-    return `pessoa jurídica de direito privado${rep}`;
-  }
-  // PF ou não informado
-  const partes: string[] = [];
-  if (dados.nacionalidade) partes.push(dados.nacionalidade);
-  if (dados.estadoCivil) partes.push(dados.estadoCivil);
-  if (dados.profissao) partes.push(dados.profissao);
-  return partes.length > 0 ? partes.join(", ") : "";
-}
+    'executivo': `
+[MODELO: EXECUTIVO]
+- Extensão: 2 a 3 páginas
+- Tom: formal e objetivo, adequado para relações B2B
+- Estrutura: cláusulas compactas, sem subdivisões excessivas
+- Inclui: cláusulas obrigatórias + confidencialidade + PI + rescisão simétrica
+- Evitar: parágrafos longos, incisos desnecessários`,
 
-export function prepararPrompt(formulario: FormularioContrato, tipoContrato: TipoContrato) {
-  const categoriaInfo = categorias[(formulario.categoria as CategoriaSlug)] || categorias['other'];
-
-  // Multas e juros
-  const penalidadeAtraso = formulario.servico.jurosAtraso
-    ? `Em caso de atraso no pagamento, incidirão juros moratórios de ${formulario.servico.jurosAtraso}.`
-    : "";
-
-  const quebraRescisao = formulario.servico.multaRescisao
-    ? `O contrato prescreve cláusula penal correspondente a ${formulario.servico.multaRescisao}% do valor global em caso de rescisão imotivada por qualquer das partes.`
-    : "";
-
-  const instrucoesFinanceiras = (penalidadeAtraso || quebraRescisao)
-    ? `\n- MULTAS E JUROS AUTORIZADOS: ${penalidadeAtraso} ${quebraRescisao}`
-    : `\n- MULTAS E JUROS: NÃO foi autorizada nenhuma cláusula de multa por atraso, juros ou cláusula penal. O contrato NÃO deve conter nenhuma estipulação financeira punitiva.`;
-
-  // Campos extras da categoria
-  let extrasString = "";
-  if (formulario.servico.camposExtrasCategoria && Object.keys(formulario.servico.camposExtrasCategoria).length > 0) {
-    extrasString = "\nINFORMAÇÕES ESPECÍFICAS DA CATEGORIA:\n";
-    for (const campo of categoriaInfo.camposExtras) {
-      if (formulario.servico.camposExtrasCategoria[campo.id]) {
-        extrasString += `- ${campo.label}: ${formulario.servico.camposExtrasCategoria[campo.id]}\n`;
-      }
-    }
+    'minimalista': `
+[MODELO: MINIMALISTA]
+- Extensão: até 1 página
+- Tom: direto, linguagem do cotidiano
+- Estrutura: blocos simples sem numeração de incisos
+- Inclui: objeto, pagamento, prazo, o que acontece se cancelar, foro
+- Evitar: juridiquês, referências legais, cláusulas complexas`,
   }
 
-  // Cláusulas da categoria
-  const clausulasEspeciais = categoriaInfo.clausulasBase.map((c, i) => `${i + 1}. ${c}`).join('\n');
+  const clausulasCategoria: Record<string, string> = {
+    'Designer / Freelancer Digital': `
+CLÁUSULAS ESPECÍFICAS — DESIGNER / FREELANCER DIGITAL:
+- Cessão de direitos de PI condicionada ao pagamento integral (art. 49 Lei 9.610/98)
+- [SE revisoes_inclusas informado] Limite de X revisões inclusas; adicionais cobrados à parte
+- [SE revisoes_inclusas NÃO informado] Omitir — nunca inventar número de revisões
+- Entrega dos arquivos finais somente após quitação total
+- Direito de portfólio: prestador pode exibir o trabalho após entrega
+- Componentes genéricos (fontes, ícones, bibliotecas) permanecem sob licença do prestador`,
 
-  // Diretriz de tipo de contrato
-  const diretrizTipo: Record<TipoContrato, string> = {
-    "completo-formal": `MODELO: Completo Formal
-EXTENSÃO OBRIGATÓRIA: 600 a 900 palavras.
-TOM: técnico-jurídico, linguagem formal, citações de artigos de lei.
-ESTRUTURA: cláusulas numeradas (CLÁUSULA 1ª, 2ª...) com parágrafos (§1º, §2º) e incisos (I, II, III).
-DEVE INCLUIR: definição de termos, força maior/caso fortuito, sucessão e cessão, vedações explícitas, legislação aplicável.`,
+    'Desenvolvedor de Software': `
+CLÁUSULAS ESPECÍFICAS — DESENVOLVEDOR DE SOFTWARE:
+- Propriedade do código-fonte transferida somente após pagamento integral
+- Componentes, bibliotecas e frameworks de uso genérico: licença de uso não exclusiva ao cliente
+- Isenção de responsabilidade por falhas em servidores, APIs ou serviços de terceiros
+- [SE garantia_dias informado] Garantia de X dias contra bugs críticos após entrega
+- [SE garantia_dias NÃO informado] Omitir — nunca usar 90 dias por padrão
+- Entrega inclui código-fonte e documentação básica de uso
+- SEO não está incluso salvo contratação expressa
+- [SE manutencao_mensal = sim] Incluir cláusula de manutenção mensal com valor e escopo informados`,
 
-    "simplificado": `MODELO: Simplificado
-EXTENSÃO OBRIGATÓRIA: 250 a 380 palavras. SE ULTRAPASSAR 380 PALAVRAS, CORTE CLÁUSULAS.
-TOM: linguagem clara e acessível. PROIBIDO usar: "doravante", "outrossim", "nos termos do art.", "inciso", "parágrafo único".
-ESTRUTURA: no máximo 6 seções com títulos simples (## DAS PARTES, ## OBJETO, ## PAGAMENTO, ## PRAZO, ## RESCISÃO, ## VALIDADE). Sem subparágrafos.
-DEVE INCLUIR APENAS: quem são as partes, o que será feito, quanto e quando paga, prazo de entrega, o que acontece se cancelar, onde resolver conflito.
-NÃO INCLUIR: definição de termos, força maior, sucessão, referências a artigos de lei, cláusulas de vínculo empregatício com linguagem técnica.`,
+    'Fotógrafo / Videomaker': `
+CLÁUSULAS ESPECÍFICAS — FOTÓGRAFO / VIDEOMAKER:
+- Autorização de uso de imagem do evento concedida pelo contratante
+- Direito de uso do material para portfólio do prestador
+- Reagendamento sem multa por imprevistos climáticos ou emergências documentadas
+- [SE entrega_raw informado] Arquivos RAW incluídos na entrega
+- [SE entrega_raw NÃO informado] Omitir
+- Prazo de entrega conta da data do evento, não da assinatura
+- [SE revisoes_inclusas informado] X rodadas de revisão inclusas`,
 
-    "executivo": `MODELO: Executivo
-EXTENSÃO OBRIGATÓRIA: 380 a 550 palavras.
-TOM: formal, direto e objetivo — adequado para relações B2B e contratos recorrentes.
-ESTRUTURA: cláusulas compactas em parágrafos corridos, sem subincisos. Máximo 8 seções.
-DEVE INCLUIR: objeto com entregáveis específicos, cronograma de pagamento, SLA/prazo, confidencialidade, rescisão com aviso prévio, foro.
-NÃO INCLUIR: definições longas, força maior genérica, sucessão, citações extensas de legislação.`,
+    'Consultor / Professor / Coach': `
+CLÁUSULAS ESPECÍFICAS — CONSULTOR / PROFESSOR / COACH:
+- Obrigação de meio, não de resultado: prestador não garante resultados específicos
+- NDA reforçado: sigilo sobre estratégias, dados e informações de negócio do cliente
+- Tolerância de 15 minutos para início de sessões
+- Cancelamento com aviso mínimo de 24h; sem aviso = sessão cobrada integralmente
+- [SE formato = online] Plataforma de videoconferência a ser definida entre as partes
+- [SE sessoes_podem_ser_gravadas = sim] Gravações para uso exclusivo do contratante`,
 
-    "minimalista": `MODELO: Minimalista
-EXTENSÃO OBRIGATÓRIA: 120 a 200 palavras. SE ULTRAPASSAR 200 PALAVRAS, CORTE SEM EXCEÇÃO.
-TOM: linguagem do dia a dia, como um combinado formal entre pessoas. PROIBIDO qualquer jargão jurídico.
-ESTRUTURA: 4 blocos simples sem numeração: QUEM, O QUÊ, PAGAMENTO, REGRAS BÁSICAS.
-DEVE INCLUIR APENAS: nomes das partes, descrição simples do serviço, valor e data de pagamento, o que acontece se um lado desistir.
-NÃO INCLUIR: LGPD, força maior, vínculo empregatício, cessão, artigos de lei, citações legais, subcláusulas.`,
-  };
+    'Eletricista / Encanador / Construção': `
+CLÁUSULAS ESPECÍFICAS — CONSTRUÇÃO / REFORMA:
+- [SE quem_compra_materiais informado] Usar exatamente o que foi informado
+- [SE quem_compra_materiais NÃO informado] "Responsabilidade pelo fornecimento de materiais a definir entre as partes"
+- [SE garantia_dias informado] Garantia de mão de obra de X dias
+- [SE garantia_dias NÃO informado] Omitir
+- Responsabilidade restrita ao escopo dos serviços contratados
+- Vistoria prévia: prestador atesta condições do local antes do início
+- Danos pré-existentes não são responsabilidade do prestador`,
 
-  // Qualificação das partes
-  const qualifPrestador = qualificarParte(formulario.prestador.tipoPessoa, formulario.prestador);
-  const qualifCliente = qualificarParte(formulario.cliente.tipoPessoa, formulario.cliente);
+    'Beleza / Estética': `
+CLÁUSULAS ESPECÍFICAS — BELEZA / ESTÉTICA:
+- Resultado pode variar conforme características individuais do cliente
+- Isenção de responsabilidade por reações alérgicas a produtos fornecidos pelo cliente
+- Cancelamento com aviso mínimo de 24h; sem aviso = serviço cobrado integralmente
+- Direito de uso de fotos do resultado para portfólio (salvo oposição expressa)`,
 
-  // Modo de assinatura
-  const modoLabel = MODO_ASSINATURA_LABEL[formulario.modoAssinatura] || "Física Simples";
+    'Saúde / Bem-estar': `
+CLÁUSULAS ESPECÍFICAS — SAÚDE / BEM-ESTAR:
+- Obrigação de meio, não de resultado terapêutico ou físico
+- Isenção de responsabilidade por condições de saúde pré-existentes não informadas
+- Recomendação de avaliação médica prévia quando aplicável
+- Cancelamento com aviso mínimo de 24h`,
 
-  const aceiteClausula =
-    formulario.modoAssinatura === "eletronica"
-      ? "Este contrato é válido mediante aceite eletrônico registrado por link, nos termos do art. 10 da MP 2.200-2/2001 e do art. 784 do CPC."
-      : formulario.modoAssinatura === "fisica_com_testemunhas"
-      ? "Assinado em 2 (duas) vias de igual teor na presença de 2 (duas) testemunhas, constituindo título executivo extrajudicial nos termos do art. 784, III do CPC."
-      : "Assinado em 2 (duas) vias de igual teor e forma.";
+    'Alimentação': `
+CLÁUSULAS ESPECÍFICAS — ALIMENTAÇÃO:
+- Responsabilidade do contratante por informar alergias e restrições alimentares
+- Isenção por reações a ingredientes não declarados pelo contratante
+- Prazo de confirmação do pedido e política de cancelamento
+- Condições de entrega e responsabilidade por conservação após entrega`,
 
-  const systemPrompt = `
-Você é um advogado brasileiro experiente, especialista em Direito Civil e Contratual. Seu papel é atuar como o motor gerador de contratos do ContratoFácil — plataforma para MEIs e autônomos brasileiros.
+    'Educação': `
+CLÁUSULAS ESPECÍFICAS — EDUCAÇÃO:
+- Obrigação de meio: prestador garante qualidade do ensino, não aprovação ou resultado
+- Material didático: [SE incluso] incluso no valor; [SE não] a cargo do aluno
+- Cancelamento com aviso mínimo de 24h; sem aviso = aula cobrada
+- Direitos autorais sobre material produzido pelo prestador permanecem com ele`,
+
+    'Outros Serviços': `
+CLÁUSULAS ESPECÍFICAS — ANALISAR O TIPO DE SERVIÇO INFORMADO E APLICAR:
+- SE presencial → cláusula de local de prestação e imprevistos
+- SE remoto/digital → cláusula de entrega digital e ferramentas utilizadas
+- SE criativo → cessão de propriedade intelectual condicionada ao pagamento
+- SE técnico → garantia limitada e isenção de responsabilidade por terceiros
+- SE saúde/bem-estar → isenção de resultado terapêutico
+- SE educacional → obrigação de meio, não de resultado`,
+  }
+
+  const clausulaCategoria = clausulasCategoria[categoria] || clausulasCategoria['Outros Serviços']
+  const instrucao = instrucaoModelo[modelo] || instrucaoModelo['simplificado']
+
+  return `Você é um advogado brasileiro experiente, especialista em Direito Civil e Contratual.
+Seu papel é o motor gerador de contratos do ContratoFácil — plataforma para MEIs e autônomos brasileiros.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 OBJETIVO
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Redigir UM CONTRATO DE PRESTAÇÃO DE SERVIÇOS juridicamente estruturado, seguro, que proteja o prestador autônomo, sem alucinar dados financeiros ou pessoais não informados pelo usuário.
+Redigir UM CONTRATO DE PRESTAÇÃO DE SERVIÇOS juridicamente estruturado,
+seguro, que proteja o prestador autônomo, sem alucinar dados financeiros
+ou pessoais não informados pelo usuário.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 REGRAS DE INVENÇÃO ZERO — NUNCA VIOLAR
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. MULTAS E JUROS: Nunca incluir percentuais de multa, juros ou cláusula penal não informados explicitamente em "MULTAS E JUROS AUTORIZADOS".${instrucoesFinanceiras}
+1. MULTAS E JUROS: Nunca incluir percentuais não informados explicitamente.
+   [SE juros informados] → Incluir exatamente o valor informado
+   [SE multa informada]  → Incluir exatamente o valor informado
+   [SE nenhum]           → Nenhuma estipulação financeira punitiva
 
 2. DATAS: Nunca inventar datas de vencimento ou marcos não definidos.
 
@@ -126,46 +160,72 @@ REGRAS DE INVENÇÃO ZERO — NUNCA VIOLAR
 
 4. OBRIGAÇÕES EXTRAS: Nunca adicionar obrigações além das descritas.
 
-5. VALORES DERIVADOS: Nunca calcular parcelas, honorários ou custos extras não informados.
+5. VALORES DERIVADOS: Nunca calcular parcelas ou custos não informados.
 
 6. QUALIFICAÇÃO DAS PARTES:
-   - Se TIPO_PESSOA = "PF": qualificar com nacionalidade, estado civil e profissão informados. Nunca inventar.
-   - Se TIPO_PESSOA = "PJ": qualificar com razão social, CNPJ e representante legal informados. Nunca inventar.
-   - Se não informado: qualificar apenas com os dados disponíveis.
+   [SE tipo_pessoa = PF] → qualificar com nacionalidade, estado civil e profissão informados
+   [SE tipo_pessoa = PJ] → qualificar com razão social, CNPJ e representante legal
+   NUNCA inventar estado civil, profissão ou representante legal.
 
-TESTE ANTES DE GERAR: Para cada cláusula com número ou percentual, pergunte: "o usuário ou sistema informaram esse valor?" Se não → remova.
+7. REVISÕES E GARANTIAS: Nunca inventar número de revisões ou dias de garantia.
+   Só incluir se explicitamente informado pelo usuário.
+
+TESTE ANTES DE GERAR: Para cada cláusula com número ou percentual,
+pergunte: "o usuário informou esse valor?" Se não → remova ou use o padrão indicado.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 TIPO DE CONTRATO
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${diretrizTipo[tipoContrato]}
+${instrucao}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-CLÁUSULAS OBRIGATÓRIAS EM TODOS OS CONTRATOS
+CLÁUSULAS OBRIGATÓRIAS — TODOS OS CONTRATOS E MODELOS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Independente de categoria ou tipo, todo contrato DEVE conter:
+Independente de categoria ou modelo, todo contrato DEVE conter:
 
-1. INEXISTÊNCIA DE VÍNCULO EMPREGATÍCIO — Declarar ausência de subordinação, pessoalidade e exclusividade (salvo se usuário ativou cláusula de exclusividade), nos termos do art. 442-B da CLT. O CONTRATADO é autônomo e responsável por seus próprios encargos trabalhistas, previdenciários e tributários.
+1. INEXISTÊNCIA DE VÍNCULO EMPREGATÍCIO
+   Ausência de subordinação, pessoalidade e exclusividade nos termos
+   do art. 442-B da CLT. O CONTRATADO é autônomo e responsável por
+   seus próprios encargos trabalhistas, previdenciários e tributários.
 
-2. EMISSÃO DE DOCUMENTO FISCAL — O CONTRATADO se obriga a emitir Nota Fiscal de Serviços (NFS-e) ou Recibo de Pagamento Autônomo (RPA) referente a cada pagamento recebido.
+2. EMISSÃO DE DOCUMENTO FISCAL
+   O CONTRATADO se obriga a emitir NFS-e ou RPA referente a cada
+   pagamento recebido.
 
-3. SIGILO E CONFIDENCIALIDADE — O CONTRATADO se obriga a manter sigilo sobre informações, dados e documentos do CONTRATANTE obtidos durante a prestação dos serviços, mesmo após o encerramento do contrato.
+3. SIGILO E CONFIDENCIALIDADE
+   Sigilo sobre informações, dados e documentos do CONTRATANTE
+   obtidos durante a prestação dos serviços.
+   [SE modelo = completo-formal] prazo de 2 anos após encerramento
+   [SE outros modelos] durante a vigência e após o encerramento
 
-4. LGPD — O tratamento de dados pessoais decorre do objeto contratual, com base legal no art. 7º, incisos II e V da Lei nº 13.709/2018 (LGPD). Os dados serão utilizados exclusivamente para cumprimento das obrigações contratadas e descartados ao final da relação contratual.
+4. LGPD — PROTEÇÃO DE DADOS PESSOAIS
+   Tratamento de dados com base legal no art. 7º, incisos II e V
+   da Lei nº 13.709/2018 (LGPD).
+   [SE modelo = completo-formal] Incluir: dados usados exclusivamente
+   para o objeto, descarte ao término, comunicação de incidente em 72h
+   [SE outros modelos] Versão simplificada: dados usados apenas para
+   cumprimento do contrato
 
-5. FORO DE ELEIÇÃO — Foro da comarca do CONTRATADO (${formulario.prestador.cidade}/${formulario.prestador.estado}), com renúncia expressa a qualquer outro, por mais privilegiado que seja.
+5. FORO DE ELEIÇÃO
+   Foro da comarca do CONTRATADO (prestador), com renúncia expressa
+   a qualquer outro foro por mais privilegiado que seja.
+   [SE modelo = completo-formal] Adicionar parágrafo de tentativa
+   amigável antes do judiciário
 
-6. ACEITE E VALIDADE — ${aceiteClausula}
+6. ACEITE E VALIDADE JURÍDICA
+   [SE modo = Aceite Eletrônico]
+   → Válido mediante aceite eletrônico com registro de IP, data, hora
+   e dispositivo, nos termos do art. 10 da MP 2.200-2/2001 e art. 784 CPC
+   [SE modo = Física Simples]
+   → Assinado em 2 vias de igual teor pelas partes
+   [SE modo = Física + Testemunhas]
+   → Assinado em 2 vias com 2 testemunhas, constituindo título
+   executivo extrajudicial nos termos do art. 784, III do CPC
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-CLÁUSULAS BASE DA CATEGORIA: ${categoriaInfo.title}
+CLÁUSULAS ESPECÍFICAS DA CATEGORIA
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${clausulasEspeciais}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-DADOS DE PAGAMENTO (REGRA ABSOLUTA)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-A cláusula de remuneração deve ser a TRANSCRIÇÃO JURÍDICA FIEL da "Forma de pagamento" passada pelo usuário. É PROIBIDO CRIAR CONDIÇÕES NÃO MENCIONADAS.
+${clausulaCategoria}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 FORMATO DE SAÍDA
@@ -179,64 +239,225 @@ FORMATO DE SAÍDA
 - Separe seções com ---
 - Nunca use markdown decorativo
 - O texto deve ler como documento jurídico real
-- Responda APENAS com o texto do contrato. Não adicione introduções ou assine como IA.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-BLOCO DE ASSINATURAS — REGRA ABSOLUTA
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Modo selecionado: ${formulario.modoAssinatura}
-
-${formulario.modoAssinatura === "fisica_com_testemunhas"
-  ? `Incluir EXATAMENTE este bloco ao final:
-CONTRATANTE: ________________________________
-CONTRATADO: _________________________________
-TESTEMUNHA 1: _______________________________
-TESTEMUNHA 2: _______________________________`
-  : formulario.modoAssinatura === "fisica_sem_testemunhas"
-  ? `Incluir EXATAMENTE este bloco ao final — SEM testemunhas:
-CONTRATANTE: ________________________________
-CONTRATADO: _________________________________`
-  : `Incluir EXATAMENTE este bloco ao final — sem linhas de assinatura física:
-Aceite eletrônico registrado por link com validade jurídica (MP 2.200-2/2001 e CPC art. 784).`
+- Responda APENAS com o texto do contrato.
+  Não adicione introduções nem assine como IA.`
 }
-`;
 
-  // User prompt
-  const prestadorQualif = qualifPrestador ? `, ${qualifPrestador}` : "";
-  const clienteQualif = qualifCliente ? `, ${qualifCliente}` : "";
+export function gerarUserPrompt(dados: {
+  modelo: string
+  contratante: {
+    nome: string
+    tipoPessoa: 'PF' | 'PJ'
+    nacionalidade?: string
+    estadoCivil?: string
+    profissao?: string
+    representanteLegal?: string
+    cargo?: string
+    cpfCnpj: string
+    cidade: string
+    estado: string
+    email?: string
+  }
+  contratado: {
+    nome: string
+    tipoPessoa: 'PF' | 'PJ'
+    nacionalidade?: string
+    estadoCivil?: string
+    profissao?: string
+    cpfCnpj: string
+    cidade: string
+    estado: string
+    email?: string
+  }
+  servico: {
+    categoria: string
+    numeroPedido?: string
+    descricao: string
+    valorTotal: number
+    prazoEntrega: string
+    formaPagamento: string
+    percentualEntrada?: number
+    numeroParcelas?: number
+    multaRescisao?: number
+    jurosMora?: number
+    localPrestacao?: string
+    formaEntrega?: string
+    revisoes?: number
+    garantiaDias?: number
+    manutencaoMensal?: boolean
+    valorManutencao?: number
+    escopoManutencao?: string
+    transferePI?: boolean
+    permitePortfolio?: boolean
+    proibeSubcontratacao?: boolean
+    clausulasEspeciais?: string
+  }
+  modoAssinatura: 'fisica-testemunhas' | 'fisica-simples' | 'aceite-eletronico'
+  camposCategoria?: Record<string, string>
+}): string {
+  const { contratante, contratado, servico, modoAssinatura, camposCategoria } = dados
 
-  const prestadorPJRep = formulario.prestador.tipoPessoa === "PJ" && formulario.prestador.representanteLegal
-    ? `\n- Representante Legal: ${formulario.prestador.representanteLegal}${formulario.prestador.cargoRepresentante ? ` (${formulario.prestador.cargoRepresentante})` : ""}`
-    : "";
+  const qualificarParte = (parte: typeof contratante) => {
+    if (parte.tipoPessoa === 'PJ') {
+      return `${parte.nome}, pessoa jurídica de direito privado, inscrita no CNPJ nº ${parte.cpfCnpj}, com sede em ${parte.cidade} - ${parte.estado}${parte.representanteLegal ? `, representada por ${parte.representanteLegal}${parte.cargo ? `, ${parte.cargo}` : ''}` : ''}${parte.email ? `, e-mail ${parte.email}` : ''}`
+    }
+    return `${parte.nome}${parte.nacionalidade ? `, ${parte.nacionalidade}` : ''}${parte.estadoCivil ? `, ${parte.estadoCivil}` : ''}${parte.profissao ? `, ${parte.profissao}` : ''}, inscrito(a) no CPF sob o nº ${parte.cpfCnpj}, residente e domiciliado(a) em ${parte.cidade} - ${parte.estado}${parte.email ? `, e-mail ${parte.email}` : ''}`
+  }
 
-  const clientePJRep = formulario.cliente.tipoPessoa === "PJ" && formulario.cliente.representanteLegal
-    ? `\n- Representante Legal: ${formulario.cliente.representanteLegal}${formulario.cliente.cargoRepresentante ? ` (${formulario.cliente.cargoRepresentante})` : ""}`
-    : "";
+  const formatarPagamento = () => {
+    const { formaPagamento, percentualEntrada, numeroParcelas, valorTotal } = servico
+    if (formaPagamento === 'entrada-saldo' && percentualEntrada) {
+      const entrada = (valorTotal * percentualEntrada) / 100
+      const saldo = valorTotal - entrada
+      return `${percentualEntrada}% na assinatura (R$ ${entrada.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}) e ${100 - percentualEntrada}% na entrega (R$ ${saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })})`
+    }
+    if (formaPagamento === 'parcelado' && numeroParcelas) {
+      const parcela = valorTotal / numeroParcelas
+      return `${numeroParcelas} parcelas iguais de R$ ${parcela.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+    }
+    return formaPagamento
+  }
 
-  const userPrompt = `
-TIPO DE CONTRATO: ${TIPO_LABEL[tipoContrato]}
+  return `TIPO DE CONTRATO: ${dados.modelo}
+MODO DE ASSINATURA: ${modoAssinatura}
 
-CONTRATANTE (Cliente):
-- Nome/Razão Social: ${formulario.cliente.nomeRazaoSocial}${clienteQualif}
-- Tipo de pessoa: ${formulario.cliente.tipoPessoa || "PF"}
-- CPF/CNPJ: ${formulario.cliente.cpfCnpj}
-- Cidade/Estado: ${formulario.cliente.cidade} - ${formulario.cliente.estado}${formulario.cliente.email ? `\n- E-mail: ${formulario.cliente.email}` : ""}${clientePJRep}
+CONTRATANTE:
+${qualificarParte(contratante)}
 
 CONTRATADO (Prestador):
-- Nome completo: ${formulario.prestador.nomeCompleto}${prestadorQualif}
-- Tipo de pessoa: ${formulario.prestador.tipoPessoa || "PF"}
-- CPF/CNPJ: ${formulario.prestador.cpfCnpj}
-- Cidade/Estado: ${formulario.prestador.cidade} - ${formulario.prestador.estado}${formulario.prestador.email ? `\n- E-mail: ${formulario.prestador.email}` : ""}${prestadorPJRep}
+${qualificarParte(contratado)}
 
-SERVIÇO/OBJETO:
-- Categoria: ${formulario.categoriaCustom || categoriaInfo.title}${formulario.servico.numeroPedido ? `\n- Número do pedido/orçamento: ${formulario.servico.numeroPedido}` : ""}
-- Descrição detalhada: ${formulario.servico.descricao}
-- Valor total: R$ ${formulario.servico.valor}
-- Prazo de entrega/vigência: ${formulario.servico.prazoEntrega}
-- Forma de pagamento: ${formulario.servico.formaPagamento}${formulario.servico.localPrestacao ? `\n- Local de prestação: ${formulario.servico.localPrestacao}` : ""}${formulario.servico.formaEntrega ? `\n- Forma de entrega: ${formulario.servico.formaEntrega}` : ""}${extrasString}${formulario.servico.clausulasEspeciais ? `\nCLÁUSULAS ESPECIAIS DO USUÁRIO:\n- ${formulario.servico.clausulasEspeciais}` : ""}
+SERVIÇO / OBJETO:
+- Categoria: ${servico.categoria}
+${servico.numeroPedido ? `- Número do pedido/orçamento: ${servico.numeroPedido}` : ''}
+- Descrição detalhada: ${servico.descricao}
+- Valor total: R$ ${servico.valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+- Prazo de entrega/vigência: ${servico.prazoEntrega}
+- Forma de pagamento: ${formatarPagamento()}
+${servico.localPrestacao ? `- Local de prestação: ${servico.localPrestacao}` : ''}
+${servico.formaEntrega ? `- Forma de entrega: ${servico.formaEntrega}` : ''}
 
-MODO DE ASSINATURA: ${modoLabel}
-`;
+MULTAS E JUROS AUTORIZADOS:
+${servico.multaRescisao ? `- Multa por rescisão imotivada: ${servico.multaRescisao}% do valor total (simétrica — vale para ambas as partes)` : '- Multa por rescisão: não informada — NÃO incluir'}
+${servico.jurosMora ? `- Juros por atraso no pagamento: ${servico.jurosMora}% ao mês` : '- Juros por atraso: não informados — NÃO incluir'}
+
+CLÁUSULAS ESPECIAIS INFORMADAS PELO USUÁRIO:
+${servico.clausulasEspeciais || 'Nenhuma'}
+
+INFORMAÇÕES ESPECÍFICAS DA CATEGORIA:
+${servico.revisoes ? `- Revisões inclusas: ${servico.revisoes}` : '- Revisões: não informadas — NÃO incluir número'}
+${servico.garantiaDias ? `- Garantia após entrega: ${servico.garantiaDias} dias` : '- Garantia: não informada — NÃO incluir'}
+${servico.manutencaoMensal ? `- Manutenção mensal: sim — valor R$ ${servico.valorManutencao?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} — escopo: ${servico.escopoManutencao}` : ''}
+${servico.transferePI !== undefined ? `- Transferência de PI após pagamento: ${servico.transferePI ? 'sim' : 'não'}` : ''}
+${servico.permitePortfolio !== undefined ? `- Permite uso em portfólio: ${servico.permitePortfolio ? 'sim' : 'não'}` : ''}
+${servico.proibeSubcontratacao !== undefined ? `- Proíbe subcontratação: ${servico.proibeSubcontratacao ? 'sim' : 'não'}` : ''}
+${camposCategoria ? Object.entries(camposCategoria).map(([k, v]) => `- ${k}: ${v}`).join('\n') : ''}`
+}
+
+// ─── Adapter: FormularioContrato → novo formato ───────────────────────────────
+// Mantido para compatibilidade com route.ts existente
+import { categorias, CategoriaSlug } from "@/lib/categorias";
+import type { FormularioContrato, TipoContrato } from "@/types/contrato";
+
+export function prepararPrompt(formulario: FormularioContrato, tipoContrato: TipoContrato) {
+  const categoriaInfo = categorias[(formulario.categoria as CategoriaSlug)] || categorias['other'];
+  const categoriaDisplay = formulario.categoriaCustom || categoriaInfo.title;
+
+  // Mapeia slugs internos para os nomes esperados por gerarSystemPrompt
+  const categoriaParaPrompt: Record<string, string> = {
+    'designer': 'Designer / Freelancer Digital',
+    'dev':      'Desenvolvedor de Software',
+    'photo':    'Fotógrafo / Videomaker',
+    'consultant': 'Consultor / Professor / Coach',
+    'maintenance': 'Eletricista / Encanador / Construção',
+    'other':    'Outros Serviços',
+  };
+  const categoriaNome = categoriaParaPrompt[formulario.categoria] || categoriaDisplay;
+
+  // Mapeia modoAssinatura para o novo formato
+  const modoMap: Record<string, 'fisica-testemunhas' | 'fisica-simples' | 'aceite-eletronico'> = {
+    'fisica_com_testemunhas': 'fisica-testemunhas',
+    'fisica_sem_testemunhas': 'fisica-simples',
+    'eletronica':             'aceite-eletronico',
+  };
+  const modoAssinatura = modoMap[formulario.modoAssinatura] || 'fisica-simples';
+
+  // Converte valor de string "1.500,00" para number
+  const valorStr = formulario.servico.valor || '0';
+  const valorTotal = parseFloat(valorStr.replace(/\./g, '').replace(',', '.')) || 0;
+
+  // Extrai percentual de entrada e número de parcelas dos detalhes
+  const det = formulario.servico.formaPagamentoDetalhes;
+  const percentualEntrada = det?.comEntrada && det?.percentualEntrada
+    ? parseFloat(det.percentualEntrada) || undefined
+    : undefined;
+  const numeroParcelas = formulario.servico.formaPagamentoTipo === 'parcelado' && det?.numeroParcelas
+    ? parseInt(det.numeroParcelas) || undefined
+    : undefined;
+
+  // Multa e juros como numbers
+  const multaRescisao = formulario.servico.multaRescisao
+    ? parseFloat(String(formulario.servico.multaRescisao)) || undefined
+    : undefined;
+  const jurosMora = formulario.servico.jurosAtraso
+    ? parseFloat(String(formulario.servico.jurosAtraso)) || undefined
+    : undefined;
+
+  // Campos extras como Record<string, string>
+  const camposCategoria: Record<string, string> = {};
+  if (formulario.servico.camposExtrasCategoria) {
+    for (const campo of categoriaInfo.camposExtras) {
+      const val = formulario.servico.camposExtrasCategoria[campo.id];
+      if (val) camposCategoria[campo.label] = String(val);
+    }
+  }
+
+  const systemPrompt = gerarSystemPrompt(categoriaNome, tipoContrato);
+
+  const userPrompt = gerarUserPrompt({
+    modelo: tipoContrato,
+    contratante: {
+      nome:              formulario.cliente.nomeRazaoSocial,
+      tipoPessoa:        formulario.cliente.tipoPessoa || 'PF',
+      nacionalidade:     formulario.cliente.nacionalidade,
+      estadoCivil:       formulario.cliente.estadoCivil,
+      profissao:         formulario.cliente.profissao,
+      representanteLegal: formulario.cliente.representanteLegal,
+      cargo:             formulario.cliente.cargoRepresentante,
+      cpfCnpj:           formulario.cliente.cpfCnpj,
+      cidade:            formulario.cliente.cidade,
+      estado:            formulario.cliente.estado,
+      email:             formulario.cliente.email,
+    },
+    contratado: {
+      nome:          formulario.prestador.nomeCompleto,
+      tipoPessoa:    formulario.prestador.tipoPessoa || 'PF',
+      nacionalidade: formulario.prestador.nacionalidade,
+      estadoCivil:   formulario.prestador.estadoCivil,
+      profissao:     formulario.prestador.profissao,
+      cpfCnpj:       formulario.prestador.cpfCnpj,
+      cidade:        formulario.prestador.cidade,
+      estado:        formulario.prestador.estado,
+      email:         formulario.prestador.email,
+    },
+    servico: {
+      categoria:        categoriaDisplay,
+      numeroPedido:     formulario.servico.numeroPedido,
+      descricao:        formulario.servico.descricao,
+      valorTotal,
+      prazoEntrega:     formulario.servico.prazoEntrega,
+      formaPagamento:   formulario.servico.formaPagamento || formulario.servico.formaPagamentoTipo,
+      percentualEntrada,
+      numeroParcelas,
+      multaRescisao,
+      jurosMora,
+      localPrestacao:   formulario.servico.localPrestacao,
+      formaEntrega:     formulario.servico.formaEntrega,
+      clausulasEspeciais: formulario.servico.clausulasEspeciais,
+    },
+    modoAssinatura,
+    camposCategoria: Object.keys(camposCategoria).length > 0 ? camposCategoria : undefined,
+  });
 
   return { systemPrompt, userPrompt };
 }
