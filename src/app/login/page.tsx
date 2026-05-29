@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 type Modo = "login" | "cadastro";
 
 export default function LoginPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const supabase = createClient();
 
   const [modo, setModo] = useState<Modo>("login");
@@ -64,8 +63,7 @@ export default function LoginPage() {
         setCarregando(false);
         return;
       }
-      const destino = searchParams.get("redirectTo") || "/meus-contratos";
-      router.push(destino);
+      router.push("/meus-contratos");
       return;
     }
 
