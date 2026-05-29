@@ -396,6 +396,28 @@ export default function Formulario({ categoria, categoriaCustom, initialData, on
 
       <form onSubmit={handleSubmit} className="space-y-10">
 
+        {/* ══ MODELO DO CONTRATO ═══════════════════════════════════════════════════ */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="material-symbols-outlined text-primary">article</span>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-primary font-body">Modelo do Contrato</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {([
+              { id: "completo-formal" as const, label: "Completo Formal", desc: "Máxima proteção — ideal para clientes empresa ou serviços acima de R$ 5.000" },
+              { id: "executivo" as const, label: "Executivo", desc: "Profissional e direto — para serviços recorrentes ou clientes exigentes" },
+              { id: "simplificado" as const, label: "Simplificado", desc: "Simples e claro — para a maioria dos serviços do dia a dia" },
+              { id: "minimalista" as const, label: "Minimalista", desc: "Rápido e objetivo — para serviços pequenos ou clientes de confiança" },
+            ]).map(opt => (
+              <button key={opt.id} type="button" onClick={() => setTipoAtivo(opt.id)}
+                className={`p-4 rounded-2xl border text-left transition-all ${tipoAtivo === opt.id ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-outline-variant/20 hover:border-primary/50"}`}>
+                <h3 className="font-bold text-on-surface text-sm mb-1">{opt.label}</h3>
+                <p className="text-xs text-on-surface-variant leading-relaxed">{opt.desc}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* ══ PRESTADOR ═══════════════════════════════════════════════════════════ */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-2">
@@ -1175,28 +1197,6 @@ export default function Formulario({ categoria, categoriaCustom, initialData, on
                   <h3 className="font-bold text-on-surface text-sm">{opt.label}</h3>
                 </div>
                 <p className="text-[10px] text-on-surface-variant leading-relaxed">{opt.desc}</p>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* ══ MODELO DO CONTRATO ═══════════════════════════════════════════════════ */}
-        <div className="space-y-4 pt-4 border-t border-outline-variant/10">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="material-symbols-outlined text-primary">article</span>
-            <h2 className="text-xs font-bold uppercase tracking-widest text-primary font-body">Modelo do Contrato</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {([
-              { id: "completo-formal" as const, label: "Completo Formal", desc: "Todas as cláusulas, linguagem jurídica técnica" },
-              { id: "simplificado" as const, label: "Simplificado", desc: "Cláusulas essenciais, linguagem acessível" },
-              { id: "executivo" as const, label: "Executivo", desc: "Formato profissional compacto para negócios" },
-              { id: "minimalista" as const, label: "Minimalista", desc: "Versão enxuta para serviços de baixo valor" },
-            ]).map(opt => (
-              <button key={opt.id} type="button" onClick={() => setTipoAtivo(opt.id)}
-                className={`p-4 rounded-2xl border text-left transition-all ${tipoAtivo === opt.id ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-outline-variant/20 hover:border-primary/50"}`}>
-                <h3 className="font-bold text-on-surface text-sm mb-1">{opt.label}</h3>
-                <p className="text-xs text-on-surface-variant leading-relaxed">{opt.desc}</p>
               </button>
             ))}
           </div>
