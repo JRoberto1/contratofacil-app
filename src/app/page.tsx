@@ -256,60 +256,110 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Pricing Section (Mantida conforme o pedido original, sem alterar os preços) */}
+      {/* Pricing Section */}
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-4xl font-extrabold font-headline text-center text-primary mb-16">Planos que cabem no seu momento</h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <h2 className="text-4xl font-extrabold font-headline text-center text-primary mb-4">Planos que cabem no seu momento</h2>
+          <p className="text-center text-on-surface-variant font-body mb-16 max-w-xl mx-auto">Comece grátis e evolua conforme sua demanda. Sem fidelidade, cancele quando quiser.</p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-stretch">
+
             {/* Grátis */}
-            <div className="bg-surface-container-lowest p-8 rounded-2xl flex flex-col items-center text-center shadow-sm">
-              <span className="text-xs font-bold uppercase tracking-widest text-outline mb-4">Grátis</span>
-              <div className="mb-6">
+            <div className="bg-surface-container-lowest p-6 rounded-2xl flex flex-col shadow-sm border border-outline-variant/20">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-outline mb-3">Grátis</span>
+              <div className="mb-1">
                 <span className="text-3xl font-extrabold font-headline text-on-surface">R$ 0</span>
               </div>
-              <ul className="text-xs space-y-3 mb-8 text-on-surface-variant text-left w-full font-body">
-                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm text-[#3B6D11]">check</span> 2 Contratos/mês</li>
-                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm text-[#3B6D11]">check</span> Exportação PDF</li>
+              <p className="text-[11px] text-on-surface-variant mb-5 font-body">Sem cartão</p>
+              <ul className="text-xs space-y-2.5 mb-6 text-on-surface-variant font-body flex-1">
+                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[15px] text-[#3B6D11]">check</span>2 contratos/mês</li>
+                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[15px] text-[#3B6D11]">check</span>PDF profissional</li>
               </ul>
-              <Link href="/gerar" className="block w-full py-3 rounded-full bg-surface-container-highest text-on-surface font-bold text-sm mt-auto text-center hover:bg-surface-container transition-colors">Começar</Link>
+              <Link href="/gerar" className="block w-full py-2.5 rounded-full bg-surface-container-high text-on-surface font-bold text-sm text-center hover:bg-surface-container-highest transition-colors font-headline">Começar agora</Link>
             </div>
+
             {/* Avulso */}
-            <div className="bg-surface-container-lowest p-8 rounded-2xl flex flex-col items-center text-center shadow-xl border border-primary/20 relative transform md:scale-105 z-10">
-              <div className="absolute -top-3 px-4 py-1 bg-[#ff5a36] text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-sm">Populares</div>
-              <span className="text-xs font-bold uppercase tracking-widest text-primary mb-4">Avulso</span>
-              <div className="mb-6 flex items-start">
-                <span className="text-sm font-bold align-top mt-1 text-primary">R$</span>
-                <span className="text-4xl font-extrabold font-headline text-primary">4,90</span>
+            <div className="bg-surface-container-lowest p-6 rounded-2xl flex flex-col shadow-sm border border-outline-variant/20">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-outline mb-3">Avulso</span>
+              <div className="mb-1 flex items-baseline gap-1">
+                <span className="text-3xl font-extrabold font-headline text-on-surface">R$ 4,90</span>
+                <span className="text-xs text-on-surface-variant font-body">/contrato</span>
               </div>
-              <ul className="text-xs space-y-3 mb-8 text-on-surface-variant text-left w-full font-body">
-                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm text-[#3B6D11]">check</span> 1 Contrato único</li>
-                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm text-[#3B6D11]">check</span> Sem assinatura</li>
-                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm text-[#3B6D11]">check</span> Formato Word</li>
+              <p className="text-[11px] text-on-surface-variant mb-5 font-body">Pague só quando precisar</p>
+              <ul className="text-xs space-y-2.5 mb-6 text-on-surface-variant font-body flex-1">
+                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[15px] text-[#3B6D11]">check</span>Categorias ilimitadas</li>
+                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[15px] text-[#3B6D11]">check</span>PDF profissional</li>
               </ul>
-              <Link href="/gerar" className="block w-full py-3 rounded-full signature-gradient text-white font-bold text-sm mt-auto shadow-md hover:shadow-lg transition-all text-center hover:scale-[1.02]">Comprar</Link>
+              <Link href="/planos#avulso" className="block w-full py-2.5 rounded-full bg-surface-container-high text-on-surface font-bold text-sm text-center hover:bg-surface-container-highest transition-colors font-headline">Começar agora</Link>
             </div>
-            {/* Mensal */}
-            <div className="bg-surface-container-lowest p-8 rounded-2xl flex flex-col items-center text-center shadow-sm">
-              <span className="text-xs font-bold uppercase tracking-widest text-outline mb-4">Mensal</span>
-              <div className="mb-6">
-                <span className="text-3xl font-extrabold font-headline text-on-surface">R$ 19</span>
+
+            {/* Mensal — DESTAQUE */}
+            <div className="bg-primary p-6 rounded-2xl flex flex-col shadow-xl relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-[#ff5a36] text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-md whitespace-nowrap">⭐ Mais Popular</div>
+              <span className="text-[11px] font-bold uppercase tracking-widest text-white/70 mb-3 mt-2">Mensal</span>
+              <div className="mb-1 flex items-baseline gap-1">
+                <span className="text-3xl font-extrabold font-headline text-white">R$ 19</span>
+                <span className="text-xs text-white/70 font-body">/mês</span>
               </div>
-              <ul className="text-xs space-y-3 mb-8 text-on-surface-variant text-left w-full font-body">
-                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm text-[#3B6D11]">check</span> Contratos ilimitados</li>
-                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm text-[#3B6D11]">check</span> Cloud</li>
+              <p className="text-[11px] text-white/70 mb-5 font-body">Contratos ilimitados</p>
+              <ul className="text-xs space-y-2.5 mb-6 text-white/90 font-body flex-1">
+                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[15px] text-white">check</span>Uso ilimitado</li>
+                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[15px] text-white">check</span>Histórico completo</li>
+                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[15px] text-white">check</span>4 formatos de exportação</li>
               </ul>
-              <Link href="/planos" className="block w-full py-3 rounded-full bg-surface-container-highest text-on-surface font-bold text-sm mt-auto text-center hover:bg-surface-container transition-colors">Assinar</Link>
+              <Link href="/planos" className="block w-full py-2.5 rounded-full bg-white text-primary font-bold text-sm text-center hover:bg-surface-container-low transition-colors font-headline shadow-sm">Começar agora</Link>
             </div>
+
+            {/* Semestral */}
+            <div className="bg-surface-container-lowest p-6 rounded-2xl flex flex-col shadow-sm border border-outline-variant/20">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-outline mb-3">Semestral</span>
+              <div className="mb-1 flex items-baseline gap-1">
+                <span className="text-3xl font-extrabold font-headline text-on-surface">R$ 89</span>
+                <span className="text-xs text-on-surface-variant font-body">/6 meses</span>
+              </div>
+              <p className="text-[11px] text-[#3B6D11] font-bold mb-5 font-body">−22% · Economia real</p>
+              <ul className="text-xs space-y-2.5 mb-6 text-on-surface-variant font-body flex-1">
+                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[15px] text-[#3B6D11]">check</span>Todos os recursos Pro</li>
+                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[15px] text-[#3B6D11]">check</span>Contratos ilimitados</li>
+              </ul>
+              <Link href="/planos" className="block w-full py-2.5 rounded-full bg-surface-container-high text-on-surface font-bold text-sm text-center hover:bg-surface-container-highest transition-colors font-headline">Começar agora</Link>
+            </div>
+
             {/* Anual */}
-            <div className="bg-surface-container-lowest p-8 rounded-2xl flex flex-col items-center text-center shadow-sm">
-              <span className="text-xs font-bold uppercase tracking-widest text-outline mb-4">Anual</span>
-              <div className="mb-6">
-                <span className="text-3xl font-extrabold font-headline text-on-surface">R$ 149</span>
+            <div className="bg-surface-container-lowest p-6 rounded-2xl flex flex-col shadow-sm border border-outline-variant/20">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-outline mb-3">Anual</span>
+              <div className="mb-1 flex items-baseline gap-1">
+                <span className="text-3xl font-extrabold font-headline text-on-surface">R$ 159</span>
+                <span className="text-xs text-on-surface-variant font-body">/ano</span>
               </div>
-              <p className="text-[10px] text-on-surface-variant mb-6 font-bold uppercase">Economia de 35%</p>
-              <Link href="/planos" className="block w-full py-3 rounded-full bg-surface-container-highest text-on-surface font-bold text-sm mt-auto text-center hover:bg-surface-container transition-colors">Assinar</Link>
+              <p className="text-[11px] text-[#3B6D11] font-bold mb-5 font-body">Melhor custo-benefício</p>
+              <ul className="text-xs space-y-2.5 mb-6 text-on-surface-variant font-body flex-1">
+                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[15px] text-[#3B6D11]">check</span>Acesso Premium total</li>
+                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[15px] text-[#3B6D11]">check</span>Prioridade no suporte</li>
+              </ul>
+              <Link href="/planos" className="block w-full py-2.5 rounded-full bg-surface-container-high text-on-surface font-bold text-sm text-center hover:bg-surface-container-highest transition-colors font-headline">Começar agora</Link>
+            </div>
+
+          </div>
+
+          {/* Incluso em todos os planos pagos */}
+          <div className="mt-12 pt-10 border-t border-outline-variant/20">
+            <p className="text-center text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-6 font-label">Incluso em todos os planos pagos</p>
+            <div className="flex flex-wrap justify-center gap-6 md:gap-10">
+              {[
+                { icon: "history",          label: "Histórico completo" },
+                { icon: "picture_as_pdf",   label: "PDF Profissional" },
+                { icon: "description",      label: "Download em Word" },
+                { icon: "support_agent",    label: "Suporte por e-mail" },
+              ].map(({ icon, label }) => (
+                <div key={label} className="flex items-center gap-2 text-on-surface-variant">
+                  <span className="material-symbols-outlined text-[20px] text-primary">{icon}</span>
+                  <span className="text-xs font-medium font-body">{label}</span>
+                </div>
+              ))}
             </div>
           </div>
+
         </div>
       </section>
 
