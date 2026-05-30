@@ -63,6 +63,12 @@ export default function LoginPage() {
         setCarregando(false);
         return;
       }
+      // Boas-vindas fire-and-forget — não bloqueia o redirect
+      fetch("/api/boas-vindas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, nome: email.split("@")[0] }),
+      }).catch(() => null);
       // Novo cadastro → direto para /gerar (menos fricção, primeiro contrato)
       router.push("/gerar");
       return;

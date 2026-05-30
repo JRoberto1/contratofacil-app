@@ -46,8 +46,24 @@ export async function GET(request: NextRequest) {
       .eq("id", sessionData.user.id)
       .maybeSingle();
 
+    const isPrimeiroAcesso = !perfil;
+
+    if (isPrimeiroAcesso && process.env.RESEND_API_KEY) {
+      const user = sessionData.user;
+      const emailUsuario = user.email ?? "";
+      const nomeUsuario  = user.user_metadata?.full_name
+                        ?? user.user_metadata?.name
+                        ?? emailUsuario.split("@")[0];
+      // Fire-and-forget — não bloqueia o redirect
+      import("@/lib/email")
+        .then(({ enviarBoasVindas }) =>
+          enviarBoasVindas({ para: emailUsuario, nome: nomeUsuario })
+        )
+        .catch(() => null);
+    }
+
     // Sem perfil = primeiro acesso → /gerar; com perfil = login normal → dashboard
-    const destino = perfil ? "/meus-contratos" : "/gerar";
+    const destino = isPrimeiroAcesso ? "/gerar" : "/meus-contratos";
     return NextResponse.redirect(`${origin}${destino}`);
   }
 
