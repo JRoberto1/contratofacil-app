@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/";
+  const next = searchParams.get("next") ?? "/meus-contratos";
 
   if (!code) {
     return NextResponse.redirect(`${origin}/?erro=auth`);
@@ -31,13 +31,25 @@ export async function GET(request: NextRequest) {
     }
   );
 
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  const { data: sessionData, error } = await supabase.auth.exchangeCodeForSession(code);
 
   if (error) {
     console.error("[auth/callback]", error.message);
     return NextResponse.redirect(`${origin}/?erro=auth`);
   }
 
-  // Redireciona para a página de destino após login
+  // next=auto: detecta primeiro acesso Google verificando se perfil existe
+  if (next === "auto" && sessionData?.user) {
+    const { data: perfil } = await supabase
+      .from("perfis")
+      .select("id")
+      .eq("id", sessionData.user.id)
+      .maybeSingle();
+
+    // Sem perfil = primeiro acesso → /gerar; com perfil = login normal → dashboard
+    const destino = perfil ? "/meus-contratos" : "/gerar";
+    return NextResponse.redirect(`${origin}${destino}`);
+  }
+
   return NextResponse.redirect(`${origin}${next}`);
 }

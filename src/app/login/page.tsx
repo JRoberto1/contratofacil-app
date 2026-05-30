@@ -30,7 +30,8 @@ export default function LoginPage() {
     setErro(null);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      // O callback detecta se é primeiro acesso e redireciona para /gerar
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=auto` },
     });
     if (error) setErro(error.message);
   }
@@ -62,7 +63,8 @@ export default function LoginPage() {
         setCarregando(false);
         return;
       }
-      router.push("/meus-contratos");
+      // Novo cadastro → direto para /gerar (menos fricção, primeiro contrato)
+      router.push("/gerar");
       return;
     }
 
