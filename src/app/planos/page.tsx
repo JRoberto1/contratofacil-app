@@ -1,12 +1,40 @@
-import type { Metadata } from "next";
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Planos | ContratoFácil",
-  description: "Planos para MEIs e autônomos. Comece grátis ou escolha o plano ideal para o seu volume.",
-};
-
 export default function PlanosPage() {
+  const [loadingPlano, setLoadingPlano] = useState<string | null>(null);
+
+  async function handleCheckout(plano: string) {
+    setLoadingPlano(plano);
+    try {
+      const res = await fetch("/api/criar-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plano }),
+      });
+      const json = await res.json();
+
+      if (!res.ok) {
+        // Se não autenticado, redireciona para login
+        if (res.status === 401) { window.location.href = "/login"; return; }
+        throw new Error(json?.error?.message ?? "Erro ao iniciar checkout.");
+      }
+
+      const url: string = json?.data?.url ?? json?.url;
+      if (url) window.location.href = url;
+    } catch (e: unknown) {
+      alert(e instanceof Error ? e.message : "Erro ao processar. Tente novamente.");
+    } finally {
+      setLoadingPlano(null);
+    }
+  }
+
+  const btnBase = "block text-center w-full py-3 px-4 font-label text-sm font-semibold uppercase tracking-wider rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed";
+  const btnNeutro = `${btnBase} bg-surface-container-high text-on-secondary-container hover:bg-surface-container-highest`;
+  const btnDestaque = `${btnBase} bg-white text-primary hover:bg-surface-bright py-4 font-extrabold`;
+
   return (
     <>
       <main className="max-w-7xl mx-auto px-6 py-12 md:py-20">
@@ -37,7 +65,7 @@ export default function PlanosPage() {
                 </li>
               </ul>
             </div>
-            <Link href="/gerar" className="block text-center w-full py-3 px-4 bg-surface-container-high text-on-secondary-container font-label text-sm font-semibold uppercase tracking-wider rounded-lg hover:bg-surface-container-highest transition-colors">
+            <Link href="/gerar" className={btnNeutro}>
               Começar agora
             </Link>
           </div>
@@ -62,14 +90,17 @@ export default function PlanosPage() {
                 </li>
               </ul>
             </div>
-            <Link href="/gerar" className="block text-center w-full py-3 px-4 bg-surface-container-high text-on-secondary-container font-label text-sm font-semibold uppercase tracking-wider rounded-lg hover:bg-surface-container-highest transition-colors">
+            {/* Avulso: checkout acontece na tela de download */}
+            <Link href="/gerar" className={btnNeutro}>
               Começar agora
             </Link>
           </div>
 
           {/* Card 3: Mensal (DESTAQUE) */}
           <div className="signature-gradient p-8 rounded-lg flex flex-col justify-between text-white architectural-layer relative transform md:scale-105 z-10 shadow-xl">
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-secondary-container text-primary font-label text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full whitespace-nowrap flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">workspace_premium</span>MAIS POPULAR</div>
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-secondary-container text-primary font-label text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full whitespace-nowrap flex items-center gap-1">
+              <span className="material-symbols-outlined text-[14px]">workspace_premium</span>MAIS POPULAR
+            </div>
             <div>
               <h3 className="font-headline text-xl font-bold mb-2">Mensal</h3>
               <div className="flex items-baseline gap-1 mb-6">
@@ -92,9 +123,13 @@ export default function PlanosPage() {
                 </li>
               </ul>
             </div>
-            <Link href="/gerar" className="block text-center w-full py-4 px-4 bg-white text-primary font-label text-sm font-extrabold uppercase tracking-widest rounded-lg hover:bg-surface-bright transition-all active:scale-[0.98]">
-              Começar agora
-            </Link>
+            <button
+              onClick={() => handleCheckout("mensal")}
+              disabled={loadingPlano !== null}
+              className={btnDestaque}
+            >
+              {loadingPlano === "mensal" ? "Aguarde…" : "Começar agora"}
+            </button>
           </div>
 
           {/* Card 4: Semestral */}
@@ -119,9 +154,13 @@ export default function PlanosPage() {
                 </li>
               </ul>
             </div>
-            <Link href="/gerar" className="block text-center w-full py-3 px-4 bg-surface-container-high text-on-secondary-container font-label text-sm font-semibold uppercase tracking-wider rounded-lg hover:bg-surface-container-highest transition-colors">
-              Começar agora
-            </Link>
+            <button
+              onClick={() => handleCheckout("semestral")}
+              disabled={loadingPlano !== null}
+              className={btnNeutro}
+            >
+              {loadingPlano === "semestral" ? "Aguarde…" : "Começar agora"}
+            </button>
           </div>
 
           {/* Card 5: Anual */}
@@ -144,9 +183,13 @@ export default function PlanosPage() {
                 </li>
               </ul>
             </div>
-            <Link href="/gerar" className="block text-center w-full py-3 px-4 bg-surface-container-high text-on-secondary-container font-label text-sm font-semibold uppercase tracking-wider rounded-lg hover:bg-surface-container-highest transition-colors">
-              Começar agora
-            </Link>
+            <button
+              onClick={() => handleCheckout("anual")}
+              disabled={loadingPlano !== null}
+              className={btnNeutro}
+            >
+              {loadingPlano === "anual" ? "Aguarde…" : "Começar agora"}
+            </button>
           </div>
         </div>
 

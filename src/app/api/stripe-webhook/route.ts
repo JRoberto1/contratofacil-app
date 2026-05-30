@@ -53,13 +53,15 @@ export async function POST(req: NextRequest) {
 
       // 2. Atualizar perfil ou liberar contrato
       if (plano === 'avulso' && contratoId) {
-        // Libera somente um contrato específico
+        // Avulso: libera um contrato específico — não altera contratos_mes do perfil
         await supabaseAdmin.from('contratos').update({ pago: true, status: 'pago' }).eq('id', contratoId);
-      } else if (plano === 'mensal' || plano === 'anual') {
-        // Altera plano na tabela de perfis 
+      } else if (plano === 'mensal' || plano === 'semestral' || plano === 'anual') {
+        // Assinaturas: atualiza plano e libera cota ilimitada (999)
         await supabaseAdmin.from('perfis').update({
-          plano: plano,
-          contratos_mes: plano === 'anual' ? 30 : 5 // valores definidos por business logic
+          plano,
+          contratos_mes: 999,
+          contratos_usados_mes: 0,
+          periodo_reset: new Date().toISOString().slice(0, 10),
         }).eq('id', userId);
       }
 
