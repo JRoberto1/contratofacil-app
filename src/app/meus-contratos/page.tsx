@@ -24,7 +24,7 @@ export default async function MeusContratosPage() {
 
   const { data: perfil } = await supabase
     .from('perfis')
-    .select('contratos_mes, contratos_usados_mes')
+    .select('contratos_mes, contratos_usados_mes, periodo_reset')
     .eq('id', user.id)
     .single();
 
@@ -32,6 +32,8 @@ export default async function MeusContratosPage() {
   const cotaDisponivel = perfil
     ? Math.max(0, (perfil.contratos_mes ?? 2) - (perfil.contratos_usados_mes || 0))
     : 2;
+
+  const periodoReset: string | null = perfil?.periodo_reset ?? null;
 
   if (contratosError) {
     return (
@@ -82,7 +84,7 @@ export default async function MeusContratosPage() {
             </Link>
           </div>
         ) : (
-          <DashboardContratosLayout contratos={contratos || []} cotaDisponivel={cotaDisponivel} />
+          <DashboardContratosLayout contratos={contratos || []} cotaDisponivel={cotaDisponivel} periodoReset={periodoReset} />
         )}
       </div>
     </div>

@@ -17,6 +17,7 @@ function nomeCategoria(cat: string | null | undefined, catCustom: string | null 
 interface Props {
   contratos: Contrato[];
   cotaDisponivel: number;
+  periodoReset?: string | null;
 }
 
 function getAvatarParams(nome: string) {
@@ -43,7 +44,7 @@ function getStatusChip(status: string) {
   }
 }
 
-export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
+export function DashboardContratosLayout({ contratos, cotaDisponivel, periodoReset }: Props) {
   const router = useRouter();
   const supabase = createClient();
 
@@ -186,7 +187,7 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
 
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
         <div className="bg-surface-container-low rounded-2xl p-6 shadow-sm">
           <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">Total Concluídos</p>
           <p className="text-4xl font-headline font-extrabold text-primary">{totalGerados}</p>
@@ -199,6 +200,40 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
           <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">Rascunhos</p>
           <p className="text-4xl font-headline font-extrabold text-[#633806]">{totalRascunhos}</p>
         </div>
+
+        {/* Card de cota — muda de visual conforme disponibilidade */}
+        {cotaDisponivel <= 0 ? (
+          <div className="bg-[#fff3e0] rounded-2xl p-6 shadow-sm border border-[#e65100]/20 flex flex-col justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest text-[#e65100] mb-2">Contratos</p>
+              <p className="text-sm font-bold font-headline text-[#bf360c] leading-snug mb-1">
+                Limite atingido
+              </p>
+              {periodoReset && (
+                <p className="text-[11px] text-[#e65100]/80 font-body">
+                  Renova em {new Date(periodoReset).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })}
+                </p>
+              )}
+            </div>
+            <button
+              onClick={() => router.push('/planos')}
+              className="mt-3 text-[11px] font-bold text-white bg-[#e65100] px-3 py-1.5 rounded-full hover:bg-[#bf360c] transition-colors w-fit"
+            >
+              Ver planos
+            </button>
+          </div>
+        ) : cotaDisponivel === 1 ? (
+          <div className="bg-[#fffde7] rounded-2xl p-6 shadow-sm border border-[#f9a825]/30">
+            <p className="text-xs font-bold uppercase tracking-widest text-[#f57f17] mb-2">Contratos</p>
+            <p className="text-4xl font-headline font-extrabold text-[#f57f17]">{cotaDisponivel}</p>
+            <p className="text-[11px] text-[#f57f17]/80 font-body mt-1">Último contrato gratuito do mês</p>
+          </div>
+        ) : (
+          <div className="bg-surface-container-low rounded-2xl p-6 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">Disponíveis</p>
+            <p className="text-4xl font-headline font-extrabold text-[#3B6D11]">{cotaDisponivel}</p>
+          </div>
+        )}
       </div>
 
       {/* Pills Filter */}
