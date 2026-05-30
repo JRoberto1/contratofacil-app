@@ -8,10 +8,10 @@ import type { FormularioContrato, TipoContrato } from "@/types/contrato";
 import { ContratoPreview } from "./ContratoPreview";
 
 const tipos: { id: TipoContrato; label: string; descricao: string }[] = [
-  { id: "completo-formal", label: "Completo Formal",  descricao: "Máxima proteção — ideal para clientes empresa ou serviços acima de R$ 5.000" },
-  { id: "simplificado",    label: "Simplificado",     descricao: "Simples e claro — para a maioria dos serviços do dia a dia" },
-  { id: "executivo",       label: "Executivo",        descricao: "Profissional e direto — para serviços recorrentes ou clientes exigentes" },
-  { id: "minimalista",     label: "Minimalista",      descricao: "Rápido e objetivo — para serviços pequenos ou clientes de confiança" },
+  { id: "completo-formal", label: "Completo Formal", descricao: "Máxima proteção — ideal para clientes empresa ou serviços acima de R$ 5.000" },
+  { id: "executivo",       label: "Executivo",       descricao: "Profissional e direto — para serviços recorrentes ou clientes exigentes" },
+  { id: "simplificado",    label: "Simplificado",    descricao: "Simples e claro — para a maioria dos serviços do dia a dia" },
+  { id: "minimalista",     label: "Minimalista",     descricao: "Rápido e objetivo — para serviços pequenos ou clientes de confiança" },
 ];
 
 interface VisualizadorContratoProps {
@@ -387,22 +387,24 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
       </header>
 
       <section className="mb-12">
-        <div className="bg-surface-container-high p-1.5 rounded-full inline-flex flex-wrap gap-1 md:gap-2">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="material-symbols-outlined text-primary">article</span>
+          <h2 className="text-xs font-bold uppercase tracking-widest text-primary font-body">Modelo do Contrato</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {tipos.map(({ id, label, descricao }) => (
             <button
               key={id}
+              type="button"
               onClick={() => trocarTipo(id)}
-              title={descricao}
-              className={`px-6 py-2.5 rounded-full text-sm transition-all font-body ${
+              className={`p-4 rounded-2xl border text-left transition-all ${
                 tipoAtivo === id
-                  ? "bg-surface-container-lowest text-primary font-bold shadow-sm"
-                  : "text-slate-600 font-medium hover:bg-surface-container"
+                  ? "border-primary bg-primary/5 ring-1 ring-primary"
+                  : "border-outline-variant/20 hover:border-primary/50"
               }`}
             >
-              <span className="block">{label}</span>
-              {tipoAtivo === id && (
-                <span className="block text-[10px] font-normal text-on-surface-variant mt-0.5 max-w-[160px] leading-tight">{descricao}</span>
-              )}
+              <h3 className="font-bold text-on-surface text-sm mb-1">{label}</h3>
+              <p className="text-xs text-on-surface-variant leading-relaxed">{descricao}</p>
             </button>
           ))}
         </div>
