@@ -21,11 +21,12 @@ export async function GET() {
     // Libera o perfil promovendo-o a um plano alto e vários contratos disponíveis
     const { error } = await supabase
       .from('perfis')
-      .update({
+      .upsert({
+        id: user.id,
         plano: 'anual',
-        contratos_mes: 999
-      })
-      .eq('id', user.id);
+        contratos_mes: 999,
+        contratos_usados_mes: 0,
+      }, { onConflict: 'id' });
 
     if (error) {
       return NextResponse.json({ error: 'Erro ao dar upgrade no perfil.', detail: error }, { status: 500 });

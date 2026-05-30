@@ -107,11 +107,6 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
   const handleDuplicar = async () => {
     if (!modalContrato) return;
 
-    if (cotaDisponivel <= 0) {
-      router.push('/planos');
-      return;
-    }
-
     try {
       setIsDuplicating(true);
       const res = await fetch('/api/duplicar-contrato', {

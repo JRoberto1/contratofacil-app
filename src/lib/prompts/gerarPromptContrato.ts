@@ -232,6 +232,15 @@ CLÁUSULAS ESPECÍFICAS DA CATEGORIA
 ${clausulaCategoria}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REGRA CRÍTICA DE ESTRUTURA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Todo o conteúdo do contrato DEVE estar dentro de seções com título (## NOME DA SEÇÃO).
+- É PROIBIDO adicionar parágrafos, frases ou blocos de texto soltos após a última seção formal do contrato.
+- A última seção do contrato deve ser sempre "DO ACEITE E VALIDADE JURÍDICA" ou "DO FORO DE ELEIÇÃO".
+- Após o separador --- final, NENHUM conteúdo adicional deve aparecer.
+- NÃO repetir cláusulas, parágrafos ou blocos de assinatura fora das seções definidas.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 FORMATO DE SAÍDA
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 - Use # apenas para o título principal
