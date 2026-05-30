@@ -90,10 +90,15 @@ export default function PlanosPage() {
                 </li>
               </ul>
             </div>
-            {/* Avulso: checkout acontece na tela de download */}
-            <Link href="/gerar" className={btnNeutro}>
-              Começar agora
-            </Link>
+            {/* Avulso: checkout acontece na tela de download do PDF */}
+            <div className="space-y-2">
+              <Link href="/gerar" className={btnNeutro}>
+                Gerar contrato
+              </Link>
+              <p className="text-[11px] text-on-surface-variant text-center font-body leading-snug">
+                O pagamento de R$&nbsp;4,90 é cobrado na hora de baixar o PDF.
+              </p>
+            </div>
           </div>
 
           {/* Card 3: Mensal (DESTAQUE) */}

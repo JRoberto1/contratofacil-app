@@ -44,6 +44,7 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
   const [gerandoLink, setGerandoLink] = useState(false);
   const [linkCopiado, setLinkCopiado] = useState(false);
   const [showCotaModal, setShowCotaModal] = useState(false);
+  const [checkoutAvulso, setCheckoutAvulso] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
@@ -349,10 +350,29 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
                   Ver planos
                 </button>
                 <button
-                  onClick={() => router.push('/planos#avulso')}
-                  className="w-full border-2 border-primary/30 text-primary font-bold py-3 rounded-full font-headline hover:border-primary/60 hover:bg-primary/5 transition-all"
+                  disabled={checkoutAvulso}
+                  onClick={async () => {
+                    if (!contratoId) { router.push('/planos#avulso'); return; }
+                    setCheckoutAvulso(true);
+                    try {
+                      const res = await fetch('/api/criar-checkout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ plano: 'avulso', contratoId }),
+                      });
+                      const json = await res.json();
+                      if (res.status === 401) { router.push('/login'); return; }
+                      const url: string = json?.data?.url ?? json?.url;
+                      if (url) window.location.href = url;
+                    } catch {
+                      router.push('/planos#avulso');
+                    } finally {
+                      setCheckoutAvulso(false);
+                    }
+                  }}
+                  className="w-full border-2 border-primary/30 text-primary font-bold py-3 rounded-full font-headline hover:border-primary/60 hover:bg-primary/5 transition-all disabled:opacity-50"
                 >
-                  Contrato avulso — R$&nbsp;4,90
+                  {checkoutAvulso ? 'Aguarde…' : 'Contrato avulso — R$ 4,90'}
                 </button>
                 <button
                   onClick={() => setShowCotaModal(false)}
