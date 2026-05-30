@@ -88,15 +88,6 @@ export async function POST(req: NextRequest) {
     const formulario = f as unknown as FormularioContrato;
     const tipoContrato = tipo as TipoContrato;
 
-    // ── [DEBUG TEMP] Diagnóstico tipoPessoa ──────────────────────────────────
-    const _cpfPrestador = formulario.prestador.cpfCnpj ?? '';
-    const _cpfCliente   = formulario.cliente.cpfCnpj   ?? '';
-    console.log('[debug] prestador.cpfCnpj:', _cpfPrestador,
-      '| digits:', _cpfPrestador.replace(/\D/g,'').length,
-      '| tipoPessoa recebido:', formulario.prestador.tipoPessoa);
-    console.log('[debug] cliente.cpfCnpj:', _cpfCliente,
-      '| digits:', _cpfCliente.replace(/\D/g,'').length,
-      '| tipoPessoa recebido:', formulario.cliente.tipoPessoa);
     // ── Monta inputs para os prompts ─────────────────────────────────────────
     const categoriaInfo = categorias[(formulario.categoria as CategoriaSlug)] || categorias['other'];
     const categoriaDisplay = formulario.categoriaCustom || categoriaInfo.title;

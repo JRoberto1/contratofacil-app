@@ -335,16 +335,21 @@ export default function Formulario({ categoria, categoriaCustom, initialData, on
         break;
     }
 
+    const resolverTipo = (cpfCnpj: string): "PF" | "PJ" =>
+      cpfCnpj.replace(/\D/g, '').length > 11 ? 'PJ' : 'PF';
+
     const normalizedData = {
       ...formData,
       prestador: {
         ...formData.prestador,
+        tipoPessoa: resolverTipo(formData.prestador.cpfCnpj),
         nomeCompleto: capitalizeWords(formData.prestador.nomeCompleto),
         cidade: capitalizeWords(formData.prestador.cidade),
         estado: normalizeState(formData.prestador.estado),
       },
       cliente: {
         ...formData.cliente,
+        tipoPessoa: resolverTipo(formData.cliente.cpfCnpj),
         nomeRazaoSocial: capitalizeWords(formData.cliente.nomeRazaoSocial),
         cidade: capitalizeWords(formData.cliente.cidade),
         estado: normalizeState(formData.cliente.estado),
