@@ -13,7 +13,9 @@ export function gerarSystemPrompt(categoria: string, modelo: string): string {
   * Suspensão de acesso/serviço por inadimplência superior a 15 dias
   * Prazo de aprovação pelo cliente (5 dias úteis — silêncio = aprovado)
   * Limitação de danos ao valor total pago pelo contratante
-  * Vedação à cessão e subcontratação sem anuência prévia
+  * Vedação à cessão: o CONTRATADO não pode ceder ou subcontratar os serviços
+    sem anuência prévia e por escrito do CONTRATANTE; o CONTRATANTE não pode
+    ceder este contrato a terceiros sem anuência prévia do CONTRATADO
   * Força maior com prazo de comunicação de 3 dias úteis (art. 393 CC)
   * Confidencialidade por 2 anos após encerramento
   * Tentativa de resolução amigável antes do judiciário
@@ -221,6 +223,8 @@ Independente de categoria ou modelo, todo contrato DEVE conter:
    [SE modo = Física + Testemunhas]
    → Assinado em 2 vias com 2 testemunhas, constituindo título
    executivo extrajudicial nos termos do art. 784, III do CPC
+   ATENÇÃO: Esta cláusula deve aparecer UMA ÚNICA VEZ no contrato.
+   Não repetir ao final do documento nem em nenhuma outra seção.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 CLÁUSULAS ESPECÍFICAS DA CATEGORIA
