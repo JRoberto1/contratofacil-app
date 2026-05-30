@@ -26,6 +26,9 @@ export async function POST(req: NextRequest) {
     const cotaDisponivel = perfil
       ? (perfil.contratos_mes ?? 2) - (perfil.contratos_usados_mes || 0)
       : 2;
+    console.log('[duplicar] user.id:', user.id);
+    console.log('[duplicar] perfil encontrado:', perfil);
+    console.log('[duplicar] cotaDisponivel:', cotaDisponivel);
     if (cotaDisponivel <= 0) {
       return err("QUOTA_EXCEEDED", "Cota de contratos esgotada.", 403);
     }
