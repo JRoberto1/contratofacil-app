@@ -11,10 +11,10 @@ export default function Home() {
   };
 
   const previewPills = [
-    "Completo Formal",
-    "Executivo",
-    "Simplificado",
-    "Minimalista",
+    { label: "Completo Formal", desc: "Máxima proteção — ideal para clientes empresa ou serviços acima de R$ 5.000" },
+    { label: "Executivo",       desc: "Profissional e direto — para serviços recorrentes ou clientes exigentes" },
+    { label: "Simplificado",    desc: "Simples e claro — para a maioria dos serviços do dia a dia" },
+    { label: "Minimalista",     desc: "Rápido e objetivo — para serviços pequenos ou clientes de confiança" },
   ];
 
   const professions = [
@@ -212,23 +212,22 @@ export default function Home() {
             <div className="absolute bottom-0 left-0 right-0 h-[80px]" style={{ background: "linear-gradient(to bottom, transparent, white)" }}></div>
           </div>
           
-          {/* Scrollable Horizontal Pills */}
-          <div className="mt-10 overflow-x-auto w-full max-w-4xl no-scrollbar pb-4 flex justify-start md:justify-center">
-            <div className="flex gap-3 px-4 min-w-max">
-              {previewPills.map((pill, index) => (
-                <button
-                  key={index}
-                  onClick={() => setActivePreviewLayout(index)}
-                  className={`px-6 py-3 rounded-full font-bold font-body text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-                    activePreviewLayout === index 
-                      ? "bg-primary text-white shadow-md" 
-                      : "bg-surface-container-high text-on-surface-variant hover:bg-outline-variant hover:text-on-surface"
-                  }`}
-                >
-                  {pill}
-                </button>
-              ))}
-            </div>
+          {/* Grid de modelos com descrição */}
+          <div className="mt-10 w-full max-w-2xl grid grid-cols-2 gap-3">
+            {previewPills.map((pill, index) => (
+              <button
+                key={index}
+                onClick={() => setActivePreviewLayout(index)}
+                className={`p-4 rounded-2xl border text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                  activePreviewLayout === index
+                    ? "border-primary bg-primary/5 ring-1 ring-primary"
+                    : "border-outline-variant/20 bg-white hover:border-primary/50"
+                }`}
+              >
+                <h3 className="font-bold text-on-surface text-sm mb-1 font-headline">{pill.label}</h3>
+                <p className="text-xs text-on-surface-variant leading-relaxed font-body">{pill.desc}</p>
+              </button>
+            ))}
           </div>
         </div>
       </section>
