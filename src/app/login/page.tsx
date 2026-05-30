@@ -149,7 +149,7 @@ export default function LoginPage() {
                 <div className="flex justify-between items-center mb-2">
                   <label className="block text-sm font-bold font-headline text-on-surface">Senha</label>
                   {modo === "login" && (
-                    <a href="#" className="font-body text-[11px] font-bold text-primary uppercase tracking-wider hover:underline">Esqueci</a>
+                    <Link href="/auth/esqueci-senha" className="font-body text-[11px] font-bold text-primary uppercase tracking-wider hover:underline">Esqueci</Link>
                   )}
                 </div>
                 <div className="relative">
