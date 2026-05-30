@@ -146,6 +146,11 @@ export interface Contrato {
   downloads_count: number;
   criado_em?: string;
   updated_at?: string;
+  // Aceite eletrônico
+  token_aceite?: string;
+  token_expira_em?: string;
+  aceite_em?: string;
+  aceite_status?: 'pendente' | 'aceito' | 'expirado';
 }
 
 export type PlanoAssinatura = "gratis" | "avulso" | "mensal" | "semestral" | "anual";

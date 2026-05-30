@@ -39,6 +39,9 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
   const [emailPara, setEmailPara] = useState("");
   const [enviandoEmail, setEnviandoEmail] = useState(false);
   const [erroEmail, setErroEmail] = useState<string | null>(null);
+  const [linkAceite, setLinkAceite] = useState<string | null>(null);
+  const [gerandoLink, setGerandoLink] = useState(false);
+  const [linkCopiado, setLinkCopiado] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
@@ -254,6 +257,36 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
     }
   };
 
+  const gerarLinkAceite = async () => {
+    if (!contratoId) return;
+    setGerandoLink(true);
+    try {
+      const res = await fetch("/api/gerar-link-aceite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contratoId }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json?.error?.message ?? "Erro ao gerar link.");
+      const link: string = json?.data?.link;
+      setLinkAceite(link);
+      await navigator.clipboard.writeText(link).catch(() => null);
+      setLinkCopiado(true);
+      setTimeout(() => setLinkCopiado(false), 4000);
+    } catch (e: unknown) {
+      setErro(e instanceof Error ? e.message : "Erro ao gerar link de aceite.");
+    } finally {
+      setGerandoLink(false);
+    }
+  };
+
+  const copiarLink = async () => {
+    if (!linkAceite) return;
+    await navigator.clipboard.writeText(linkAceite).catch(() => null);
+    setLinkCopiado(true);
+    setTimeout(() => setLinkCopiado(false), 2500);
+  };
+
   return (
     <div className="w-full pb-12 animate-in fade-in duration-500 relative">
       {/* Toast — download */}
@@ -397,6 +430,49 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
                 <span className="material-symbols-outlined">mail</span>
                 Enviar por E-mail
               </button>
+
+              {/* Botão de link de aceite — somente para modo eletrônico com contrato salvo */}
+              {formulario?.modoAssinatura === "eletronica" && contratoId && (
+                <div className="border-t border-surface-container pt-4 mt-2 space-y-3">
+                  <button
+                    onClick={gerarLinkAceite}
+                    disabled={gerandoLink || carregando || !textoAtual}
+                    className="w-full bg-surface-container text-primary py-4 rounded-full font-bold flex items-center justify-center gap-3 hover:bg-surface-container-high transition-colors font-body disabled:opacity-50"
+                  >
+                    <span className={`material-symbols-outlined ${gerandoLink ? "animate-spin" : ""}`}>
+                      {gerandoLink ? "refresh" : "link"}
+                    </span>
+                    {gerandoLink ? "Gerando link…" : "Gerar link de aceite"}
+                  </button>
+
+                  {linkAceite && (
+                    <div className="space-y-2 animate-in fade-in duration-200">
+                      {linkCopiado && (
+                        <p className="text-xs text-[#2e7d32] font-bold text-center flex items-center justify-center gap-1">
+                          <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                          Link copiado! Envie para o cliente via WhatsApp ou e-mail.
+                        </p>
+                      )}
+                      <div className="flex gap-2">
+                        <input
+                          readOnly
+                          value={linkAceite}
+                          className="flex-1 text-xs bg-surface-container border border-outline-variant/40 rounded-xl px-3 py-2 text-on-surface-variant font-body truncate"
+                        />
+                        <button
+                          onClick={copiarLink}
+                          title="Copiar link"
+                          className="px-3 py-2 bg-primary/10 text-primary rounded-xl hover:bg-primary/20 transition-colors shrink-0"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">
+                            {linkCopiado ? "done" : "content_copy"}
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {user && (
                 <button

@@ -263,12 +263,24 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
                     {item.criado_em ? new Date(item.criado_em).toLocaleDateString('pt-BR') : '-'}
                   </td>
                   <td className="p-5">
-                    <span 
-                      className="px-3 py-1 text-[11px] uppercase tracking-wider font-bold rounded-md" 
-                      style={{ backgroundColor: chip.bg, color: chip.text }}
-                    >
-                      {chip.label}
-                    </span>
+                    <div className="flex flex-col gap-1 items-start">
+                      <span
+                        className="px-3 py-1 text-[11px] uppercase tracking-wider font-bold rounded-md"
+                        style={{ backgroundColor: chip.bg, color: chip.text }}
+                      >
+                        {chip.label}
+                      </span>
+                      {item.aceite_status === 'aceito' && (
+                        <span className="px-2 py-0.5 text-[10px] uppercase tracking-wider font-bold rounded-md bg-[#e8f5e9] text-[#2e7d32]">
+                          ✓ Assinado
+                        </span>
+                      )}
+                      {item.aceite_status === 'pendente' && item.token_aceite && (
+                        <span className="px-2 py-0.5 text-[10px] uppercase tracking-wider font-bold rounded-md bg-[#fff8e1] text-[#e65100]">
+                          ⏳ Aguardando aceite
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="p-5 text-center">
                     <button 
@@ -309,14 +321,26 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
                     <p className="text-xs text-on-surface-variant">{item.referencia || 'N/A'}</p>
                   </div>
                 </div>
-                <span 
-                  className="px-2 py-1 text-[10px] uppercase tracking-wider font-bold rounded-md shrink-0" 
-                  style={{ backgroundColor: chip.bg, color: chip.text }}
-                >
-                  {chip.label}
-                </span>
+                <div className="flex flex-col gap-1 items-end shrink-0">
+                  <span
+                    className="px-2 py-1 text-[10px] uppercase tracking-wider font-bold rounded-md"
+                    style={{ backgroundColor: chip.bg, color: chip.text }}
+                  >
+                    {chip.label}
+                  </span>
+                  {item.aceite_status === 'aceito' && (
+                    <span className="px-2 py-0.5 text-[10px] uppercase tracking-wider font-bold rounded-md bg-[#e8f5e9] text-[#2e7d32]">
+                      ✓ Assinado
+                    </span>
+                  )}
+                  {item.aceite_status === 'pendente' && item.token_aceite && (
+                    <span className="px-2 py-0.5 text-[10px] uppercase tracking-wider font-bold rounded-md bg-[#fff8e1] text-[#e65100]">
+                      ⏳ Aguardando
+                    </span>
+                  )}
+                </div>
               </div>
-              
+
               <div className="text-sm text-on-surface-variant flex flex-col gap-1 mb-4">
                 <p><span className="font-medium text-on-surface">Categoria:</span> {nomeCategoria(item.categoria, item.categoria_custom)}</p>
                 <p><span className="font-medium text-on-surface">Valor:</span> {item.servico_valor ? `R$ ${(item.servico_valor / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '-'}</p>

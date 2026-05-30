@@ -16,7 +16,7 @@ export default async function MeusContratosPage() {
 
   const { data: contratos, error: contratosError } = await supabase
     .from('contratos')
-    .select('id, referencia, usuario_id, categoria, categoria_custom, cliente_nome, prestador_nome, servico_valor, status, conteudo, tipo, imutavel, downloads_count, criado_em')
+    .select('id, referencia, usuario_id, categoria, categoria_custom, cliente_nome, prestador_nome, servico_valor, status, conteudo, tipo, imutavel, downloads_count, criado_em, token_aceite, token_expira_em, aceite_em, aceite_status')
     .eq('usuario_id', user.id)
     .order('criado_em', { ascending: false });
 
