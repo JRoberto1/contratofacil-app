@@ -1,14 +1,14 @@
 {
   "$schema": "https://bifrost.harness/session-schema/v1",
-  "session_id": "",
-  "timestamp": "",
-  "runtime": "",
-  "harness_version": "3.0.0",
-  "task_summary": "",
-  "context_level_at_close": "",
+  "session_id": "2026-05-30T17:49:33Z",
+  "timestamp": "2026-05-30T17:49:33Z",
+  "runtime": "claude-code",
+  "harness_version": "unknown",
+  "task_summary": "feat: PDF anexado no email de aceite para cliente e prestador",
+  "context_level_at_close": "L2",
   "open_items": [],
   "decisions_made": [],
-  "files_modified": [],
-  "next_action": "",
+  "files_modified": ["src/app/api/registrar-aceite/route.ts","src/lib/email.ts"],
+  "next_action": "Continuar desenvolvimento — ver último commit para contexto",
   "hashimoto_events": []
 }
