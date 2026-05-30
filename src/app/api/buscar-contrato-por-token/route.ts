@@ -2,10 +2,10 @@ import { NextRequest } from "next/server";
 import { createClient as createServerClient } from "@supabase/supabase-js";
 import { ok, err } from "@/lib/api-response";
 
-// Usa anon key + RLS policy "Leitura pública por token de aceite"
-function getAnonClient() {
+// Service role bypassa RLS — necessário para leitura pública por token
+function getAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
   return createServerClient(url, key, { auth: { persistSession: false } });
 }
 
@@ -14,13 +14,17 @@ export async function GET(req: NextRequest) {
     const token = req.nextUrl.searchParams.get("token");
     if (!token) return err("VALIDATION_ERROR", "Token obrigatório.", 400);
 
-    const supabase = getAnonClient();
+    console.log("[buscar-token] token recebido:", token);
+
+    const supabase = getAdminClient();
 
     const { data: contrato, error } = await supabase
       .from("contratos")
       .select("id, referencia, conteudo, prestador_nome, cliente_nome, aceite_status, aceite_em, token_expira_em")
       .eq("token_aceite", token)
       .single();
+
+    console.log("[buscar-token] resultado:", contrato, error);
 
     if (error || !contrato) {
       return err("NOT_FOUND", "Link inválido ou contrato não encontrado.", 404);
