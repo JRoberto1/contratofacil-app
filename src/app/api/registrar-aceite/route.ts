@@ -24,10 +24,10 @@ export async function POST(req: NextRequest) {
     const { token } = parsed.data;
     const supabase = getAdminClient();
 
-    // Busca contrato pelo token
+    // Busca contrato pelo token (inclui conteudo para gerar PDF no email)
     const { data: contrato, error: fetchError } = await supabase
       .from("contratos")
-      .select("id, referencia, prestador_nome, cliente_nome, cliente_email, aceite_status, token_expira_em, usuario_id")
+      .select("id, referencia, prestador_nome, cliente_nome, cliente_email, aceite_status, token_expira_em, usuario_id, conteudo")
       .eq("token_aceite", token)
       .single();
 
@@ -74,6 +74,23 @@ export async function POST(req: NextRequest) {
     if (process.env.RESEND_API_KEY) {
       const { enviarNotificacaoAceite, enviarConfirmacaoAceiteCliente } = await import("@/lib/email");
 
+      // Gera PDF em memória para anexar nos dois e-mails
+      // Se falhar, prossegue sem anexo — o aceite já foi registrado
+      let pdfBuffer: Buffer | undefined;
+      const conteudoContrato = (contrato as typeof contrato & { conteudo?: string }).conteudo;
+      if (conteudoContrato) {
+        try {
+          const { gerarPDFBuffer } = await import("@/lib/pdf");
+          pdfBuffer = Buffer.from(await gerarPDFBuffer(conteudoContrato));
+        } catch (pdfErr) {
+          console.error("[registrar-aceite] falha ao gerar PDF para email:", pdfErr);
+        }
+      }
+
+      const anexoPDF = pdfBuffer
+        ? [{ content: pdfBuffer, filename: `contrato-${contrato.referencia}.pdf`, content_type: "application/pdf" }]
+        : undefined;
+
       // E-mail para o prestador — busca o e-mail dele pelo usuario_id
       const { data: perfil } = await supabase
         .from("perfis")
@@ -90,6 +107,7 @@ export async function POST(req: NextRequest) {
           aceiteEm,
           ip,
           userAgent,
+          attachments:   anexoPDF,
         }).catch(() => null); // fire-and-forget
       }
 
@@ -98,11 +116,12 @@ export async function POST(req: NextRequest) {
 
       if (emailCliente) {
         enviarConfirmacaoAceiteCliente({
-          paraCliente:  emailCliente,
-          nomeCliente:  contrato.cliente_nome   ?? "Cliente",
+          paraCliente:   emailCliente,
+          nomeCliente:   contrato.cliente_nome   ?? "Cliente",
           nomePrestador: contrato.prestador_nome ?? "Prestador",
-          referencia:   contrato.referencia,
+          referencia:    contrato.referencia,
           aceiteEm,
+          attachments:   anexoPDF,
         }).catch(() => null); // fire-and-forget
       }
     }

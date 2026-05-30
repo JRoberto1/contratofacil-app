@@ -187,6 +187,7 @@ export async function enviarNotificacaoAceite({
   aceiteEm,
   ip,
   userAgent,
+  attachments,
 }: {
   paraPrestador: string;
   nomePrestador: string;
@@ -195,6 +196,7 @@ export async function enviarNotificacaoAceite({
   aceiteEm: Date;
   ip: string;
   userAgent: string;
+  attachments?: { content: Buffer; filename: string; content_type: string }[];
 }) {
   const dataFormatada = aceiteEm.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
   const horaFormatada = aceiteEm.toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" });
@@ -251,6 +253,7 @@ export async function enviarNotificacaoAceite({
     to: paraPrestador,
     subject: `✅ Contrato ${referencia} aceito por ${nomeCliente}`,
     html: templateBase("Contrato aceito!", corpo),
+    ...(attachments && { attachments }),
   });
 }
 
@@ -263,12 +266,14 @@ export async function enviarConfirmacaoAceiteCliente({
   nomePrestador,
   referencia,
   aceiteEm,
+  attachments,
 }: {
   paraCliente: string;
   nomeCliente: string;
   nomePrestador: string;
   referencia: string;
   aceiteEm: Date;
+  attachments?: { content: Buffer; filename: string; content_type: string }[];
 }) {
   const dataFormatada = aceiteEm.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
   const horaFormatada = aceiteEm.toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" });
@@ -308,6 +313,7 @@ export async function enviarConfirmacaoAceiteCliente({
     to: paraCliente,
     subject: `Confirmação — você aceitou o contrato ${referencia}`,
     html: templateBase("Confirmação de aceite", corpo),
+    ...(attachments && { attachments }),
   });
 }
 
