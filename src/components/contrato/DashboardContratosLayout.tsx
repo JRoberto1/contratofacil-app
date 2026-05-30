@@ -52,6 +52,7 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
   const [showConfirmDuplicate, setShowConfirmDuplicate] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isDuplicating, setIsDuplicating] = useState(false);
+  const [showCotaModal, setShowCotaModal] = useState(false);
 
   // Slugs únicos para filtro; labels em português para exibição
   const categoriasUnicas = Array.from(new Set(contratos.map(c => c.categoria_custom || c.categoria))).filter(Boolean) as string[];
@@ -117,17 +118,24 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
 
       const resJson = await res.json();
       if (!res.ok) {
+        const code = resJson.error?.code ?? resJson.code;
+        const msg: string = resJson.error?.message ?? resJson.message ?? resJson.error ?? "";
+        if (code === "QUOTA_EXCEEDED" || msg.toLowerCase().includes("cota")) {
+          setShowCotaModal(true);
+          return;
+        }
         if (resJson.redirect) {
           router.push(resJson.redirect);
           return;
         }
-        throw new Error(resJson.error?.message || resJson.error || "Erro de fetch");
+        throw new Error(msg || "Erro de fetch");
       }
 
       const novoId = resJson.data?.novoId ?? resJson.novoId;
       router.push(`/contrato/${novoId}`);
-    } catch (error: any) {
-      alert("Falha ao duplicar: " + error.message);
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : "Erro desconhecido";
+      alert("Falha ao duplicar: " + msg);
     } finally {
       setIsDuplicating(false);
       setShowConfirmDuplicate(false);
@@ -136,7 +144,47 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel }: Props) {
 
   return (
     <div className="max-w-6xl mx-auto w-full pb-20 fade-in animate-in duration-500">
-      
+
+      {/* ── Modal: Cota Esgotada ───────────────────────────────────── */}
+      {showCotaModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+          <div className="bg-surface rounded-3xl shadow-2xl p-8 max-w-sm w-full animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex flex-col items-center text-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+                <span className="material-symbols-outlined text-primary text-3xl">workspace_premium</span>
+              </div>
+              <h2 className="text-xl font-extrabold font-headline text-on-surface">
+                Limite do plano gratuito atingido
+              </h2>
+              <p className="text-sm text-on-surface-variant leading-relaxed">
+                Você usou seus <strong>2 contratos gratuitos</strong> deste mês. Para continuar gerando contratos, escolha uma das opções:
+              </p>
+              <div className="flex flex-col gap-3 w-full mt-2">
+                <button
+                  onClick={() => router.push('/planos')}
+                  className="w-full signature-gradient text-white font-bold py-3 rounded-full font-headline shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all"
+                >
+                  Ver planos
+                </button>
+                <button
+                  onClick={() => router.push('/planos#avulso')}
+                  className="w-full border-2 border-primary/30 text-primary font-bold py-3 rounded-full font-headline hover:border-primary/60 hover:bg-primary/5 transition-all"
+                >
+                  Contrato avulso — R$&nbsp;4,90
+                </button>
+                <button
+                  onClick={() => setShowCotaModal(false)}
+                  className="text-sm text-on-surface-variant hover:text-on-surface transition-colors mt-1"
+                >
+                  Agora não
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+
       {/* Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         <div className="bg-surface-container-low rounded-2xl p-6 shadow-sm">
