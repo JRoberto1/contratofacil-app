@@ -7,12 +7,12 @@ import Stripe from "stripe";
 
 const PRECOS: Record<string, { unit_amount: number; name: string; description: string; recurring?: Stripe.PriceCreateParams.Recurring }> = {
   avulso: {
-    unit_amount: parseInt(process.env.PRECO_AVULSO_CENTAVOS || '1990'),
+    unit_amount: parseInt(process.env.PRECO_AVULSO_CENTAVOS || '490'),
     name: "Contrato Avulso",
     description: "Acesso permanente a este contrato específico em PDF e edição.",
   },
   mensal: {
-    unit_amount: parseInt(process.env.PRECO_MENSAL_CENTAVOS || '3990'),
+    unit_amount: parseInt(process.env.PRECO_MENSAL_CENTAVOS || '1900'),
     name: "Plano Mensal - ContratoFácil",
     description: "Gere contratos ilimitados sem custos extras.",
     recurring: { interval: "month" },
@@ -24,7 +24,7 @@ const PRECOS: Record<string, { unit_amount: number; name: string; description: s
     recurring: { interval: "month", interval_count: 6 },
   },
   anual: {
-    unit_amount: parseInt(process.env.PRECO_ANUAL_CENTAVOS || '29990'),
+    unit_amount: parseInt(process.env.PRECO_ANUAL_CENTAVOS || '15900'),
     name: "Plano Anual - ContratoFácil",
     description: "Acesso ilimitado e o melhor custo-benefício.",
     recurring: { interval: "year" },
