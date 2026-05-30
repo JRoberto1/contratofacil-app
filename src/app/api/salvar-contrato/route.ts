@@ -42,6 +42,7 @@ export async function POST(req: NextRequest) {
       prestador_doc: formulario.prestador.cpfCnpj,
       cliente_nome: formulario.cliente.nomeRazaoSocial,
       cliente_doc: formulario.cliente.cpfCnpj,
+      cliente_email: formulario.cliente.email || null,
       servico_descricao: formulario.servico.descricao,
       servico_valor: valorCentavos,
       servico_prazo: formulario.servico.prazoEntrega,

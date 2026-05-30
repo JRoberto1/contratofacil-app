@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     // Busca contrato pelo token
     const { data: contrato, error: fetchError } = await supabase
       .from("contratos")
-      .select("id, referencia, prestador_nome, cliente_nome, aceite_status, token_expira_em, usuario_id")
+      .select("id, referencia, prestador_nome, cliente_nome, cliente_email, aceite_status, token_expira_em, usuario_id")
       .eq("token_aceite", token)
       .single();
 
@@ -93,14 +93,8 @@ export async function POST(req: NextRequest) {
         }).catch(() => null); // fire-and-forget
       }
 
-      // E-mail para o cliente — busca o email salvo no contrato (campo cliente_email se existir)
-      const { data: contratoCompleto } = await supabase
-        .from("contratos")
-        .select("cliente_email")
-        .eq("id", contrato.id)
-        .single();
-
-      const emailCliente: string | null = (contratoCompleto as { cliente_email?: string } | null)?.cliente_email ?? null;
+      // E-mail para o cliente — usa cliente_email salvo no contrato
+      const emailCliente: string | null = (contrato as typeof contrato & { cliente_email?: string }).cliente_email ?? null;
 
       if (emailCliente) {
         enviarConfirmacaoAceiteCliente({
