@@ -34,6 +34,7 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
   const [textoEditado, setTextoEditado] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [processandoDownload, setProcessandoDownload] = useState(false);
+  const [processandoWord, setProcessandoWord] = useState(false);
   const [fezModificacoes, setFezModificacoes] = useState(false);
   const [modalEmail, setModalEmail] = useState(false);
   const [emailPara, setEmailPara] = useState("");
@@ -205,6 +206,36 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
       setErro(e.message);
     } finally {
       setProcessandoDownload(false);
+    }
+  };
+
+  const baixarWord = async () => {
+    if (!conteudo[tipoAtivo]) return;
+    setProcessandoWord(true);
+    setErro(null);
+    try {
+      const res = await fetch("/api/gerar-word", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ conteudo: conteudo[tipoAtivo] }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error ?? "Erro ao gerar Word.");
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `contrato-${tipoAtivo}.docx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (e: unknown) {
+      setErro(e instanceof Error ? e.message : "Erro ao gerar Word.");
+    } finally {
+      setProcessandoWord(false);
     }
   };
 
@@ -422,6 +453,17 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
                 </span>
                 {processandoDownload ? 'Processando...' : 'Baixar em PDF'}
               </button>
+              <button
+                onClick={baixarWord}
+                disabled={carregando || processandoWord || !textoAtual}
+                className="w-full bg-surface-container text-primary py-4 rounded-full font-bold flex items-center justify-center gap-3 hover:bg-surface-container-high transition-colors font-body disabled:opacity-50"
+              >
+                <span className={`material-symbols-outlined ${processandoWord ? "animate-spin" : ""}`}>
+                  {processandoWord ? "refresh" : "description"}
+                </span>
+                {processandoWord ? "Gerando Word…" : "Baixar em Word"}
+              </button>
+
               <button
                 onClick={() => { setModalEmail(true); setErroEmail(null); }}
                 disabled={carregando || !textoAtual}
