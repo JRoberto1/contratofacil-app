@@ -17,19 +17,7 @@ export async function POST(req: NextRequest) {
 
     const { contratoId } = parsed.data;
 
-    const { data: perfil } = await supabase
-      .from('perfis')
-      .select('contratos_mes, contratos_usados_mes')
-      .eq('id', user.id)
-      .single();
-
-    const cotaDisponivel = perfil
-      ? (perfil.contratos_mes ?? 2) - (perfil.contratos_usados_mes || 0)
-      : 2;
-    if (cotaDisponivel <= 0) {
-      return err("QUOTA_EXCEEDED", "Cota de contratos esgotada.", 403);
-    }
-
+    // Duplicar não consome cota — cota é verificada apenas no download do PDF
     const { data: original, error: origError } = await supabase
       .from('contratos')
       .select('*')
@@ -73,11 +61,6 @@ export async function POST(req: NextRequest) {
       console.error("[duplicar-contrato]", insertError.message);
       return err("DB_ERROR", "Falha ao criar rascunho cópia.", 500);
     }
-
-    await supabase
-      .from('perfis')
-      .update({ contratos_usados_mes: (perfil?.contratos_usados_mes || 0) + 1 })
-      .eq('id', user.id);
 
     return ok({ novoId: novoContrato.id }, 201);
   } catch (error: unknown) {

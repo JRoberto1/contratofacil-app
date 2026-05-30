@@ -43,6 +43,7 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
   const [linkAceite, setLinkAceite] = useState<string | null>(null);
   const [gerandoLink, setGerandoLink] = useState(false);
   const [linkCopiado, setLinkCopiado] = useState(false);
+  const [showCotaModal, setShowCotaModal] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
@@ -182,7 +183,12 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
       
       if (!resGerar.ok) {
         const errorData = await resGerar.json().catch(() => ({}));
-        throw new Error(errorData.error || "Erro ao gerar arquivo PDF.");
+        const code = errorData?.error?.code ?? errorData?.code ?? "";
+        if (code === "QUOTA_EXCEEDED") {
+          setShowCotaModal(true);
+          return;
+        }
+        throw new Error(errorData?.error?.message ?? errorData.error ?? "Erro ao gerar arquivo PDF.");
       }
 
       // 3. Renderiza o Blob para Download NATIVO no Navegador
@@ -320,6 +326,46 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
 
   return (
     <div className="w-full pb-12 animate-in fade-in duration-500 relative">
+
+      {/* ── Modal: Cota Esgotada ──────────────────────────────────────────── */}
+      {showCotaModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+          <div className="bg-surface rounded-3xl shadow-2xl p-8 max-w-sm w-full animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex flex-col items-center text-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+                <span className="material-symbols-outlined text-primary text-3xl">workspace_premium</span>
+              </div>
+              <h2 className="text-xl font-extrabold font-headline text-on-surface">
+                Limite do plano gratuito atingido
+              </h2>
+              <p className="text-sm text-on-surface-variant leading-relaxed">
+                Você usou seus <strong>2 contratos gratuitos</strong> deste mês. Para continuar, escolha uma opção:
+              </p>
+              <div className="flex flex-col gap-3 w-full mt-2">
+                <button
+                  onClick={() => router.push('/planos')}
+                  className="w-full signature-gradient text-white font-bold py-3 rounded-full font-headline shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all"
+                >
+                  Ver planos
+                </button>
+                <button
+                  onClick={() => router.push('/planos#avulso')}
+                  className="w-full border-2 border-primary/30 text-primary font-bold py-3 rounded-full font-headline hover:border-primary/60 hover:bg-primary/5 transition-all"
+                >
+                  Contrato avulso — R$&nbsp;4,90
+                </button>
+                <button
+                  onClick={() => setShowCotaModal(false)}
+                  className="text-sm text-on-surface-variant hover:text-on-surface transition-colors mt-1"
+                >
+                  Agora não
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Toast — download */}
       <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-[#e6f4ea] text-[#137333] px-6 py-4 rounded-xl shadow-[0_10px_40px_rgba(19,115,51,0.2)] transition-all duration-300 border border-[#137333]/20 ${mostrarToast ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
         <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
