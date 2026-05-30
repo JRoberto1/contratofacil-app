@@ -25,12 +25,7 @@ interface VisualizadorContratoProps {
 export default function VisualizadorContrato({ formulario, tipoInicial = "completo-formal", onBack, contratoId, conteudoDB }: VisualizadorContratoProps) {
   const router = useRouter();
   const [tipoAtivo, setTipoAtivo] = useState<TipoContrato>(tipoInicial);
-  const [conteudo, setConteudo] = useState<Record<TipoContrato, string>>(() => {
-    if (conteudoDB) {
-      return { [tipoInicial]: conteudoDB } as any;
-    }
-    return {} as Record<TipoContrato, string>;
-  });
+  const [conteudo, setConteudo] = useState<Record<TipoContrato, string>>({} as Record<TipoContrato, string>);
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [mostrarToast, setMostrarToast] = useState(false);
@@ -61,12 +56,18 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
   }, [supabase]);
 
   const gerarTipo = useCallback(async (tipo: TipoContrato) => {
-    if (conteudo[tipo] || conteudoDB) return;
+    // Usa conteudoDB apenas para o tipo inicial (contrato já salvo no banco).
+    // Para outros tipos, sempre chama a IA — conteudoDB não se aplica.
+    if (conteudo[tipo]) return;
+    if (tipo === tipoInicial && conteudoDB) {
+      setConteudo((prev) => ({ ...prev, [tipo]: conteudoDB }));
+      return;
+    }
     setCarregando(true);
     setErro(null);
     try {
       if (!formulario) throw new Error("Faltando formulário para geração.");
-      
+
       const res = await fetch("/api/gerar-contrato", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -80,7 +81,7 @@ export default function VisualizadorContrato({ formulario, tipoInicial = "comple
     } finally {
       setCarregando(false);
     }
-  }, [formulario, conteudo]);
+  }, [formulario, conteudo, tipoInicial, conteudoDB]);
 
   useEffect(() => {
     gerarTipo(tipoInicial);
