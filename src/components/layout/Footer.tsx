@@ -1,10 +1,11 @@
 "use client";
 
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 export default function Footer() {
   const pathname = usePathname();
-  
+
   if (pathname === '/login') return null;
 
   return (
@@ -17,7 +18,7 @@ export default function Footer() {
         </div>
         <div className="flex gap-8">
           <a href="#" className="text-xs font-medium font-body text-slate-500 hover:text-primary transition-opacity">Termos</a>
-          <a href="#" className="text-xs font-medium font-body text-slate-500 hover:text-primary transition-opacity">Privacidade</a>
+          <Link href="/politica-de-privacidade" className="text-xs font-medium font-body text-slate-500 hover:text-primary transition-opacity">Privacidade</Link>
           <a href="#" className="text-xs font-medium font-body text-slate-500 hover:text-primary transition-opacity">Ajuda</a>
         </div>
       </div>
