@@ -14,8 +14,6 @@ export async function GET(req: NextRequest) {
     const token = req.nextUrl.searchParams.get("token");
     if (!token) return err("VALIDATION_ERROR", "Token obrigatório.", 400);
 
-    console.log("[buscar-token] token recebido:", token);
-
     const supabase = getAdminClient();
 
     const { data: contrato, error } = await supabase
@@ -23,8 +21,6 @@ export async function GET(req: NextRequest) {
       .select("id, referencia, conteudo, prestador_nome, cliente_nome, aceite_status, aceite_em, token_expira_em")
       .eq("token_aceite", token)
       .single();
-
-    console.log("[buscar-token] resultado:", contrato, error);
 
     if (error || !contrato) {
       return err("NOT_FOUND", "Link inválido ou contrato não encontrado.", 404);
