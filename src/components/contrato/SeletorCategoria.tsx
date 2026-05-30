@@ -1,18 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { gruposCategorias, categorias } from "@/lib/categorias";
 
 interface SeletorCategoriaProps {
   onSelect: (categoria: string, customText?: string) => void;
+  categoriaInicial?: string;
 }
 
-export default function SeletorCategoria({ onSelect }: SeletorCategoriaProps) {
+export default function SeletorCategoria({ onSelect, categoriaInicial }: SeletorCategoriaProps) {
   const [busca, setBusca] = useState("");
   const [activeGroup, setActiveGroup] = useState<string | null>(null);
-  
+
   const [showCustom, setShowCustom] = useState(false);
   const [customRole, setCustomRole] = useState("");
+
+  // Pré-seleciona categoria quando vinda via URL
+  useEffect(() => {
+    if (!categoriaInicial) return;
+    const slug = categoriaInicial.toLowerCase();
+
+    // Se for 'other' ou 'outros' → abre campo customizado
+    if (slug === "other" || slug === "outros") {
+      setShowCustom(true);
+      return;
+    }
+
+    // Se o slug existe nas categorias → seleciona diretamente
+    if (categorias[slug as keyof typeof categorias]) {
+      onSelect(slug);
+      return;
+    }
+
+    // Se o slug é um grupo → abre o grupo
+    const grupo = gruposCategorias.find(g => g.id === slug);
+    if (grupo) {
+      setActiveGroup(slug);
+    }
+  // Executa apenas na montagem
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSelectSub = (id: string) => {
     if (id === "other" || id === "outros") {

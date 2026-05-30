@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Formulario from "@/components/contrato/Formulario";
 import VisualizadorContrato from "@/components/contrato/VisualizadorContrato";
 import SeletorCategoria from "@/components/contrato/SeletorCategoria";
 
-export default function GerarPage() {
+function GerarPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const categoriaParam = searchParams.get("categoria") ?? undefined;
   const [step, setStep] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isOther, setIsOther] = useState(false);
@@ -127,7 +129,8 @@ export default function GerarPage() {
 
       {step === 0 && (
         <main className="flex-1 max-w-4xl mx-auto w-full px-4 md:px-6 pb-24 pt-4">
-          <SeletorCategoria 
+          <SeletorCategoria
+            categoriaInicial={categoriaParam}
             onSelect={(catId, customText) => {
               setSelectedCategory(catId);
               if (catId === "other") {
@@ -153,5 +156,17 @@ export default function GerarPage() {
         </main>
       )}
     </div>
+  );
+}
+
+export default function GerarPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <span className="material-symbols-outlined text-primary text-4xl animate-spin">refresh</span>
+      </div>
+    }>
+      <GerarPageInner />
+    </Suspense>
   );
 }

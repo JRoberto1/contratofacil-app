@@ -18,18 +18,18 @@ export default function Home() {
   ];
 
   const professions = [
-    { icon: "photo_camera", name: "Fotógrafo" },
-    { icon: "videocam", name: "Videomaker" },
-    { icon: "palette", name: "Designer Gráfico" },
-    { icon: "code", name: "Desenvolvedor" },
-    { icon: "smartphone", name: "Social Media" },
-    { icon: "edit", name: "Redator" },
-    { icon: "electrical_services", name: "Eletricista" },
-    { icon: "format_paint", name: "Pintor" },
-    { icon: "construction", name: "Pedreiro" },
-    { icon: "content_cut", name: "Cabeleireiro" },
-    { icon: "fitness_center", name: "Personal Trainer" },
-    { icon: "restaurant", name: "Chef" },
+    { icon: "photo_camera",       name: "Fotógrafo",        slug: "photo" },
+    { icon: "videocam",           name: "Videomaker",       slug: "videomaker" },
+    { icon: "palette",            name: "Designer Gráfico", slug: "designer" },
+    { icon: "code",               name: "Desenvolvedor",    slug: "dev" },
+    { icon: "smartphone",         name: "Social Media",     slug: "socialmedia" },
+    { icon: "edit",               name: "Redator",          slug: "copywriter" },
+    { icon: "electrical_services",name: "Eletricista",      slug: "eletricista" },
+    { icon: "format_paint",       name: "Pintor",           slug: "pintor" },
+    { icon: "construction",       name: "Pedreiro",         slug: "maintenance" },
+    { icon: "content_cut",        name: "Cabeleireiro",     slug: "cabeleireiro" },
+    { icon: "fitness_center",     name: "Personal Trainer", slug: "personaltrainer" },
+    { icon: "restaurant",         name: "Chef",             slug: "other" },
   ];
 
   return (
@@ -161,7 +161,7 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {professions.map((prof) => (
-              <Link key={prof.name} href="/gerar" className="flex items-center justify-center gap-3 bg-white p-5 rounded-2xl shadow-sm hover:bg-primary-fixed/30 border-2 border-transparent hover:border-primary active:scale-95 transition-all group outline-none">
+              <Link key={prof.name} href={`/gerar?categoria=${prof.slug}`} className="flex items-center justify-center gap-3 bg-white p-5 rounded-2xl shadow-sm hover:bg-primary-fixed/30 border-2 border-transparent hover:border-primary active:scale-95 transition-all group outline-none">
                 <span className="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">{prof.icon}</span>
                 <span className="font-bold font-headline text-on-surface text-sm">{prof.name}</span>
               </Link>
