@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { DashboardContratosLayout } from "@/components/contrato/DashboardContratosLayout";
+
+export const metadata: Metadata = {
+  title: "Meus Contratos | ContratoFácil",
+  description: "Gerencie seus contratos, acompanhe aceites e baixe seus documentos.",
+};
 
 export const dynamic = 'force-dynamic';
 
@@ -67,19 +73,20 @@ export default async function MeusContratosPage() {
 
         {!contratos || contratos.length === 0 ? (
           /* Empty State */
-          <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-3xl p-12 text-center flex flex-col items-center justify-center min-h-[400px] shadow-sm">
-            <div className="w-20 h-20 bg-secondary-container/30 text-primary rounded-full flex flex-col items-center justify-center mb-6 shadow-sm">
-              <span className="material-symbols-outlined text-[40px]" style={{ fontVariationSettings: "'FILL' 1" }}>draft</span>
+          <div className="flex flex-col items-center justify-center text-center min-h-[420px] gap-6">
+            <div className="w-20 h-20 rounded-full bg-primary/8 flex items-center justify-center">
+              <span className="material-symbols-outlined text-primary text-[40px]">description</span>
             </div>
-            <h2 className="text-2xl md:text-3xl font-bold text-on-surface mb-4 font-headline">Você ainda não tem contratos gerados.</h2>
-            <p className="text-on-surface-variant font-body mb-10 max-w-md mx-auto leading-relaxed">
-              Nossa inteligência artificial cria as cláusulas perfeitas para sua área de atuação em menos de 2 minutos. Que tal começar agora?
-            </p>
+            <div className="space-y-3 max-w-sm">
+              <h2 className="text-2xl font-bold font-headline text-on-surface">Você ainda não tem contratos</h2>
+              <p className="text-on-surface-variant font-body leading-relaxed">
+                Gere seu primeiro contrato em menos de 5 minutos — sem precisar saber nada de direito.
+              </p>
+            </div>
             <Link
               href="/gerar"
-              className="signature-gradient text-white rounded-full px-8 py-4 font-bold font-headline shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2"
+              className="signature-gradient text-white rounded-full px-10 py-4 font-bold font-headline shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all text-lg"
             >
-              <span className="material-symbols-outlined">add_circle</span>
               Gerar meu primeiro contrato
             </Link>
           </div>

@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Planos | ContratoFácil",
+  description: "Planos para MEIs e autônomos. Comece grátis ou escolha o plano ideal para o seu volume.",
+};
 
 export default function PlanosPage() {
   return (

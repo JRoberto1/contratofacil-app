@@ -2,19 +2,35 @@ import Link from 'next/link';
 
 export default function NotFound() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-4 bg-surface animate-in fade-in duration-500">
-      <p className="text-xs font-bold uppercase tracking-widest text-primary mb-4 font-headline">
-        Página não encontrada
-      </p>
-      <h1 className="text-3xl md:text-5xl font-headline font-extrabold mb-4 text-on-surface text-center">
-        Ops, essa página não existe
-      </h1>
-      <p className="text-on-surface-variant font-body mb-8 text-center max-w-md leading-relaxed">
-        O link pode estar errado, ou o contrato que você está procurando não existe ou foi removido.
-      </p>
-      <Link href="/meus-contratos" className="signature-gradient text-white px-8 py-4 rounded-full font-bold font-headline shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all">
-        Voltar para a Segurança
-      </Link>
-    </main>
+    <div className="min-h-screen bg-surface flex flex-col items-center justify-center px-6 text-center gap-6 animate-in fade-in duration-500">
+      <div className="w-24 h-24 rounded-full bg-primary/8 flex items-center justify-center mb-2">
+        <span className="material-symbols-outlined text-primary text-5xl">search_off</span>
+      </div>
+
+      <div className="space-y-3 max-w-sm">
+        <h1 className="text-4xl font-extrabold font-headline text-primary">404</h1>
+        <h2 className="text-xl font-bold font-headline text-on-surface">Página não encontrada</h2>
+        <p className="text-on-surface-variant font-body leading-relaxed">
+          O endereço que você acessou não existe ou foi removido.
+        </p>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-3 mt-2">
+        <Link
+          href="/"
+          className="signature-gradient text-white font-bold px-8 py-3 rounded-full shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all font-headline"
+        >
+          Ir para o início
+        </Link>
+        <Link
+          href="/gerar"
+          className="border-2 border-primary/30 text-primary font-bold px-8 py-3 rounded-full hover:border-primary/60 hover:bg-primary/5 transition-all font-headline"
+        >
+          Gerar contrato
+        </Link>
+      </div>
+
+      <p className="text-xs text-outline font-body mt-4">ContratoFácil — Um produto FlowIQ</p>
+    </div>
   );
 }
