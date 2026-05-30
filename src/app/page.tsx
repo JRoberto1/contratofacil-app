@@ -11,10 +11,10 @@ export default function Home() {
   };
 
   const previewPills = [
-    "Completo + Formal",
-    "Resumido + Formal",
-    "Completo + Dia a Dia",
-    "Resumido + Dia a Dia",
+    "Completo Formal",
+    "Executivo",
+    "Simplificado",
+    "Minimalista",
   ];
 
   const professions = [
