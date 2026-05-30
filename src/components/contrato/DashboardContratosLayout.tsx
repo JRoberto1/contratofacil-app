@@ -18,6 +18,7 @@ interface Props {
   contratos: Contrato[];
   cotaDisponivel: number;
   periodoReset?: string | null;
+  plano?: string | null;
 }
 
 function getAvatarParams(nome: string) {
@@ -44,7 +45,7 @@ function getStatusChip(status: string) {
   }
 }
 
-export function DashboardContratosLayout({ contratos, cotaDisponivel, periodoReset }: Props) {
+export function DashboardContratosLayout({ contratos, cotaDisponivel, periodoReset, plano }: Props) {
   const router = useRouter();
   const supabase = createClient();
 
@@ -54,6 +55,27 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel, periodoRes
   const [isDownloading, setIsDownloading] = useState(false);
   const [isDuplicating, setIsDuplicating] = useState(false);
   const [showCotaModal, setShowCotaModal] = useState(false);
+  const [abrindoPortal, setAbrindoPortal] = useState(false);
+
+  const handlePortalAssinatura = async () => {
+    setAbrindoPortal(true);
+    try {
+      const res = await fetch('/api/portal-assinatura', { method: 'POST' });
+      const json = await res.json();
+      if (!res.ok) {
+        alert(json?.error?.message ?? "Não foi possível abrir o portal. Tente novamente.");
+        return;
+      }
+      const url: string = json?.url;
+      if (url) window.location.href = url;
+    } catch {
+      alert("Erro ao conectar com o portal de assinatura.");
+    } finally {
+      setAbrindoPortal(false);
+    }
+  };
+
+  const planoAssinatura = plano === 'mensal' || plano === 'semestral' || plano === 'anual';
 
   // Slugs únicos para filtro; labels em português para exibição
   const categoriasUnicas = Array.from(new Set(contratos.map(c => c.categoria_custom || c.categoria))).filter(Boolean) as string[];
@@ -185,6 +207,22 @@ export function DashboardContratosLayout({ contratos, cotaDisponivel, periodoRes
         </div>
       )}
 
+
+      {/* Botão gerenciar assinatura — só para planos pagos recorrentes */}
+      {planoAssinatura && (
+        <div className="flex justify-end mb-6">
+          <button
+            onClick={handlePortalAssinatura}
+            disabled={abrindoPortal}
+            className="flex items-center gap-2 text-sm font-bold text-on-surface-variant border border-outline-variant/40 px-4 py-2 rounded-full hover:bg-surface-container hover:text-on-surface transition-all disabled:opacity-50 font-label"
+          >
+            <span className="material-symbols-outlined text-[18px]">
+              {abrindoPortal ? 'refresh' : 'settings'}
+            </span>
+            {abrindoPortal ? 'Abrindo portal…' : 'Gerenciar assinatura'}
+          </button>
+        </div>
+      )}
 
       {/* Metrics Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">

@@ -30,7 +30,7 @@ export default async function MeusContratosPage() {
 
   const { data: perfil } = await supabase
     .from('perfis')
-    .select('contratos_mes, contratos_usados_mes, periodo_reset')
+    .select('contratos_mes, contratos_usados_mes, periodo_reset, plano')
     .eq('id', user.id)
     .single();
 
@@ -40,6 +40,7 @@ export default async function MeusContratosPage() {
     : 2;
 
   const periodoReset: string | null = perfil?.periodo_reset ?? null;
+  const plano: string | null = perfil?.plano ?? null;
 
   if (contratosError) {
     return (
@@ -91,7 +92,7 @@ export default async function MeusContratosPage() {
             </Link>
           </div>
         ) : (
-          <DashboardContratosLayout contratos={contratos || []} cotaDisponivel={cotaDisponivel} periodoReset={periodoReset} />
+          <DashboardContratosLayout contratos={contratos || []} cotaDisponivel={cotaDisponivel} periodoReset={periodoReset} plano={plano} />
         )}
       </div>
     </div>

@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
         status: 'aprovado',
         metodo: session.payment_method_types[0],
         stripe_session_id: session.id,
+        stripe_customer_id: typeof session.customer === 'string' ? session.customer : (session.customer?.id ?? null),
         idempotency_key: session.id,
       }], { onConflict: 'idempotency_key', ignoreDuplicates: true });
 
