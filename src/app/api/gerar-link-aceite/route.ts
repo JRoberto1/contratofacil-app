@@ -17,18 +17,24 @@ export async function POST(req: NextRequest) {
     if (!user) return err("UNAUTHORIZED", "Não autorizado.", 401);
 
     const body = await req.json();
+    console.log("[gerar-link] body:", body);
+    console.log("[gerar-link] user:", user?.id);
+
     const parsed = Schema.safeParse(body);
     if (!parsed.success) return err("VALIDATION_ERROR", parsed.error.issues[0]?.message ?? "Dados inválidos", 422);
 
     const { contratoId } = parsed.data;
 
     // Verifica que o contrato pertence ao usuário
+    // Nota: modo_assinatura não é persistido na tabela contratos — validação feita no frontend
     const { data: contrato, error: fetchError } = await supabase
       .from("contratos")
-      .select("id, modo_assinatura")
+      .select("id")
       .eq("id", contratoId)
       .eq("usuario_id", user.id)
       .single();
+
+    console.log("[gerar-link] contrato:", contrato, "fetchError:", fetchError?.message);
 
     if (fetchError || !contrato) {
       return err("NOT_FOUND", "Contrato não encontrado.", 404);
