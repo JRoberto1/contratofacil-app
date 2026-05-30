@@ -161,10 +161,10 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {professions.map((prof) => (
-              <button key={prof.name} className="flex items-center justify-center gap-3 bg-white p-5 rounded-2xl shadow-sm hover:bg-primary-fixed/30 active:border-primary active:border-2 border-2 border-transparent transition-all group outline-none">
+              <Link key={prof.name} href="/gerar" className="flex items-center justify-center gap-3 bg-white p-5 rounded-2xl shadow-sm hover:bg-primary-fixed/30 border-2 border-transparent hover:border-primary active:scale-95 transition-all group outline-none">
                 <span className="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">{prof.icon}</span>
                 <span className="font-bold font-headline text-on-surface text-sm">{prof.name}</span>
-              </button>
+              </Link>
             ))}
             <Link href="/gerar" className="flex items-center justify-center gap-3 bg-surface-container-low p-5 rounded-2xl border-2 border-dashed border-outline-variant hover:border-primary hover:bg-surface-container transition-all group outline-none">
               <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">more_horiz</span>
