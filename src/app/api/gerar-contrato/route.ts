@@ -207,7 +207,6 @@ export async function POST(req: NextRequest) {
       throw groqError;
     }
 
-    console.log('[gerar-contrato] tamanho do conteudo gerado:', conteudo.length);
     const alertas = validarContrato(conteudo, formulario);
 
     if (contratoId) {

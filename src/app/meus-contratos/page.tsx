@@ -20,9 +20,7 @@ export default async function MeusContratosPage() {
     .eq('usuario_id', user.id)
     .order('criado_em', { ascending: false });
 
-  if (contratosError) {
-    console.error("ERRO [meus-contratos] select contratos:", contratosError);
-  }
+  // contratosError é tratado na UI abaixo — sem log em produção
 
   const { data: perfil } = await supabase
     .from('perfis')
